@@ -37,6 +37,8 @@ export interface PartyMember {
   combat_power: number | null;
   item_level: number | null;
   server_name: string | null;
+  /** Character portrait URL from the API (roster `profile_image`); null when not provided. */
+  profile_image: string | null;
   /** Manually managed guild raid role. */
   role: PartyRole | null;
   /** Admin's comment / nickname for the player (roster "notes"); "" when unset. */

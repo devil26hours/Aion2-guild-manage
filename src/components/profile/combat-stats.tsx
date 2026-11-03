@@ -28,7 +28,7 @@ function Group({
 }) {
   return (
     <div className="border border-steel/10 bg-ink/40">
-      <h3 className="flex items-center gap-2 border-b border-steel/10 px-3 py-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">
+      <h3 className="flex items-center gap-2 border-b border-steel/10 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
         <Icon className="size-3.5 text-gold/80" />
         {title}
       </h3>
@@ -56,7 +56,7 @@ function Vital({ label, value, color }: { label: string; value: number; color: s
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <span className="text-[0.65rem] font-semibold tracking-[0.18em] text-steel uppercase">{label}</span>
+        <span className="text-3xs font-semibold tracking-[0.18em] text-steel uppercase">{label}</span>
         <span className="font-heading text-lg font-bold text-foreground tabular-nums">{formatNumber(value)}</span>
       </div>
       <div className="mt-1 h-2 border border-steel/15 bg-ink p-px">

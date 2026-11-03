@@ -10,7 +10,7 @@ export function ServerIndicator({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 border border-steel/20 bg-ink/60 px-2.5 py-1 text-[0.65rem] font-medium tracking-[0.2em] text-steel uppercase backdrop-blur-sm",
+        "inline-flex items-center gap-2 border border-steel/20 bg-ink/60 px-2.5 py-1 text-3xs font-medium tracking-[0.2em] text-steel uppercase backdrop-blur-sm",
         className,
       )}
     >

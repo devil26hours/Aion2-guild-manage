@@ -22,7 +22,7 @@ function Row({
   return (
     <div className="border border-steel/10 bg-ink/50 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-steel uppercase">{label}</p>
+        <p className="text-3xs font-semibold tracking-[0.18em] text-steel uppercase">{label}</p>
         {previous !== null && <DeltaChip delta={delta} />}
       </div>
       <div className="mt-1.5 flex items-baseline gap-2 tabular-nums">
@@ -40,7 +40,7 @@ function Row({
           {formatNumber(current)}
         </span>
       </div>
-      <div className="mt-1 flex justify-between text-[0.6rem] tracking-wider text-steel/50 uppercase">
+      <div className="mt-1 flex justify-between text-4xs tracking-wider text-steel/50 uppercase">
         <span>Previous</span>
         <span>Current</span>
       </div>
@@ -91,7 +91,7 @@ export function ProgressionPreview({
             current={current.gear_score}
             delta={progression.gearScoreDelta}
           />
-          <p className="pt-1 text-[0.7rem] text-steel/60">
+          <p className="pt-1 text-2xs text-steel/60">
             {previous ? (
               <>
                 Previous snapshot <RelativeTime iso={previous.captured_at} /> · current{" "}

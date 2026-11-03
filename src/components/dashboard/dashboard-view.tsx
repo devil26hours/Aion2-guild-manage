@@ -302,7 +302,7 @@ export function DashboardView() {
                         <span className={cn("ml-1 tabular-nums", e.delta_il > 0 ? "text-[#9af0b3]" : "text-[#f0a596]")}>({formatSigned(e.delta_il)})</span>
                       )}
                     </span>
-                    {e.first && <span className="border border-steel/25 px-1 text-[0.6rem] tracking-wider text-steel uppercase">{t("First snapshot")}</span>}
+                    {e.first && <span className="border border-steel/25 px-1 text-4xs tracking-wider text-steel uppercase">{t("First snapshot")}</span>}
                     <RelativeTime iso={e.captured_at} className="ml-auto text-xs text-steel/70" />
                   </li>
                 ))}

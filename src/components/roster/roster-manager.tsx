@@ -64,7 +64,7 @@ type Notice = { tone: "success" | "info" | "error"; text: string; id: number };
 type Busy = "refresh" | "role" | "remove" | "comment";
 let noticeSeq = 0;
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
 const actionBtn =
   "flex size-8 items-center justify-center border border-transparent text-steel/70 transition-colors outline-none hover:border-steel/20 focus-visible:border-arcane/50 disabled:opacity-40";
 const UNKNOWN = "Unknown";
@@ -381,7 +381,7 @@ export function RosterManager() {
               <div className="relative overflow-x-auto">
                 <table className="w-full min-w-[64rem] text-sm" data-testid="roster-table">
                   <thead>
-                    <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
+                    <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
                       <th scope="col" className="sticky left-0 z-10 bg-ink-raised py-3 pr-3 pl-4 font-medium sm:pl-5">{t("Character")}</th>
                       <th scope="col" className="px-3 py-3 font-medium">{t("Class")}</th>
                       <th scope="col" className="px-3 py-3 text-right font-medium">{t("Level")}</th>
@@ -409,7 +409,7 @@ export function RosterManager() {
                             <button type="button" onClick={() => setViewing(m)} className="text-left font-medium text-foreground underline-offset-4 hover:text-gold-bright hover:underline">
                               {m.character_name}
                             </button>
-                            <p className="text-[0.7rem] text-steel/60">
+                            <p className="text-2xs text-steel/60">
                               {m.server_name ?? "—"} <span className="font-mono">({m.server_id})</span> · <span className="uppercase">{m.region}</span>
                             </p>
                             {m.notes && (
@@ -449,7 +449,7 @@ export function RosterManager() {
                                   <span
                                     title={t("Last refresh failed: {msg}", { msg: m.last_refresh_error.message })}
                                     data-testid="refresh-error-badge"
-                                    className="ml-1.5 border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-[0.6rem] font-semibold tracking-wider text-[#f0cf86] uppercase"
+                                    className="ml-1.5 border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-4xs font-semibold tracking-wider text-[#f0cf86] uppercase"
                                   >
                                     {t("Refresh failed")}</span>
                                 )}
@@ -569,7 +569,7 @@ function CommentForm({ member, onSave }: { member: RosterMember; onSave: (text: 
           onChange={(e) => { setText(e.target.value); setError(null); }}
           className={aionField}
         />
-        <p className="text-right text-[0.65rem] text-steel/60 tabular-nums">{text.length}/{NOTES_MAX}</p>
+        <p className="text-right text-3xs text-steel/60 tabular-nums">{text.length}/{NOTES_MAX}</p>
       </div>
       {error && (
         <p role="alert" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]">

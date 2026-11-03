@@ -7,9 +7,9 @@ import { RARITIES } from "@/lib/aion/types";
 function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="border border-steel/10 bg-ink/50 px-3 py-2.5">
-      <p className="text-[0.6rem] tracking-[0.16em] text-steel/70 uppercase">{label}</p>
+      <p className="text-4xs tracking-[0.16em] text-steel/70 uppercase">{label}</p>
       <p className="mt-0.5 font-heading text-xl font-bold text-foreground tabular-nums">{value}</p>
-      {sub && <p className="truncate text-[0.7rem] text-steel/60">{sub}</p>}
+      {sub && <p className="truncate text-2xs text-steel/60">{sub}</p>}
     </div>
   );
 }
@@ -38,7 +38,7 @@ export function EquipmentSummary({ summary }: { summary: Summary }) {
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <p className="mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
           Rarity Distribution
         </p>
         {/* Stacked bar: segments separated by a 2px surface gap */}

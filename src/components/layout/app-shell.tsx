@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="relative flex flex-1">
         <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px)] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-ink/50 px-3 py-5 lg:flex">
-          <p className="px-3 font-heading text-[0.65rem] font-semibold tracking-[0.3em] text-gold/70 uppercase">
+          <p className="px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold/70 uppercase">
             Command
           </p>
           <SidebarNav />

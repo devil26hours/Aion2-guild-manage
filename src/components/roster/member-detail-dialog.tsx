@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { getRosterMemberDetail } from "@/lib/roster/roster-store";
 import type { RosterMember } from "@/lib/roster/types";
 import { cn } from "@/lib/utils";
-import { CharacterProfileView } from "./character-profile-view";
+import { CharacterProfileView, isInGearPin } from "./character-profile-view";
 
 type Detail = { status: "loading" } | { status: "ready"; raw: unknown } | { status: "error"; message: string };
 
@@ -19,7 +19,13 @@ type Detail = { status: "loading" } | { status: "ready"; raw: unknown } | { stat
 export function MemberDetailDialog({ member, onClose }: { member: RosterMember | null; onClose: () => void }) {
   return (
     <Dialog open={member !== null} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className={cn(aionDialog, "max-w-5xl gap-4")}>{member && <Body key={member.id} member={member} />}</DialogContent>
+      <DialogContent
+        className={cn(aionDialog, "max-w-5xl gap-4")}
+        // Pinned equipment tooltips live outside the dialog DOM (portaled to <body>): interacting with them must not close it.
+        onInteractOutside={(e) => isInGearPin(e.target) && e.preventDefault()}
+      >
+        {member && <Body key={member.id} member={member} />}
+      </DialogContent>
     </Dialog>
   );
 }
@@ -67,7 +73,7 @@ function Body({ member }: { member: RosterMember }) {
         <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {" "}{t("Loading character profile…")}</p>
       )}
       {detail.status === "error" && <p className="text-sm text-[#f6c2b6]">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
-      {detail.status === "ready" && <CharacterProfileView member={member} raw={detail.raw} />}
+      {detail.status === "ready" && <CharacterProfileView member={member} raw={detail.raw} itemDetails />}
     </>
   );
 }

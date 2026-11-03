@@ -28,7 +28,7 @@ export function BackToMembers({ className }: { className?: string }) {
 function HeaderStat({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="bg-[#090d16] px-4 py-3 sm:px-6">
-      <p className="text-[0.6rem] font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</p>
+      <p className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</p>
       <div className="mt-1">{children}</div>
     </div>
   );
@@ -87,7 +87,7 @@ export function ProfileHeader({
         </div>
 
         <div className="min-w-0">
-          <p className="text-[0.65rem] font-semibold tracking-[0.3em] text-arcane/90 uppercase">
+          <p className="text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase">
             {member.server} · {member.rank}
           </p>
           <h1 className="mt-1 font-heading text-3xl font-bold tracking-[0.06em] text-gold-bright sm:text-4xl">

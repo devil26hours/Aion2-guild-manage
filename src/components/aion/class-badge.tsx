@@ -41,7 +41,7 @@ export function ClassBadge({
       )}
       <span className="text-foreground/90">{meta.name}</span>
       {showRole && (
-        <span className="text-[0.7rem] text-steel/60">{meta.role}</span>
+        <span className="text-2xs text-steel/60">{meta.role}</span>
       )}
     </span>
   );

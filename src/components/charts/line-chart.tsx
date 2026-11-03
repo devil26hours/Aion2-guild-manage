@@ -98,7 +98,7 @@ export function LineChart({
   return (
     <figure className={cn("border border-steel/10 bg-ink/40 p-3", className)}>
       <figcaption className="mb-1 flex items-baseline justify-between gap-2">
-        <span id={titleId} className="text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <span id={titleId} className="text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
           {title}
         </span>
         {latest && (
@@ -128,15 +128,15 @@ export function LineChart({
             {ticks.map((tv, i) => (
               <g key={i}>
                 <line x1={pad.l} x2={pad.l + w} y1={y(tv)} y2={y(tv)} stroke="rgba(147,162,187,0.12)" strokeDasharray={i === 0 ? undefined : "2 4"} />
-                <text x={pad.l - 8} y={y(tv)} dy="0.32em" textAnchor="end" fontSize="10" fill="rgba(147,162,187,0.7)">
+                <text x={pad.l - 8} y={y(tv)} dy="0.32em" textAnchor="end" fontSize="11" fill="rgba(147,162,187,0.7)">
                   {format(tv)}
                 </text>
               </g>
             ))}
-            <text x={pad.l} y={height - 6} fontSize="10" fill="rgba(147,162,187,0.7)">
+            <text x={pad.l} y={height - 6} fontSize="11" fill="rgba(147,162,187,0.7)">
               {fmtDate.format(new Date(t0))}
             </text>
-            <text x={pad.l + w} y={height - 6} fontSize="10" textAnchor="end" fill="rgba(147,162,187,0.7)">
+            <text x={pad.l + w} y={height - 6} fontSize="11" textAnchor="end" fill="rgba(147,162,187,0.7)">
               {fmtDate.format(new Date(t1))}
             </text>
             {a && <line x1={a.x} x2={a.x} y1={pad.t} y2={pad.t + h} stroke="rgba(207,227,255,0.35)" />}
@@ -156,7 +156,7 @@ export function LineChart({
         )}
         {a && active !== null && (
           <div
-            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full border border-gold-dim/40 bg-ink-raised px-2 py-1 text-[0.7rem] whitespace-nowrap shadow-lg"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full border border-gold-dim/40 bg-ink-raised px-2 py-1 text-2xs whitespace-nowrap shadow-lg"
             style={{ left: Math.min(Math.max(a.x, 60), width - 60), top: a.y - 8 }}
           >
             <span className="text-steel">{fmtDate.format(new Date(points[active].t))}</span>{" "}

@@ -38,7 +38,7 @@ import { addMember, isInRoster } from "@/lib/members/members-store";
 import { searchCharacters } from "@/lib/members/mock-character-service";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 
 type LookupState =
   | { status: "idle" }
@@ -286,15 +286,15 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2">
                         <span className="font-medium text-foreground">{r.character_name}</span>
-                        <span className="text-[0.7rem] text-steel/60">
+                        <span className="text-2xs text-steel/60">
                           {r.server} · Lv. {r.level}
                         </span>
                       </span>
-                      <ClassBadge cls={r.class} className="text-[0.7rem]" />
+                      <ClassBadge cls={r.class} className="text-2xs" />
                     </span>
                     <span className="text-right">
                       {inGuild ? (
-                        <span className="border border-steel/25 px-1.5 py-0.5 text-[0.6rem] tracking-wider text-steel uppercase">
+                        <span className="border border-steel/25 px-1.5 py-0.5 text-4xs tracking-wider text-steel uppercase">
                           Already in guild
                         </span>
                       ) : (
@@ -302,7 +302,7 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
                           <span className="block text-sm font-semibold text-gold-bright tabular-nums">
                             {formatNumber(r.combat_power)}
                           </span>
-                          <span className="block text-[0.65rem] text-steel/60 tabular-nums">
+                          <span className="block text-3xs text-steel/60 tabular-nums">
                             iLv {r.item_level}
                           </span>
                         </>

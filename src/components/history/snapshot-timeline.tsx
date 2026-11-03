@@ -57,7 +57,7 @@ export function SnapshotTimeline({
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="text-xs font-medium text-foreground">{snapshotLabel(s, i)}</p>
-                  <p className="text-[0.7rem] text-steel/60">
+                  <p className="text-2xs text-steel/60">
                     <RelativeTime iso={s.captured_at} />
                     {i === history.length - 1 && <span className="ml-1.5 text-arcane">· latest</span>}
                     {i === 0 && <span className="ml-1.5">· first recorded</span>}
@@ -73,7 +73,7 @@ export function SnapshotTimeline({
                         aria-pressed={on}
                         onClick={() => onPick(w, s.id)}
                         className={cn(
-                          "h-6 min-w-7 border px-1.5 text-[0.65rem] font-bold tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-arcane/40",
+                          "h-6 min-w-7 border px-1.5 text-3xs font-bold tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-arcane/40",
                           on ? "border-gold/70 bg-gold/20 text-gold-bright" : "border-steel/20 text-steel hover:border-gold-dim/60 hover:text-foreground",
                         )}
                         aria-label={`Set ${snapshotLabel(s, i)} as comparison ${w.toUpperCase()}`}
@@ -87,29 +87,29 @@ export function SnapshotTimeline({
 
               <dl className="mt-2 grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">CP</dt>
+                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">CP</dt>
                   <dd className="flex flex-wrap items-center gap-1 font-semibold text-gold-bright tabular-nums">
                     {formatNumber(s.combat_power)}
-                    {prev && <DeltaChip delta={s.combat_power - prev.combat_power} className="px-1 py-0 text-[0.6rem]" />}
+                    {prev && <DeltaChip delta={s.combat_power - prev.combat_power} className="px-1 py-0 text-4xs" />}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Item Lv.</dt>
+                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Item Lv.</dt>
                   <dd className="flex flex-wrap items-center gap-1 font-semibold text-foreground tabular-nums">
                     {s.item_level}
-                    {prev && <DeltaChip delta={s.item_level - prev.item_level} className="px-1 py-0 text-[0.6rem]" />}
+                    {prev && <DeltaChip delta={s.item_level - prev.item_level} className="px-1 py-0 text-4xs" />}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Combat Speed</dt>
+                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Combat Speed</dt>
                   <dd className="flex flex-wrap items-center gap-1 font-semibold text-foreground tabular-nums">
                     {s.stats.combat_speed.toFixed(1)}
-                    {prev && <DeltaChip delta={cs} className="px-1 py-0 text-[0.6rem]" />}
+                    {prev && <DeltaChip delta={cs} className="px-1 py-0 text-4xs" />}
                   </dd>
                 </div>
               </dl>
 
-              <p className="mt-1.5 text-[0.7rem] text-steel/70">
+              <p className="mt-1.5 text-2xs text-steel/70">
                 {!prev
                   ? "Baseline snapshot."
                   : unchanged

@@ -19,7 +19,7 @@ import { BindingRate, SoulBindingLines } from "./soul-binding-lines";
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-1.5 flex items-center gap-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">
+    <h3 className="mb-1.5 flex items-center gap-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
       {children}
     </h3>
   );
@@ -86,7 +86,7 @@ export function ItemDetailDialog({
                 ["Rarity", RARITY_META[item.rarity].label],
               ].map(([k, v]) => (
                 <div key={k} className="border-r border-steel/10 px-2 py-2.5 last:border-r-0">
-                  <p className="text-[0.6rem] tracking-[0.16em] text-steel/60 uppercase">{k}</p>
+                  <p className="text-4xs tracking-[0.16em] text-steel/60 uppercase">{k}</p>
                   <p className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">{v}</p>
                 </div>
               ))}
@@ -121,7 +121,7 @@ export function ItemDetailDialog({
               ) : (
                 <p className="text-xs text-steel/60">This item cannot be soul bound.</p>
               )}
-              <p className="mt-1.5 text-[0.65rem] text-steel/55">
+              <p className="mt-1.5 text-3xs text-steel/55">
                 Option names and slot pools are checked against Global client data. Values, ranges and binding rate are mock.
               </p>
             </div>

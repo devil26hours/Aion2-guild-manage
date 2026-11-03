@@ -31,7 +31,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm sm:min-w-[34rem]">
           <thead>
-            <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
               <th scope="col" className="w-10 py-2.5 pl-4 font-medium sm:w-12 sm:pl-5">#</th>
               <th scope="col" className="py-2.5 pl-2 font-medium sm:pl-0">Character</th>
               <th scope="col" className="hidden py-2.5 font-medium sm:table-cell">Class</th>
@@ -74,7 +74,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
                   </Link>
                   <ClassBadge
                     cls={m.class}
-                    className="mt-0.5 flex text-[0.7rem] font-normal sm:hidden"
+                    className="mt-0.5 flex text-2xs font-normal sm:hidden"
                   />
                 </td>
                 <td className="hidden py-3 text-xs sm:table-cell">

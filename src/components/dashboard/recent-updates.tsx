@@ -41,7 +41,7 @@ export function RecentUpdates({ events }: { events: SnapshotEvent[] }) {
                   <span className="block truncate text-sm font-medium text-foreground">
                     {e.member.character_name}
                   </span>
-                  <ClassBadge cls={e.member.class} className="text-[0.7rem]" />
+                  <ClassBadge cls={e.member.class} className="text-2xs" />
                 </div>
 
                 <div className="order-3 col-span-2 flex items-center gap-2 text-xs text-steel tabular-nums sm:order-none sm:col-span-1">
@@ -50,7 +50,7 @@ export function RecentUpdates({ events }: { events: SnapshotEvent[] }) {
                   <ArrowRight className="size-3 text-steel/50" aria-hidden />
                   <span className="font-semibold text-gold-bright">{formatNumber(e.snapshot.combat_power)}</span>
                   {e.snapshot.source === "refresh" && (
-                    <span className="border border-arcane/30 px-1 text-[0.55rem] tracking-wider text-arcane uppercase">
+                    <span className="border border-arcane/30 px-1 text-5xs tracking-wider text-arcane uppercase">
                       Refresh
                     </span>
                   )}
@@ -60,7 +60,7 @@ export function RecentUpdates({ events }: { events: SnapshotEvent[] }) {
                   <DeltaChip delta={e.cpDelta} />
                 </div>
 
-                <p className="order-4 col-span-2 flex items-center gap-1 text-[0.7rem] whitespace-nowrap text-steel/60 sm:order-none sm:col-span-1 sm:min-w-16 sm:justify-end">
+                <p className="order-4 col-span-2 flex items-center gap-1 text-2xs whitespace-nowrap text-steel/60 sm:order-none sm:col-span-1 sm:min-w-16 sm:justify-end">
                   <Clock className="size-3" aria-hidden />
                   <RelativeTime iso={e.snapshot.captured_at} />
                 </p>

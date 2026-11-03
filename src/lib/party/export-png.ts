@@ -1,3 +1,4 @@
+import { classImageSrc } from "@/lib/aion/class-images";
 import { CLASS_META } from "@/lib/aion/classes";
 import { knownClass } from "@/lib/roster/party-adapter";
 import { PARTY_ROLES, ROLE_COLORS, type PartyRole } from "./types";
@@ -16,6 +17,11 @@ export interface ExportSlot {
   role: PartyRole | null;
   cp: number | null;
   itemLevel: number | null;
+  /**
+   * Same-origin URL of the character portrait (the roster `profile_image`,
+   * served by /api/roster/members/{id}/portrait); null when the API gave none.
+   */
+  portraitUrl: string | null;
 }
 
 export interface ExportData {
@@ -35,6 +41,9 @@ const PAD = 44;
 const CARD_H = 92;
 const GAP = 14;
 const HEADER_H = 168;
+/** Square portrait drawn in each filled card. */
+const AVATAR = 64;
+const IMAGE_TIMEOUT_MS = 8000;
 const FOOTER_H = 70;
 /** Two columns; rows grow with the party size (2–10 members → 1–5 rows). */
 export function exportRows(slotCount: number): number {
@@ -107,6 +116,42 @@ function frame(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h
   }
 }
 
+/** Same-origin image → bitmap (never taints the canvas); null on any failure. */
+async function loadBitmap(src: string): Promise<ImageBitmap | null> {
+  try {
+    const res = await fetch(src, { signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS) });
+    if (!res.ok) return null;
+    return await createImageBitmap(await res.blob());
+  } catch {
+    return null;
+  }
+}
+
+/** Per slot: the portrait, else the class emblem, else null (the initial is drawn). */
+async function loadSlotImages(slots: ExportSlot[]): Promise<(ImageBitmap | null)[]> {
+  const cache = new Map<string, Promise<ImageBitmap | null>>();
+  const get = (src: string) => {
+    let p = cache.get(src);
+    if (!p) cache.set(src, (p = loadBitmap(src)));
+    return p;
+  };
+  return Promise.all(
+    slots.map(async (s) => {
+      if (!s.name) return null;
+      const portrait = s.portraitUrl ? await get(s.portraitUrl) : null;
+      if (portrait) return portrait;
+      const emblem = classImageSrc(s.className);
+      return emblem ? get(emblem) : null;
+    }),
+  );
+}
+
+/** Draw `img` into a square with object-fit: cover. */
+function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, x: number, y: number, size: number) {
+  const side = Math.min(img.width, img.height);
+  ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, x, y, size, size);
+}
+
 export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasElement> {
   const display = fontVar("--font-cinzel", "Georgia, serif");
   const sans = fontVar("--font-geist-sans", "Segoe UI, Arial, sans-serif");
@@ -118,6 +163,7 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     ]).catch(() => undefined);
     await document.fonts.ready;
   }
+  const images = await loadSlotImages(data.slots);
 
   const rows = exportRows(data.slots.length);
   const px = exportSize(data.slots.length);
@@ -235,7 +281,26 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     // name + class — fixed column (widest pill) so names align across cards
     ctx.font = `700 11px ${sans}`;
     const pillCol = Math.max(...[...PARTY_ROLES, "No role"].map((r) => ctx.measureText(r.toUpperCase()).width + 16));
-    const textX = x + 18 + pillCol + 16;
+    // character portrait (class emblem, then the name initial, when unavailable)
+    const ax = x + 18 + pillCol + 16;
+    const ay = y + (CARD_H - AVATAR) / 2;
+    ctx.fillStyle = "#0a0e18";
+    ctx.fillRect(ax, ay, AVATAR, AVATAR);
+    const img = images[i];
+    if (img) {
+      drawCover(ctx, img, ax, ay, AVATAR);
+    } else {
+      ctx.fillStyle = "rgba(147,162,187,0.6)";
+      ctx.font = `700 24px ${display}`;
+      ctx.textAlign = "center";
+      ctx.fillText([...s.name][0] ?? "?", ax + AVATAR / 2, ay + AVATAR / 2 + 9);
+      ctx.textAlign = "left";
+    }
+    ctx.strokeStyle = `${C.goldDim}cc`;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(ax + 0.5, ay + 0.5, AVATAR - 1, AVATAR - 1);
+
+    const textX = ax + AVATAR + 14;
     const rightW = 150;
     const nameMax = colW - (textX - x) - rightW - 12;
     ctx.fillStyle = C.text;

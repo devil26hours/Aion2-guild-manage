@@ -54,7 +54,7 @@ import {
 } from "@/lib/settings/settings-store";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function Field({ id, label, hint, error, children }: { id: string; label: string; hint?: string; error?: string; children: ReactNode }) {
@@ -65,7 +65,7 @@ function Field({ id, label, hint, error, children }: { id: string; label: string
       {error ? (
         <p id={`${id}-err`} className="text-xs text-[#ef9b89]">{error}</p>
       ) : (
-        hint && <p className="text-[0.7rem] text-steel/60">{hint}</p>
+        hint && <p className="text-2xs text-steel/60">{hint}</p>
       )}
     </div>
   );
@@ -335,7 +335,7 @@ function PreferencesForm({ prefs }: { prefs: AppPrefs }) {
       </div>
 
       <fieldset className="border border-steel/10 p-4">
-        <legend className="flex items-center gap-2 px-1 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <legend className="flex items-center gap-2 px-1 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
           <LayoutDashboard className="size-3.5" /> {" "}{t("Dashboard display")}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
           {DASH_TOGGLES.map(({ key, label }) => (
@@ -363,7 +363,7 @@ function PreferencesForm({ prefs }: { prefs: AppPrefs }) {
           </Field>
         </div>
       </fieldset>
-      <p className="text-[0.7rem] text-steel/60" aria-live="polite">
+      <p className="text-2xs text-steel/60" aria-live="polite">
         {error ? <span className="text-[#f6c2b6]">{t("Not saved:")}{" "}{error}</span> : t("Preferences are saved automatically on the server and shared by every browser.")}
       </p>
     </div>

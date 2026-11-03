@@ -42,7 +42,7 @@ export function PresetToolbar({
   return (
     <div className="flex flex-wrap items-end gap-2">
       <div className="min-w-[12rem] flex-1 space-y-1.5 sm:max-w-xs">
-        <Label htmlFor="preset-select" className="text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase">
+        <Label htmlFor="preset-select" className="text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
           {t("Preset (")}{presets.length})
         </Label>
         <NativeSelect id="preset-select" value={active.id} onChange={(e) => setActivePreset(e.target.value)} className={aionField}>

@@ -14,7 +14,7 @@ import { useT } from "@/lib/i18n";
 import { GUILD_IMAGE_MAX_BYTES, LIMITS } from "@/lib/settings/schema";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 
 interface GuildSummary {
   id: string;
@@ -179,7 +179,7 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
                 {g.leader && <span className="block text-xs text-steel/80">{t("Leader")}: {g.leader}</span>}
                 {g.description && <span className="mt-1 line-clamp-2 block text-xs text-foreground/75">{g.description}</span>}
                 {!g.join_open && (
-                  <span className="mt-1 block text-[0.7rem] text-[#f0cf86]">{g.join_code_set ? t("This guild is full.") : t("Joining is closed (no join code set).")}</span>
+                  <span className="mt-1 block text-2xs text-[#f0cf86]">{g.join_code_set ? t("This guild is full.") : t("Joining is closed (no join code set).")}</span>
                 )}
               </span>
             </button>
@@ -286,7 +286,7 @@ function CreateGuild({ onBack }: { onBack: () => void }) {
             onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
             className={cn(aionField, "w-32 text-center font-mono tracking-[0.4em]")}
           />
-          {errors.code ? <p className="text-xs text-[#ef9b89]">{errors.code}</p> : <p className="text-[0.7rem] text-steel/60">{t("Players need this code to join. You can set or change it later in Settings.")}</p>}
+          {errors.code ? <p className="text-xs text-[#ef9b89]">{errors.code}</p> : <p className="text-2xs text-steel/60">{t("Players need this code to join. You can set or change it later in Settings.")}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cg-image" className={labelClass}>{t("Guild image")} ({t("optional")})</Label>

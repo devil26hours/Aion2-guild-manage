@@ -1,13 +1,13 @@
 import { requireGuild } from "@/lib/auth/context";
 import { NextResponse, type NextRequest } from "next/server";
-import { ENDPOINTS, isEndpointId, validateRequest } from "@/lib/aion2-api/endpoints";
+import { ENDPOINTS, isEndpointId, upstreamTimeoutFor, validateRequest } from "@/lib/aion2-api/endpoints";
 import type { ProxyErrorBody } from "@/lib/aion2-api/types";
 import { fetchUpstream, getBaseUrl } from "@/lib/aion2-api/upstream";
 
 /**
  * Restricted server-side proxy: /api/aion2/{endpoint}?param=…
  *
- * - `endpoint` must be one of the five allowlisted ids (see ENDPOINTS).
+ * - `endpoint` must be one of the allowlisted ids (see ENDPOINTS).
  * - Only the params declared for that endpoint are accepted, validated, and
  *   re-encoded before the upstream URL is built — no arbitrary paths/hosts.
  * - Exactly one upstream GET per request; no retries, no caching.
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[e
   }
 
   const upstreamPath = `${check.path}${Object.keys(check.query).length ? `?${new URLSearchParams(check.query)}` : ""}`;
-  const result = await fetchUpstream(base, check.path, check.query);
+  const result = await fetchUpstream(base, check.path, check.query, upstreamTimeoutFor(endpoint, check.query));
 
   if (result.kind === "error") {
     const status = result.code === "TIMEOUT" ? 504 : 502;

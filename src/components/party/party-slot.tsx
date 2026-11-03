@@ -10,6 +10,7 @@ import { formatNumber } from "@/lib/format";
 import { describePlacements, type PresetPlacement } from "@/lib/party/party-store";
 import { PARTY_ROLES, ROLE_COLORS, type PartyMember, type PartyRole, type PartySlot as Slot } from "@/lib/party/types";
 import { cn } from "@/lib/utils";
+import { MemberAvatar } from "./member-avatar";
 import { RoleBadge } from "./role-badge";
 
 interface Props {
@@ -99,12 +100,35 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
           {index + 1}
         </span>
 
+        {member && (
+          <MemberAvatar
+            key={member.id}
+            src={member.profile_image}
+            name={name}
+            className={member.class_name}
+            size={view === "cards" ? 44 : 32}
+          />
+        )}
+
         <div className="min-w-0 flex-1">
           {member ? (
-            <p className="truncate font-medium text-foreground" title={member.server_name ? `${name} · ${member.server_name}` : name}>
-              {name}
-              {member.comment && <span className="ml-1.5 text-xs font-normal text-steel/80 italic" data-testid="slot-comment">· {member.comment}</span>}
-            </p>
+            <>
+              <p className="truncate font-medium text-foreground" title={member.server_name ? `${name} · ${member.server_name}` : name}>
+                {name}
+              </p>
+              {member.comment && (
+                <p
+                  data-testid="slot-comment"
+                  title={member.comment}
+                  className={cn(
+                    "text-xs break-words text-[#cfe3ff]/85 italic",
+                    view === "cards" ? "line-clamp-2" : "truncate",
+                  )}
+                >
+                  “{member.comment}”
+                </p>
+              )}
+            </>
           ) : (
             <p className="flex items-center gap-1.5 text-sm text-[#f0a596]">
               <CircleAlert className="size-3.5" /> {" "}{t("Removed from roster")}</p>
@@ -115,9 +139,9 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
               <span className="text-steel">Lv. {member.level ?? "—"}</span>
             </div>
           )}
-          {duplicate && <p className="mt-1 text-[0.7rem] text-[#f0a596]">{t("Assigned more than once")}</p>}
+          {duplicate && <p className="mt-1 text-2xs text-[#f0a596]">{t("Assigned more than once")}</p>}
           {member && elsewhere.length > 0 && (
-            <p data-testid="slot-elsewhere" className="mt-1 flex items-center gap-1 text-[0.7rem] text-[#f0cf86]">
+            <p data-testid="slot-elsewhere" className="mt-1 flex items-center gap-1 text-2xs text-[#f0cf86]">
               <CircleAlert aria-hidden className="size-3 shrink-0" />
               {t("Also in")}{" "}{describePlacements(elsewhere)}
             </p>
@@ -148,11 +172,11 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
         <div className="mt-3 flex items-end justify-between gap-2 border-t border-steel/10 pt-2.5">
           <dl className="flex gap-4 text-xs tabular-nums">
             <div>
-              <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">CP</dt>
+              <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">CP</dt>
               <dd className="font-semibold text-gold-bright">{member.combat_power !== null ? formatNumber(member.combat_power) : "—"}</dd>
             </div>
             <div>
-              <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">{t("Item Lv.")}</dt>
+              <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">{t("Item Lv.")}</dt>
               <dd className="font-semibold text-foreground">{member.item_level ?? "—"}</dd>
             </div>
           </dl>
@@ -160,7 +184,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
         </div>
       )}
       {member && slot.role === null && (
-        <p className="mt-1.5 text-[0.65rem] text-steel/60">
+        <p className="mt-1.5 text-3xs text-steel/60">
           {t("Guild role:")}{" "}{member.role ?? t("not set")}
         </p>
       )}

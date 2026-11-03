@@ -20,7 +20,7 @@ import { rosterId } from "@/lib/roster/types";
 import { getSettings } from "@/lib/settings/settings-store";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 
 type Search =
   | { status: "idle" }

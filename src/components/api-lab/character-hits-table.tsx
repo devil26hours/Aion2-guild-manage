@@ -29,7 +29,7 @@ export function CharacterHitsTable({
     <div className="relative max-h-96 overflow-auto border border-steel/12">
       <table className="w-full min-w-[46rem] text-sm" data-testid={testId}>
         <thead className="sticky top-0 z-10 bg-ink-raised">
-          <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+          <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
             <th scope="col" className="py-2 pr-3 pl-3 font-medium">{t("Character Name")}</th>
             <th scope="col" className="px-3 py-2 text-right font-medium">{t("Level")}</th>
             <th scope="col" className="px-3 py-2 font-medium">{t("Server Name")}</th>
@@ -55,7 +55,7 @@ export function CharacterHitsTable({
                 <td className="px-3 py-1.5 text-foreground/85">{h.server_name ?? "—"}</td>
                 <td className="px-3 py-1.5 font-mono text-xs text-steel">{h.server_id}</td>
                 <td className="px-3 py-1.5 text-xs tracking-wider text-steel uppercase">{h.region}</td>
-                <td className="max-w-[14rem] truncate px-3 py-1.5 font-mono text-[0.65rem] text-steel/70" title={h.character_id}>
+                <td className="max-w-[14rem] truncate px-3 py-1.5 font-mono text-3xs text-steel/70" title={h.character_id}>
                   {h.character_id}
                 </td>
                 <td className="py-1.5 pr-3 pl-3 text-right">

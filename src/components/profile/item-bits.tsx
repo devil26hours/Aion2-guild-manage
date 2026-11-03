@@ -30,7 +30,7 @@ export function RarityLabel({ rarity, className }: { rarity: Rarity; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center border px-1.5 py-px text-[0.6rem] font-semibold tracking-[0.14em] uppercase",
+        "inline-flex items-center border px-1.5 py-px text-4xs font-semibold tracking-[0.14em] uppercase",
         className,
       )}
       style={{ color: meta.color, borderColor: `${meta.color}55`, backgroundColor: `${meta.color}14` }}
@@ -61,7 +61,7 @@ export function VerificationBadge({ verification, className }: { verification: V
           : "Sources conflict"
       }
       className={cn(
-        "inline-flex items-center border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-[0.55rem] font-semibold tracking-[0.12em] text-[#f0cf86] uppercase",
+        "inline-flex items-center border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-5xs font-semibold tracking-[0.12em] text-[#f0cf86] uppercase",
         className,
       )}
     >
@@ -76,7 +76,7 @@ export function MockTag({ className }: { className?: string }) {
     <span
       title="Mock value — not real character data"
       className={cn(
-        "inline-flex items-center border border-steel/25 px-1 text-[0.55rem] font-semibold tracking-[0.14em] text-steel/70 uppercase",
+        "inline-flex items-center border border-steel/25 px-1 text-5xs font-semibold tracking-[0.14em] text-steel/70 uppercase",
         className,
       )}
     >

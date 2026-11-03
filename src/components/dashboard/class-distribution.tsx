@@ -50,7 +50,7 @@ export function ClassDistribution({
                 {/* tooltip */}
                 <span
                   role="presentation"
-                  className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden border border-gold-dim/40 bg-ink-raised px-2.5 py-1.5 text-[0.7rem] whitespace-nowrap text-foreground shadow-lg group-hover/row:block group-focus-visible/row:block"
+                  className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden border border-gold-dim/40 bg-ink-raised px-2.5 py-1.5 text-2xs whitespace-nowrap text-foreground shadow-lg group-hover/row:block group-focus-visible/row:block"
                 >
                   <span className="font-medium">{meta.name}</span>
                   <span className="text-steel"> · {meta.role}</span>

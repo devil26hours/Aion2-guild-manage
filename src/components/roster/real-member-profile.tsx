@@ -118,7 +118,7 @@ export function RealMemberProfile({ id }: { id: string }) {
       )}
       {detail.status === "loading" && <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {" "}{t("Loading character profile…")}</p>}
       {detail.status === "error" && <p className="text-sm text-[#f6c2b6]">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
-      {detail.status === "ready" && <CharacterProfileView key={detail.key} member={member} raw={detail.raw} />}
+      {detail.status === "ready" && <CharacterProfileView key={detail.key} member={member} raw={detail.raw} itemDetails />}
     </div>
   );
 }

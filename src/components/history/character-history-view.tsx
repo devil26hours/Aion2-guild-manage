@@ -103,7 +103,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             <ClassImage name={member.class} className="relative size-9" />
           </div>
           <div className="min-w-0">
-            <p className="flex flex-wrap items-center gap-2 text-[0.65rem] font-semibold tracking-[0.3em] text-arcane/90 uppercase">
+            <p className="flex flex-wrap items-center gap-2 text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase">
               Character History · {member.server}
               <MockTag />
             </p>
@@ -123,15 +123,15 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             ["Snapshots", String(history.length), null],
           ].map(([label, value, delta]) => (
             <div key={label as string} className="bg-[#090d16] px-4 py-3 sm:px-6">
-              <dt className="text-[0.6rem] font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</dt>
+              <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</dt>
               <dd className="mt-1 flex flex-wrap items-center gap-2">
                 <span className="font-heading text-xl font-bold text-foreground tabular-nums">{value}</span>
-                {delta !== null && <DeltaChip delta={delta as number} className="px-1 py-0 text-[0.65rem]" />}
+                {delta !== null && <DeltaChip delta={delta as number} className="px-1 py-0 text-3xs" />}
               </dd>
             </div>
           ))}
           <div className="col-span-2 bg-[#090d16] px-4 py-3 sm:px-6 lg:col-span-1">
-            <dt className="text-[0.6rem] font-semibold tracking-[0.2em] text-steel/70 uppercase">Latest Snapshot</dt>
+            <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">Latest Snapshot</dt>
             <dd className="mt-1 text-sm text-foreground">
               {refreshing ? (
                 <span className="inline-flex items-center gap-1.5 text-arcane"><Loader2 className="size-3.5 animate-spin" /> Capturing…</span>
@@ -141,7 +141,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             </dd>
           </div>
         </dl>
-        <p className="relative border-t border-steel/10 px-4 py-2 text-[0.65rem] text-steel/60 sm:px-6">
+        <p className="relative border-t border-steel/10 px-4 py-2 text-3xs text-steel/60 sm:px-6">
           Changes in the stat strip are measured from the first recorded snapshot. All history is simulated demo data.
         </p>
       </section>
@@ -158,7 +158,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
           />
         ))}
       </div>
-      <p className="-mt-2 text-[0.7rem] text-steel/60">Filled markers show the snapshots selected for comparison (A and B).</p>
+      <p className="-mt-2 text-2xs text-steel/60">Filled markers show the snapshots selected for comparison (A and B).</p>
 
       <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)]">
         <SnapshotTimeline

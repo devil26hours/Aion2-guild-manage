@@ -28,7 +28,7 @@ export function CpValue({
         {delta !== undefined && (
           <span
             className={cn(
-              "aion-enter border px-1 text-[0.65rem] font-semibold tabular-nums",
+              "aion-enter border px-1 text-3xs font-semibold tabular-nums",
               delta > 0 && "border-[#7ee79e]/30 bg-[#7ee79e]/10 text-[#9af0b3]",
               delta < 0 && "border-destructive/40 bg-destructive/10 text-[#f0a596]",
               delta === 0 && "border-steel/20 text-steel",

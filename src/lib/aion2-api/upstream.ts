@@ -33,7 +33,12 @@ export type UpstreamResult =
  * One GET to the upstream service. No retries, no caching: the Python service
  * already spaces, caches and backs off its own NCSOFT calls.
  */
-export async function fetchUpstream(base: URL, path: string, query: Record<string, string>): Promise<UpstreamResult> {
+export async function fetchUpstream(
+  base: URL,
+  path: string,
+  query: Record<string, string>,
+  timeoutMs: number = UPSTREAM_TIMEOUT_MS,
+): Promise<UpstreamResult> {
   const url = new URL(path.replace(/^\//, ""), base.href.endsWith("/") ? base.href : `${base.href}/`);
   for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
 
@@ -45,7 +50,7 @@ export async function fetchUpstream(base: URL, path: string, query: Record<strin
       headers: { accept: "application/json" },
       cache: "no-store",
       redirect: "error",
-      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const len = Number(res.headers.get("content-length") ?? 0);
     if (len > MAX_UPSTREAM_BYTES) {
@@ -69,7 +74,7 @@ export async function fetchUpstream(base: URL, path: string, query: Record<strin
       kind: "error",
       code: timeout ? "TIMEOUT" : "UNREACHABLE",
       message: timeout
-        ? `No response from the local AION2 API within ${UPSTREAM_TIMEOUT_MS / 1000}s.`
+        ? `No response from the local AION2 API within ${Math.round(timeoutMs / 1000)}s.`
         : "Could not connect to the local AION2 API. Is the Python service running?",
       durationMs: elapsed(),
     };

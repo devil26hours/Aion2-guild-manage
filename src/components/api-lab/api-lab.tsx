@@ -58,7 +58,7 @@ interface LabResponse {
   isJson: boolean;
 }
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
 
 const TONE: Record<"ok" | "warn" | "error", string> = {
   ok: "border-[#7ee79e]/40 bg-[#7ee79e]/10 text-[#9af0b3]",
@@ -226,12 +226,12 @@ export function ApiLab() {
                           on ? "border-gold/60 bg-gold/[0.08]" : "border-steel/12 hover:border-gold-dim/50 hover:bg-white/[0.02]",
                         )}
                       >
-                        <span className="mt-0.5 shrink-0 border border-arcane/40 bg-arcane/10 px-1 font-mono text-[0.6rem] font-bold text-arcane">
+                        <span className="mt-0.5 shrink-0 border border-arcane/40 bg-arcane/10 px-1 font-mono text-4xs font-bold text-arcane">
                           {d.method}
                         </span>
                         <span className="min-w-0">
                           <span className={cn("block text-sm", on ? "text-gold-bright" : "text-foreground")}>{d.label}</span>
-                          <span className="block truncate font-mono text-[0.7rem] text-steel/70">{d.path}</span>
+                          <span className="block truncate font-mono text-2xs text-steel/70">{d.path}</span>
                         </span>
                       </button>
                     );
@@ -259,7 +259,7 @@ export function ApiLab() {
                         </Label>
                         {p.kind === "select" ? (
                           <NativeSelect id={id} value={values[p.name] ?? ""} onChange={(e) => setValue(p.name, e.target.value)} className={aionField}>
-                            <option value="">All regions</option>
+                            <option value="">{p.name === "region" ? "All regions" : "Default"}</option>
                             {p.options?.map((o) => (
                               <option key={o} value={o}>{o}</option>
                             ))}
@@ -280,7 +280,7 @@ export function ApiLab() {
                         {err ? (
                           <p id={`${id}-err`} className="text-xs text-[#ef9b89]">{err.message}</p>
                         ) : (
-                          p.help && <p className="text-[0.7rem] text-steel/55">{p.help}</p>
+                          p.help && <p className="text-2xs text-steel/55">{p.help}</p>
                         )}
                       </div>
                     );
@@ -289,7 +289,7 @@ export function ApiLab() {
               )}
 
               <div className="border border-steel/12 bg-[#060910] px-3 py-2">
-                <p className="text-[0.6rem] tracking-[0.16em] text-steel/60 uppercase">Upstream request</p>
+                <p className="text-4xs tracking-[0.16em] text-steel/60 uppercase">Upstream request</p>
                 <p className="mt-0.5 font-mono text-xs break-all text-foreground/85" data-testid="request-preview">
                   GET {preview}
                 </p>
@@ -380,31 +380,31 @@ export function ApiLab() {
                     {response.status}
                   </span>
                   <span className="text-sm text-foreground">{status.label}</span>
-                  <span className="border border-steel/20 px-1.5 text-[0.6rem] tracking-[0.14em] text-steel uppercase" data-source={response.source}>
+                  <span className="border border-steel/20 px-1.5 text-4xs tracking-[0.14em] text-steel uppercase" data-source={response.source}>
                     {response.source === "upstream" ? "from API" : "from proxy"}
                   </span>
                 </div>
                 <dl className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4" data-testid="response-meta">
                   <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Total time</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Total time</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.clientMs} ms</dd>
                   </div>
                   <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Upstream time</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Upstream time</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.upstreamMs !== null ? `${response.upstreamMs} ms` : "—"}</dd>
                   </div>
                   <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Size</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Size</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.bytes.toLocaleString("en-US")} B</dd>
                   </div>
                   <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">Items</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Items</dt>
                     <dd className="font-semibold text-foreground tabular-nums">
                       {Array.isArray(response.json) ? response.json.length : isObj(response.json) ? `${Object.keys(response.json).length} keys` : "—"}
                     </dd>
                   </div>
                 </dl>
-                <p className="font-mono text-[0.7rem] break-all text-steel/70">
+                <p className="font-mono text-2xs break-all text-steel/70">
                   {response.requestUrl}
                   {response.upstreamPath && <span className="text-steel/50"> → upstream {response.upstreamPath}</span>}
                 </p>
@@ -433,7 +433,7 @@ export function ApiLab() {
                     )}
                   </div>
                   <JsonViewer text={displayText} className="max-h-[36rem]" />
-                  <p className="mt-1 text-[0.65rem] text-steel/55">
+                  <p className="mt-1 text-3xs text-steel/55">
                     Pretty view re-indents the JSON without changing keys, order or values. Raw view is the body exactly as received.
                   </p>
                 </div>
@@ -538,7 +538,7 @@ function ResultHelpers({
   if (status === 200 && endpoint === "character-profile" && isObj(json)) {
     return (
       <div>
-        <p className="mb-1.5 text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase">Top-level keys in this response</p>
+        <p className="mb-1.5 text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">Top-level keys in this response</p>
         <ul className="flex flex-wrap gap-1.5" data-testid="profile-keys">
           {Object.entries(json).map(([k, v]) => (
             <li key={k} className="border border-steel/15 px-2 py-0.5 font-mono text-xs text-foreground/85">
@@ -560,7 +560,7 @@ function ResultHelpers({
       <div className="relative overflow-x-auto border border-steel/12">
         <table className="w-full min-w-[30rem] text-sm" data-testid="boards-table">
           <thead>
-            <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
               <th className="py-2 pr-3 pl-3 font-medium">id</th>
               <th className="px-3 py-2 font-medium">name</th>
               <th className="px-3 py-2 text-right font-medium">openNodeCount / totalNodeCount</th>

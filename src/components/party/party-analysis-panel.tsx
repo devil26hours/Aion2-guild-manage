@@ -20,7 +20,7 @@ const LEVEL_STYLE: Record<WarningLevel, { icon: typeof Info; cls: string }> = {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="border border-steel/10 bg-ink/50 px-3 py-2">
-      <p className="text-[0.6rem] tracking-[0.16em] text-steel/70 uppercase">{label}</p>
+      <p className="text-4xs tracking-[0.16em] text-steel/70 uppercase">{label}</p>
       <p className="font-heading text-lg font-bold text-foreground tabular-nums">{value}</p>
     </div>
   );
@@ -41,7 +41,7 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         <Stat label={t("Classes")} value={String(classes.length)} />
       </div>
 
-      <h3 className="mt-4 mb-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Role Distribution")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Role Distribution")}</h3>
       <ul className="space-y-1.5">
         {[...PARTY_ROLES, "Unassigned" as const].map((r) => {
           const n = analysis.roleCounts[r];
@@ -62,7 +62,7 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         })}
       </ul>
 
-      <h3 className="mt-4 mb-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Class Distribution")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Class Distribution")}</h3>
       {classes.length === 0 ? (
         <p className="text-xs text-steel/60">{t("No characters assigned.")}</p>
       ) : (
@@ -77,7 +77,7 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         </ul>
       )}
 
-      <h3 className="mt-4 mb-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Warnings")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Warnings")}</h3>
       {analysis.warnings.length === 0 ? (
         <p className="border border-[#7ee79e]/25 bg-[#7ee79e]/[0.06] px-3 py-2 text-xs text-[#c8f5d4]">{t("No issues found.")}</p>
       ) : (
@@ -93,7 +93,7 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
           })}
         </ul>
       )}
-      <p className="mt-3 text-[0.65rem] text-steel/55">
+      <p className="mt-3 text-3xs text-steel/55">
         {t("Balance warnings are planning guidelines for this")}{" "}{size}{t("-member party (≥")}{limits.classStack} {" "}{t("of one class")}{Number.isFinite(limits.roleHeavy) && <>, ≥{limits.roleHeavy} {" "}{t("of one role")}</>}{t(", a member ≥")}{BALANCE_GUIDE.cpGapPct}{t("% below average CP) — not game rules. No class or role is restricted.")}</p>
     </SectionPanel>
   );

@@ -2,76 +2,140 @@
 
 
 import { useT } from "@/lib/i18n";
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { BookOpen, ChevronDown, Feather, Gem, ScrollText, Shield, Sparkles, Swords } from "lucide-react";
+import { BookOpen, ChevronDown, Feather, Gem, ScrollText, Shield, Sparkles, Swords, X } from "lucide-react";
 import { JsonViewer } from "@/components/api-lab/json-viewer";
 import { RelativeTime } from "@/components/aion/relative-time";
 import { SectionPanel } from "@/components/aion/section-panel";
 import { RoleBadge } from "@/components/party/role-badge";
 import { formatNumber } from "@/lib/format";
-import { buildProfileView, gradeColor, type GearItem, type StatRow } from "@/lib/roster/profile-view";
+import { itemDetailKey, itemDetailTarget, profileIdentity, type ItemDetailTarget } from "@/lib/roster/item-details";
+import { requestItemDetail, useItemDetail } from "@/lib/roster/item-details-store";
+import { buildProfileView, gradeColor, type GearItem, type ProfileView, type StatRow } from "@/lib/roster/profile-view";
 import type { RosterMember } from "@/lib/roster/types";
 import { cn } from "@/lib/utils";
+import { ApiIcon, GradeLabel } from "./api-icon";
+import { ItemDetailSection } from "./item-detail-body";
 import { RosterClassBadge } from "./roster-class-badge";
 
 /* ------------------------------------------------------------------ */
 /* Small pieces                                                        */
 /* ------------------------------------------------------------------ */
 
-/** Remote icon from the API response, with a lettered fallback when it fails or is absent. */
-function ApiIcon({ src, alt, size = 40, color }: { src: string | null; alt: string; size?: number; color?: string }) {
-  const [ok, setOk] = useState(true);
-  return (
-    <span
-      className="relative flex shrink-0 items-center justify-center overflow-hidden border bg-[#0a0e18]"
-      style={{ width: size, height: size, borderColor: color ? `${color}99` : "rgba(147,162,187,0.25)", boxShadow: color ? `inset 0 0 10px ${color}33` : undefined }}
-    >
-      {src && ok ? (
-        // eslint-disable-next-line @next/next/no-img-element -- icon URL returned by the AION2 API
-        <img src={src} alt={alt} referrerPolicy="no-referrer" loading="lazy" onError={() => setOk(false)} className="size-full object-contain" />
-      ) : (
-        <span aria-hidden className="text-xs font-bold text-steel/60">{alt.charAt(0)}</span>
-      )}
-    </span>
-  );
-}
+/**
+ * What the tooltip can say about item details: the per-item request target
+ * (details are fetched on hover and read from the item-details cache), or a
+ * short hint when no request can be made.
+ */
+type TooltipDetails = { target: ItemDetailTarget } | { note: string };
 
-function GradeLabel({ grade }: { grade: string | null }) {
-  if (!grade) return null;
-  const c = gradeColor(grade);
-  return (
-    <span className="border px-1 text-[0.55rem] font-semibold tracking-[0.12em] uppercase" style={{ color: c, borderColor: `${c}55`, backgroundColor: `${c}14` }}>
-      {grade}
-    </span>
-  );
-}
+/** Hover must rest this long on a tile before its detail is requested, so sweeping across tiles fetches nothing. */
+const HOVER_INTENT_MS = 120;
+
+/** Viewport box of the tile a tooltip belongs to (captured when it opens). */
+type Anchor = { left: number; right: number; top: number };
+
+/** A tooltip kept open with Alt+hover. `dx`/`dy` is how far it was dragged; higher `order` is in front. */
+type Pin = { key: string; anchor: Anchor; dx: number; dy: number; order: number };
+
+/** Marks pinned tooltips (portaled to <body>) so a host dialog can treat clicks in them as inside. */
+export const GEAR_PIN_ATTR = "data-gear-pin";
+export const isInGearPin = (target: EventTarget | null) => target instanceof Element && target.closest(`[${GEAR_PIN_ATTR}]`) !== null;
+
+const anchorOf = (el: Element): Anchor => {
+  const r = el.getBoundingClientRect();
+  return { left: r.left, right: r.right, top: r.top };
+};
+
+type PinControls = { z: number; dx: number; dy: number; onClose: () => void; onFront: () => void; onDrag: (dx: number, dy: number) => void };
 
 /**
- * In-game-style item tooltip. Shows ONLY fields present in the API response
- * (equipmentList: name, enchantLevel, exceedLevel, grade, icon, id, slot) plus
- * the matching appearance skin. The API does not return item stats, Soul
- * Binding or other options, so those sections are not rendered.
+ * In-game-style item tooltip. Shows the fields of the stored API response
+ * (equipmentList: name, enchantLevel, exceedLevel, grade, icon, id, slot), the
+ * matching appearance skin and — fetched for this item on hover — its detail
+ * (Soul Binding, stats, sub skills, stones).
+ *
+ * With `pin` it is a pinned tooltip: interactive (text can be selected and
+ * copied), draggable by its title, closed with its X button.
  */
-function GearTooltip({ item, rect, id }: { item: GearItem; rect: DOMRect; id: string }) {
+function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; anchor: Anchor; id: string; details: TooltipDetails; pin?: PinControls }) {
   const t = useT();
   const c = gradeColor(item.grade);
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; dx: number; dy: number } | null>(null);
+  const target = "target" in details ? details.target : null;
+  const entry = useItemDetail(target ? itemDetailKey(target) : null);
+  // Height of the rendered tooltip; details make it taller than the base 260px.
+  const [height, setHeight] = useState(260);
+  useLayoutEffect(() => {
+    if (ref.current) setHeight(ref.current.offsetHeight);
+  }, [entry, details]);
   const W = 288;
   const gap = 10;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const right = rect.right + gap + W <= vw - 8;
-  const left = right ? rect.right + gap : Math.max(8, rect.left - gap - W);
-  const top = Math.min(Math.max(8, rect.top), vh - 8 - 260);
+  const right = anchor.right + gap + W <= vw - 8;
+  const baseLeft = right ? anchor.right + gap : Math.max(8, anchor.left - gap - W);
+  const baseTop = Math.max(8, Math.min(anchor.top, vh - 8 - height));
+  // A dragged pin stays reachable: its title line never leaves the viewport.
+  const left = pin ? Math.min(Math.max(8, baseLeft + pin.dx), vw - W - 8) : baseLeft;
+  const top = pin ? Math.min(Math.max(8, baseTop + pin.dy), vh - 40) : baseTop;
+  const titleDrag = pin
+    ? {
+        onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
+          if (e.button !== 0) return;
+          e.preventDefault();
+          e.currentTarget.setPointerCapture(e.pointerId);
+          drag.current = { x: e.clientX, y: e.clientY, dx: pin.dx, dy: pin.dy };
+        },
+        onPointerMove: (e: React.PointerEvent<HTMLElement>) => {
+          const d = drag.current;
+          if (d) pin.onDrag(d.dx + e.clientX - d.x, d.dy + e.clientY - d.y);
+        },
+        onPointerUp: () => {
+          drag.current = null;
+        },
+        onPointerCancel: () => {
+          drag.current = null;
+        },
+      }
+    : {};
   return createPortal(
     <div
+      ref={ref}
       id={id}
-      role="tooltip"
-      data-testid="gear-tooltip"
-      className="pointer-events-none fixed z-[100] border bg-gradient-to-b from-[#121a2c] to-[#080b13] p-3 text-left shadow-[0_18px_50px_-12px_rgba(0,0,0,0.95)]"
-      style={{ left, top, width: W, borderColor: `${c}99`, boxShadow: `0 18px 50px -12px rgba(0,0,0,0.95), inset 0 0 24px ${c}14` }}
+      role={pin ? "dialog" : "tooltip"}
+      aria-label={pin ? item.name : undefined}
+      {...(pin ? { [GEAR_PIN_ATTR]: "" } : {})}
+      data-testid={pin ? "gear-tooltip-pinned" : "gear-tooltip"}
+      className={cn(
+        "fixed border bg-gradient-to-b from-[#121a2c] to-[#080b13] p-3 text-left shadow-[0_18px_50px_-12px_rgba(0,0,0,0.95)]",
+        pin ? "pointer-events-auto select-text" : "pointer-events-none",
+      )}
+      style={{ left, top, width: W, zIndex: pin ? pin.z : 1000, borderColor: `${c}99`, boxShadow: `0 18px 50px -12px rgba(0,0,0,0.95), inset 0 0 24px ${c}14` }}
+      onPointerDown={pin?.onFront}
     >
-      <p className="font-heading text-[0.95rem] leading-snug font-bold" style={{ color: c }} data-testid="gear-tooltip-title">
+      {pin && (
+        <button
+          type="button"
+          aria-label={t("Close pinned tooltip")}
+          title={t("Close")}
+          className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center text-steel/70 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:ring-2 focus-visible:ring-arcane/50 focus-visible:outline-none"
+          // Keep focus where it is, so a host dialog's focus trap is not disturbed.
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={pin.onClose}
+          data-testid="gear-tooltip-close"
+        >
+          <X className="size-3.5" aria-hidden />
+        </button>
+      )}
+      <p
+        className={cn("font-heading text-[1rem] leading-snug font-bold", pin && "cursor-move touch-none pr-6 select-none")}
+        style={{ color: c }}
+        data-testid="gear-tooltip-title"
+        {...titleDrag}
+      >
         {item.enchant !== null && item.enchant > 0 && `+${item.enchant} `}
         {item.name}
       </p>
@@ -103,9 +167,10 @@ function GearTooltip({ item, rect, id }: { item: GearItem; rect: DOMRect; id: st
           <dd className="text-right text-foreground/90">{item.slotLabel}</dd>
         </dl>
       </div>
+      {target && <ItemDetailSection entry={entry} />}
       {item.skin && (
         <div className="mt-3 border-t border-steel/15 pt-2" data-testid="gear-tooltip-skin">
-          <p className="text-[0.6rem] font-semibold tracking-[0.18em] text-gold/80 uppercase">{t("Skin Info")}</p>
+          <p className="text-4xs font-semibold tracking-[0.18em] text-gold/80 uppercase">{t("Skin Info")}</p>
           <div className="mt-1.5 flex items-center gap-2">
             <ApiIcon src={item.skin.icon} alt={item.skin.name} size={30} color={gradeColor(item.skin.grade)} />
             <span className="min-w-0 text-xs">
@@ -115,53 +180,248 @@ function GearTooltip({ item, rect, id }: { item: GearItem; rect: DOMRect; id: st
           </div>
         </div>
       )}
-      <p className="mt-3 border-t border-steel/15 pt-2 text-[0.62rem] leading-snug text-steel/55">
-        {t("Item stats, Soul Binding and other options are not included in the AION2 API response.")}{item.itemId !== null && <span className="mt-0.5 block font-mono text-steel/45">{t("Item ID")}{" "}{item.itemId}</span>}
-      </p>
+      {("note" in details || item.itemId !== null) && (
+        <p className="mt-3 border-t border-steel/15 pt-2 text-4xs leading-snug text-steel/55">
+          {"note" in details && details.note}
+          {item.itemId !== null && <span className={cn("block font-mono text-steel/45", "note" in details && "mt-0.5")}>{t("Item ID")}{" "}{item.itemId}</span>}
+        </p>
+      )}
     </div>,
     document.body,
   );
 }
 
-function GearTile({ item }: { item: GearItem }) {
+function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: TooltipDetails; pinned: boolean; onPin: (anchor: Anchor) => void }) {
   const t = useT();
   const c = gradeColor(item.grade);
   const tipId = useId();
-  const [rect, setRect] = useState<DOMRect | null>(null);
-  const show = (el: HTMLElement) => setRect(el.getBoundingClientRect());
-  const hide = () => setRect(null);
+  const liRef = useRef<HTMLLIElement>(null);
+  const [anchor, setAnchor] = useState<Anchor | null>(null);
+  const [mouseOver, setMouseOver] = useState(false);
+  const timer = useRef<number | null>(null);
+  const cancel = () => {
+    if (timer.current !== null) window.clearTimeout(timer.current);
+    timer.current = null;
+  };
+  useEffect(() => cancel, []);
+  // Requests start only from these events (never from render). requestItemDetail
+  // is a no-op while this item is loading or freshly cached, and retries errors.
+  const target = "target" in details ? details.target : null;
+  const load = () => {
+    cancel();
+    if (target) requestItemDetail(target);
+  };
+  const show = (el: HTMLElement) => setAnchor(anchorOf(el));
+  const hide = () => {
+    cancel();
+    setAnchor(null);
+  };
+  const pinHere = (el: Element) => {
+    load();
+    onPin(anchorOf(el));
+  };
+  const pinRef = useRef(pinHere);
+  useLayoutEffect(() => {
+    pinRef.current = pinHere;
+  });
+  // Pressing Alt while the pointer is already over this tile pins it too.
+  useEffect(() => {
+    if (!mouseOver) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Alt" || e.repeat || !liRef.current) return;
+      e.preventDefault();
+      pinRef.current(liRef.current);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mouseOver]);
   return (
     <li
-      className="flex cursor-default items-center gap-2.5 border border-steel/10 bg-ink/50 p-1.5 transition-colors outline-none hover:border-gold-dim/50 focus-visible:border-arcane/60"
+      ref={liRef}
+      className="flex cursor-pointer items-center gap-2.5 border border-steel/10 bg-ink/50 p-1.5 transition-colors outline-none hover:border-gold-dim/50 focus-visible:border-arcane/60"
       data-slot-key={item.slotKey}
       tabIndex={0}
-      aria-describedby={rect ? tipId : undefined}
-      onMouseEnter={(e) => show(e.currentTarget)}
-      onMouseLeave={hide}
-      onFocus={(e) => show(e.currentTarget)}
+      aria-describedby={anchor && !pinned ? tipId : undefined}
+      onMouseEnter={(e) => {
+        setMouseOver(true);
+        if (e.altKey) return pinHere(e.currentTarget);
+        show(e.currentTarget);
+        cancel();
+        if (target) timer.current = window.setTimeout(load, HOVER_INTENT_MS);
+      }}
+      onMouseLeave={() => {
+        setMouseOver(false);
+        hide();
+      }}
+      onFocus={(e) => {
+        show(e.currentTarget);
+        load();
+      }}
       onBlur={hide}
-      onKeyDown={(e) => e.key === "Escape" && hide()}
+      onClick={load}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") hide();
+        else if (e.key === "Enter") load();
+      }}
     >
-      {rect && <GearTooltip item={item} rect={rect} id={tipId} />}
+      {/* A pinned item shows its pinned tooltip instead of a second hover tooltip. */}
+      {anchor && !pinned && <GearTooltip item={item} anchor={anchor} id={tipId} details={details} />}
       <span className="relative">
         <ApiIcon src={item.icon} alt={item.name} color={c} />
         {item.enchant !== null && item.enchant > 0 && (
-          <span className="absolute -top-1.5 -left-1.5 border border-gold-dim/60 bg-ink px-1 text-[0.6rem] leading-tight font-bold text-gold-bright tabular-nums">
+          <span className="absolute -top-1.5 -left-1.5 border border-gold-dim/60 bg-ink px-1 text-4xs leading-tight font-bold text-gold-bright tabular-nums">
             +{item.enchant}
           </span>
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[0.6rem] tracking-[0.16em] text-steel/55 uppercase">{item.slotLabel}</span>
-        <span className="block truncate text-[0.8rem] font-medium" style={{ color: c }} title={item.name}>
+        <span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{item.slotLabel}</span>
+        <span className="block truncate text-[0.875rem] font-medium" style={{ color: c }} title={item.name}>
           {item.name}
         </span>
-        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[0.65rem] text-steel/70">
+        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-3xs text-steel/70">
           <GradeLabel grade={item.grade} />
           {item.exceed !== null && item.exceed > 0 && <span title={t("exceedLevel")}>{t("Exceed")}{" "}{item.exceed}</span>}
         </span>
       </span>
     </li>
+  );
+}
+
+/**
+ * Equipment section. With `lazyDetails`, hovering (or focusing) an equipped
+ * item fetches that one item's detail from `GET /characters/equipment/item`
+ * through the shared per-item cache in item-details-store; nothing is fetched
+ * when the panel mounts. The request ids come from the same stored response
+ * the tiles are built from (`profile` + the item's `equipmentList` entry).
+ */
+function EquipmentPanel({
+  member,
+  view,
+  identity,
+  lazyDetails,
+}: {
+  member: RosterMember;
+  view: ProfileView;
+  identity: { characterId: string | null; serverId: string | null };
+  lazyDetails: boolean;
+}) {
+  const t = useT();
+  const count = view.equipment.reduce((n, g) => n + g.items.length, 0);
+  // The member's region is only sent when the stored response is this member's own character.
+  const region = identity.characterId === member.character_id && identity.serverId === member.server_id ? member.region : undefined;
+
+  const detailsFor = (it: GearItem): TooltipDetails => {
+    if (!lazyDetails) return { note: t("Soul Binding, item stats and stones are not stored with this profile.") };
+    const r = itemDetailTarget(identity, it, region);
+    return r.ok ? { target: r.target } : { note: t("Item details cannot be loaded: the stored response has no {fields} for this item.", { fields: r.missing.join(", ") }) };
+  };
+
+  const description = count
+    ? lazyDetails
+      ? t("{n} items equipped · hover an item for its details, Alt+hover to pin", { n: count })
+      : t("{n} items equipped", { n: count })
+    : undefined;
+
+  // Every tile by a stable key, so pins always render the item as currently shown
+  // (a refresh that changes an item updates or drops its pin instead of keeping stale data).
+  const skinNote: TooltipDetails = { note: t("Item stats, Soul Binding and other options are not included in the AION2 API response.") };
+  const tiles = new Map<string, { item: GearItem; details: TooltipDetails }>();
+  for (const g of view.equipment) for (const it of g.items) tiles.set(`gear:${it.slotKey}-${it.name}`, { item: it, details: detailsFor(it) });
+  for (const it of view.skins) tiles.set(`skin:${it.slotKey}-${it.name}`, { item: it, details: skinNote });
+
+  // Pinned tooltips (Alt+hover). Several can be open at once; each closes only
+  // with its own X (releasing Alt or leaving the tile keeps it). The array keeps
+  // its order (so portals are never moved mid-drag or mid-selection); stacking
+  // comes from `order`.
+  const pinIdBase = useId();
+  const [pins, setPins] = useState<Pin[]>([]);
+  const nextOrder = useRef(0);
+  const toFront = (ps: Pin[], key: string) => {
+    const p = ps.find((x) => x.key === key);
+    // Orders are unique, so an already front-most pin changes nothing (no re-render).
+    if (!p || p.order === Math.max(...ps.map((x) => x.order))) return ps;
+    const order = ++nextOrder.current;
+    return ps.map((x) => (x === p ? { ...x, order } : x));
+  };
+  // Alt pressed or released on its own can move focus to the browser menu on
+  // Windows; once Alt has pinned something, that release is swallowed.
+  const altPinned = useRef(false);
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "Alt" && !e.repeat) altPinned.current = false;
+    };
+    const up = (e: KeyboardEvent) => {
+      if (e.key !== "Alt" || !altPinned.current) return;
+      altPinned.current = false;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", down, true);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down, true);
+      window.removeEventListener("keyup", up);
+    };
+  }, []);
+  const pin = (key: string, anchor: Anchor) => {
+    altPinned.current = true;
+    setPins((ps) => (ps.some((p) => p.key === key) ? toFront(ps, key) : [...ps, { key, anchor, dx: 0, dy: 0, order: ++nextOrder.current }]));
+  };
+  const pinnedKeys = new Set(pins.map((p) => p.key));
+  const tile = (key: string, it: GearItem, details: TooltipDetails) => (
+    <GearTile key={key} item={it} details={details} pinned={pinnedKeys.has(key)} onPin={(anchor) => pin(key, anchor)} />
+  );
+
+  return (
+    <SectionPanel title={t("Equipment")} icon={Shield} description={description}>
+      {view.equipment.length === 0 ? (
+        <p className="text-sm text-steel">{t("No equipment data in the API response.")}</p>
+      ) : (
+        <div className="space-y-4" data-testid="equipment">
+          {view.equipment.map((g) => (
+            <div key={g.group}>
+              <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{g.group}</h3>
+              <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
+                {g.items.map((it) => {
+                  const key = `gear:${it.slotKey}-${it.name}`;
+                  return tile(key, it, tiles.get(key)!.details);
+                })}
+              </ul>
+            </div>
+          ))}
+          {view.skins.length > 0 && (
+            <Collapsible title={t("Appearance skins")} count={view.skins.length}>
+              <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
+                {view.skins.map((it) => tile(`skin:${it.slotKey}-${it.name}`, it, skinNote))}
+              </ul>
+            </Collapsible>
+          )}
+        </div>
+      )}
+      {pins.map((p, i) => {
+        const current = tiles.get(p.key);
+        // Stacking rank among pins: 0 = back. All pins sit below the hover tooltip (z 1000).
+        const rank = pins.filter((x) => x.order < p.order).length;
+        if (!current) return null;
+        return (
+          <GearTooltip
+            key={p.key}
+            item={current.item}
+            details={current.details}
+            anchor={p.anchor}
+            id={`${pinIdBase}-pin-${i}`}
+            pin={{
+              z: 100 + rank,
+              dx: p.dx,
+              dy: p.dy,
+              onClose: () => setPins((ps) => ps.filter((x) => x.key !== p.key)),
+              onFront: () => setPins((ps) => toFront(ps, p.key)),
+              onDrag: (dx, dy) => setPins((ps) => ps.map((x) => (x.key === p.key ? { ...x, dx, dy } : x))),
+            }}
+          />
+        );
+      })}
+    </SectionPanel>
   );
 }
 
@@ -175,14 +435,14 @@ function StatGrid({ rows, accent }: { rows: StatRow[]; accent?: boolean }) {
           className="border border-steel/10 bg-ink/50 px-2.5 py-1.5"
           title={[s.apiName && s.apiName !== s.name ? `${t("API name")}: ${s.apiName}` : null, ...s.effects].filter(Boolean).join("\n") || undefined}
         >
-          <dt className="flex items-center justify-between gap-2 text-[0.7rem] text-steel">
+          <dt className="flex items-center justify-between gap-2 text-2xs text-steel">
             <span className="truncate">{s.name}</span>
             <span className={cn("font-heading text-base font-bold tabular-nums", accent ? "text-gold-bright" : "text-foreground")}>
               {s.value ?? "—"}
             </span>
           </dt>
           {s.effects.length > 0 && (
-            <dd className="mt-0.5 space-y-px text-[0.62rem] leading-snug text-[#9af0b3]/80">
+            <dd className="mt-0.5 space-y-px text-4xs leading-snug text-[#9af0b3]/80">
               {s.effects.map((e, i) => (
                 <span key={i} className="block truncate">{e}</span>
               ))}
@@ -197,7 +457,7 @@ function StatGrid({ rows, accent }: { rows: StatRow[]; accent?: boolean }) {
 function Collapsible({ title, count, children, testId }: { title: string; count?: number; children: React.ReactNode; testId?: string }) {
   return (
     <details className="group border border-steel/12 bg-ink/40" data-testid={testId}>
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase outline-none select-none hover:bg-white/[0.02] focus-visible:ring-2 focus-visible:ring-arcane/40">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase outline-none select-none hover:bg-white/[0.02] focus-visible:ring-2 focus-visible:ring-arcane/40">
         <span>
           {title}
           {count !== undefined && <span className="ml-1.5 font-normal tracking-normal text-steel/60 normal-case">({count})</span>}
@@ -219,18 +479,22 @@ export type ProfileSection = "header" | "equipment" | "stats" | "extras" | "skil
  * Human-readable character profile built from the stored API response.
  * Shared by the Members detail dialog and the Character History page.
  * Fields absent from the response are hidden; raw JSON is collapsed.
+ * `itemDetails` makes equipment tooltips fetch each item's detail on hover.
  */
 export function CharacterProfileView({
   member,
   raw,
   sections = ["header", "equipment", "stats", "extras", "skills", "raw"],
+  itemDetails = false,
 }: {
   member: RosterMember;
   raw: unknown;
   sections?: ProfileSection[];
+  itemDetails?: boolean;
 }) {
   const t = useT();
   const view = useMemo(() => buildProfileView(raw), [raw]);
+  const identity = useMemo(() => profileIdentity(raw), [raw]);
   const has = (s: ProfileSection) => sections.includes(s);
   const activeSkills = view?.skills.filter((s) => s.category === "Active") ?? [];
   const passiveSkills = view?.skills.filter((s) => s.category === "Passive") ?? [];
@@ -245,7 +509,7 @@ export function CharacterProfileView({
           <div className="relative flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
             <ApiIcon src={member.profile_image} alt={member.character_name} size={88} color="#c9a45c" />
             <div className="min-w-0 flex-1">
-              <p className="text-[0.65rem] font-semibold tracking-[0.3em] text-arcane/90 uppercase" data-testid="profile-server">
+              <p className="text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase" data-testid="profile-server">
                 {member.server_name ?? "—"} · {member.region.toUpperCase()}
               </p>
               <h2 className="mt-0.5 font-heading text-2xl font-bold tracking-[0.06em] text-gold-bright sm:text-3xl" data-testid="profile-name">
@@ -274,14 +538,14 @@ export function CharacterProfileView({
               ["Last API update", null, "profile-updated", false],
             ].map(([label, value, tid, big]) => (
               <div key={label as string} className="bg-[#090d16] px-4 py-2.5">
-                <dt className="text-[0.6rem] font-semibold tracking-[0.2em] text-steel/70 uppercase">{t(label as string)}</dt>
+                <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{t(label as string)}</dt>
                 <dd className={cn("mt-0.5 tabular-nums", big ? "font-heading text-xl font-bold text-gold-bright" : "text-sm font-semibold text-foreground")} data-testid={tid as string}>
                   {value ?? <RelativeTime iso={member.api_updated_at} />}
                 </dd>
               </div>
             ))}
           </dl>
-          <details className="relative border-t border-steel/10 px-4 py-1.5 text-[0.65rem] text-steel/60">
+          <details className="relative border-t border-steel/10 px-4 py-1.5 text-3xs text-steel/60">
             <summary className="cursor-pointer select-none">{t("Admin identifiers")}</summary>
             <p className="mt-1 font-mono break-all">id {member.id}</p>
             <p className="font-mono break-all">{t("characterId")}{" "}{member.character_id}</p>
@@ -293,31 +557,7 @@ export function CharacterProfileView({
         <p className="border border-steel/12 bg-ink/50 px-3 py-6 text-center text-sm text-steel">{t("No stored API response for this character yet.")}</p>
       )}
 
-      {view && has("equipment") && (
-        <SectionPanel title={t("Equipment")} icon={Shield} description={view.equipment.length ? `${view.equipment.reduce((n, g) => n + g.items.length, 0)} items equipped` : undefined}>
-          {view.equipment.length === 0 ? (
-            <p className="text-sm text-steel">{t("No equipment data in the API response.")}</p>
-          ) : (
-            <div className="space-y-4" data-testid="equipment">
-              {view.equipment.map((g) => (
-                <div key={g.group}>
-                  <h3 className="mb-1.5 text-[0.6rem] font-semibold tracking-[0.24em] text-gold/60 uppercase">{g.group}</h3>
-                  <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
-                    {g.items.map((it) => <GearTile key={`${it.slotKey}-${it.name}`} item={it} />)}
-                  </ul>
-                </div>
-              ))}
-              {view.skins.length > 0 && (
-                <Collapsible title={t("Appearance skins")} count={view.skins.length}>
-                  <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
-                    {view.skins.map((it) => <GearTile key={`${it.slotKey}-${it.name}`} item={it} />)}
-                  </ul>
-                </Collapsible>
-              )}
-            </div>
-          )}
-        </SectionPanel>
-      )}
+      {view && has("equipment") && <EquipmentPanel key={member.id} member={member} view={view} identity={identity} lazyDetails={itemDetails} />}
 
       {view && has("stats") && (
         <SectionPanel title={t("Stats")} icon={Swords} description={t("stat.statList · hover a stat for its effects")}>
@@ -327,19 +567,19 @@ export function CharacterProfileView({
             <div className="space-y-4" data-testid="stats">
               {view.stats.primary.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-[0.6rem] font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Primary")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Primary")}</h3>
                   <StatGrid rows={view.stats.primary} accent />
                 </div>
               )}
               {view.stats.deity.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-[0.6rem] font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Deity")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Deity")}</h3>
                   <StatGrid rows={view.stats.deity} />
                 </div>
               )}
               {view.stats.other.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-[0.6rem] font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Other")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Other")}</h3>
                   <StatGrid rows={view.stats.other} />
                 </div>
               )}
@@ -374,25 +614,25 @@ export function CharacterProfileView({
                 {view.pet && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.pet.icon} alt={view.pet.name} size={36} />
-                    <span><span className="block text-[0.6rem] tracking-[0.16em] text-steel/55 uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
+                    <span><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
                   </li>
                 )}
                 {view.wing && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.wing.icon} alt={view.wing.name} size={36} color={gradeColor(view.wing.grade)} />
-                    <span className="min-w-0"><span className="block text-[0.6rem] tracking-[0.16em] text-steel/55 uppercase">{t("Wings")}</span>{view.wing.name} {view.wing.enchant ? <span className="text-gold-bright">+{view.wing.enchant}</span> : null} <GradeLabel grade={view.wing.grade} /></span>
+                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Wings")}</span>{view.wing.name} {view.wing.enchant ? <span className="text-gold-bright">+{view.wing.enchant}</span> : null} <GradeLabel grade={view.wing.grade} /></span>
                   </li>
                 )}
                 {view.wingSkin && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.wingSkin.icon} alt={view.wingSkin.name} size={36} color={gradeColor(view.wingSkin.grade)} />
-                    <span className="min-w-0"><span className="block text-[0.6rem] tracking-[0.16em] text-steel/55 uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
+                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
                   </li>
                 )}
                 {view.titles && (
                   <li className="flex items-center gap-2.5">
                     <span className="flex size-9 items-center justify-center border border-gold-dim/40 text-gold"><Gem className="size-4" /></span>
-                    <span><span className="block text-[0.6rem] tracking-[0.16em] text-steel/55 uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
+                    <span><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
                   </li>
                 )}
               </ul>
@@ -411,7 +651,7 @@ export function CharacterProfileView({
             ].map(([label, list]) =>
               (list as typeof activeSkills).length ? (
                 <div key={label as string}>
-                  <h3 className="mb-1.5 text-[0.6rem] font-semibold tracking-[0.24em] text-gold/60 uppercase">
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">
                     <Sparkles className="mr-1 inline size-3" aria-hidden />
                     {label as string}
                   </h3>
@@ -433,7 +673,7 @@ export function CharacterProfileView({
 
       {has("raw") && raw !== undefined && (
         <Collapsible title={t("Raw API Data")} testId="raw-api-data">
-          <p className="mb-2 text-[0.65rem] text-steel/60">{t("The stored response, unmodified — for admin/debugging.")}</p>
+          <p className="mb-2 text-3xs text-steel/60">{t("The stored response, unmodified — for admin/debugging.")}</p>
           <JsonViewer text={JSON.stringify(raw, null, 2)} className="max-h-80" />
         </Collapsible>
       )}

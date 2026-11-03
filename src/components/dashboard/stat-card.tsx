@@ -25,14 +25,14 @@ export function StatCard({
         className="pointer-events-none absolute -top-10 -right-10 size-28 rounded-full bg-arcane/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
       />
       <div className="relative flex items-start justify-between gap-3">
-        <p className="text-[0.7rem] font-medium tracking-[0.18em] text-steel uppercase">
+        <p className="text-2xs font-medium tracking-[0.18em] text-steel uppercase">
           {label}
         </p>
         <span className="flex size-8 shrink-0 items-center justify-center border border-gold-dim/40 bg-gold/5 text-gold">
           <Icon className="size-4" />
         </span>
       </div>
-      <p className="relative mt-2 font-heading text-2xl font-bold tracking-wide text-foreground tabular-nums sm:text-[1.75rem]">
+      <p className="relative mt-2 font-heading text-2xl font-bold tracking-wide text-foreground tabular-nums sm:text-[1.875rem]">
         {value}
       </p>
       {detail && (

@@ -7,10 +7,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-cinzel);
-  --font-heading: var(--font-cinzel);
+  /* Latin glyphs come from Geist / Cinzel; Thai glyphs (which those fonts do
+     not contain) fall through to Noto Sans Thai instead of a small OS font. */
+  --font-sans: var(--font-geist-sans), var(--font-thai), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), var(--font-thai), ui-monospace, monospace;
+  --font-display: var(--font-cinzel), var(--font-thai), serif;
+  --font-heading: var(--font-cinzel), var(--font-thai), serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -56,6 +58,56 @@
   --color-ink: #070a11;
   --color-ink-raised: #0b101b;
   --color-steel: #93a2bb;
+}
+
+/* ---------------------------------------------------------------
+   Type scale
+   Kept in a non-inline @theme so utilities read the CSS variables
+   and the :lang(th) block below can tune them for Thai.
+   Every step is ~1px larger than Tailwind's default; the smallest
+   steps grow the most since that is where readability suffered.
+   --------------------------------------------------------------- */
+@theme {
+  /* micro labels (replaced hardcoded 0.55rem–0.7rem arbitrary sizes) */
+  --text-5xs: 0.625rem; /* 10px   (was 8.8px)  */
+  --text-4xs: 0.6875rem; /* 11px   (was 9.6px)  */
+  --text-3xs: 0.71875rem; /* 11.5px (was 10.4px) */
+  --text-2xs: 0.75rem; /* 12px   (was 11.2px) */
+
+  --text-xs: 0.8125rem; /* 13px (was 12px) */
+  --text-xs--line-height: calc(1.25 / 0.8125);
+  --text-sm: 0.9375rem; /* 15px (was 14px) */
+  --text-sm--line-height: calc(1.375 / 0.9375);
+  --text-base: 1.0625rem; /* 17px (was 16px) */
+  --text-base--line-height: calc(1.625 / 1.0625);
+  --text-lg: 1.1875rem; /* 19px (was 18px) */
+  --text-lg--line-height: calc(1.75 / 1.1875);
+  --text-xl: 1.3125rem; /* 21px (was 20px) */
+  --text-xl--line-height: calc(1.875 / 1.3125);
+  --text-2xl: 1.625rem; /* 26px (was 24px) */
+  --text-2xl--line-height: calc(2.125 / 1.625);
+  --text-3xl: 2rem; /* 32px (was 30px) */
+  --text-3xl--line-height: calc(2.375 / 2);
+  /* 4xl and up are display titles: already large, left at defaults. */
+}
+
+/* Thai: glyphs carry stacked vowels and tone marks above/below the line,
+   so they read smaller than Latin at the same size and need more leading. */
+:root:lang(th) {
+  --text-5xs: 0.65625rem; /* 10.5px */
+  --text-4xs: 0.71875rem; /* 11.5px */
+  --text-3xs: 0.75rem; /* 12px   */
+  --text-2xs: 0.78125rem; /* 12.5px */
+  --text-xs: 0.84375rem; /* 13.5px */
+  --text-xs--line-height: 1.6;
+  --text-sm: 0.96875rem; /* 15.5px */
+  --text-sm--line-height: 1.6;
+  --text-base: 1.09375rem; /* 17.5px */
+  --text-base--line-height: 1.7;
+  --text-lg--line-height: 1.6;
+  --text-xl--line-height: 1.55;
+  --text-2xl--line-height: 1.45;
+  --text-3xl--line-height: 1.35;
 }
 
 :root {
@@ -138,6 +190,37 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Tailwind v4 resets buttons to cursor:default. Restore the pointer on
+     every interactive control (enabled only); plain text/containers keep
+     the default cursor. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"]:not([aria-disabled="true"]),
+  [role="checkbox"]:not(:disabled),
+  [role="menuitem"]:not([data-disabled]),
+  [role="menuitemcheckbox"]:not([data-disabled]),
+  [role="menuitemradio"]:not([data-disabled]),
+  select:not(:disabled),
+  summary,
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  label:has(input[type="checkbox"]:not(:disabled)),
+  label:has(input[type="radio"]:not(:disabled)),
+  label:has(button[role="checkbox"]:not(:disabled)) {
+    @apply cursor-pointer;
+  }
+  /* Thai text inherits a roomier default line-height. */
+  :root:lang(th) body {
+    line-height: 1.65;
+  }
+  /* shadcn titles/labels use leading-none, which crams Thai tone marks. */
+  :root:lang(th) [data-slot="dialog-title"],
+  :root:lang(th) [data-slot="sheet-title"],
+  :root:lang(th) [data-slot="card-title"],
+  :root:lang(th) [data-slot="label"] {
+    line-height: 1.4;
   }
 }
 

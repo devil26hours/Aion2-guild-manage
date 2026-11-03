@@ -38,7 +38,7 @@ function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null 
         return (
           <Fragment key={href}>
           {firstDev && (
-            <p className="mt-3 border-t border-steel/10 px-3 pt-3 font-heading text-[0.6rem] font-semibold tracking-[0.3em] text-steel/50 uppercase">
+            <p className="mt-3 border-t border-steel/10 px-3 pt-3 font-heading text-4xs font-semibold tracking-[0.3em] text-steel/50 uppercase">
               {t("Developer")}</p>
           )}
           <Link
@@ -70,7 +70,7 @@ function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null 
               )}
             />
             <span className="tracking-wide">{t(label)}</span>
-            {dev && <span className="ml-auto border border-steel/20 px-1 text-[0.55rem] font-semibold tracking-wider text-steel/60 uppercase">Dev</span>}
+            {dev && <span className="ml-auto border border-steel/20 px-1 text-5xs font-semibold tracking-wider text-steel/60 uppercase">Dev</span>}
           </Link>
           </Fragment>
         );

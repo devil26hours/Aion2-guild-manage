@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import type { CharacterHit } from "@/lib/aion2-api/types";
 import type { PartyRole } from "@/lib/party/types";
 import { call, onRevalidate } from "@/lib/client/api";
+import { clearItemDetails } from "./item-details-store";
 import type { RosterMember, RosterSnapshot } from "./types";
 
 /**
@@ -86,7 +87,10 @@ export async function updateRosterMember(id: string, patch: { role?: PartyRole |
 
 export async function removeRosterMember(id: string) {
   const r = await call<{ ok: true }>(memberUrl(id), { method: "DELETE" });
-  if (r.ok) set({ members: state.members.filter((m) => m.id !== id) });
+  if (r.ok) {
+    set({ members: state.members.filter((m) => m.id !== id) });
+    clearItemDetails(id);
+  }
   return r;
 }
 

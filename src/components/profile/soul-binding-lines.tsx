@@ -47,11 +47,11 @@ export function SoulBindingLines({
             </div>
             {!compact && (
               <div className="mt-1 flex items-center gap-2">
-                <span className={cn("w-24 shrink-0 text-[0.6rem] tracking-[0.12em] uppercase", CATEGORY_TONE[cat])}>
+                <span className={cn("w-28 shrink-0 text-4xs tracking-[0.12em] uppercase", CATEGORY_TONE[cat])}>
                   {CATEGORY_LABELS[cat]}
                 </span>
                 {line.skill ? (
-                  <span className="text-[0.65rem] text-steel/60">
+                  <span className="text-3xs text-steel/60">
                     {line.skill.name ?? `${line.skill.kind === "active" ? "Active" : "Passive"} skill — name not in mock data`}
                   </span>
                 ) : (
@@ -59,7 +59,7 @@ export function SoulBindingLines({
                     <span aria-hidden className="h-1 flex-1 bg-steel/10">
                       <span className="block h-full bg-[#7ee79e]/70" style={{ width: `${pct}%` }} />
                     </span>
-                    <span className="text-[0.6rem] text-steel/50 tabular-nums">
+                    <span className="text-4xs text-steel/50 tabular-nums">
                       {line.min}–{line.max}
                     </span>
                   </>

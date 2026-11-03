@@ -30,7 +30,7 @@ export function UserMenu() {
         </span>
         <span className="hidden text-left leading-tight md:block">
           <span className="block min-w-16 text-sm text-foreground">{ready ? display : "\u00a0"}</span>
-          <span className="block text-[0.65rem] tracking-wider text-gold/80 uppercase">
+          <span className="block text-3xs tracking-wider text-gold/80 uppercase">
             {ready ? roleLabel : "\u00a0"}
           </span>
         </span>
@@ -43,7 +43,7 @@ export function UserMenu() {
         <DropdownMenuLabel className="font-normal">
           <p className="text-sm text-foreground" data-testid="user-menu-name">{display}</p>
           <p className="truncate text-xs text-steel/70">{me?.user.email}</p>
-          <p className="mt-0.5 text-[0.65rem] tracking-wider text-gold/80 uppercase" data-testid="user-menu-role">{roleLabel}</p>
+          <p className="mt-0.5 text-3xs tracking-wider text-gold/80 uppercase" data-testid="user-menu-role">{roleLabel}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="rounded-none">

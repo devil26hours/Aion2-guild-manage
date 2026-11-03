@@ -215,13 +215,13 @@ export function LoginForm() {
           />
           <Label
             htmlFor={rememberId}
-            className="cursor-pointer text-[0.8rem] font-normal text-steel"
+            className="cursor-pointer text-[0.875rem] font-normal text-steel"
           >
             {t("Remember me")}</Label>
         </div>
         <Link
           href="/forgot-password"
-          className="text-[0.8rem] text-gold/90 underline-offset-4 transition-colors outline-none hover:text-gold-bright hover:underline focus-visible:text-gold-bright focus-visible:underline"
+          className="text-[0.875rem] text-gold/90 underline-offset-4 transition-colors outline-none hover:text-gold-bright hover:underline focus-visible:text-gold-bright focus-visible:underline"
         >
           {t("Forgot password?")}</Link>
       </div>
@@ -269,7 +269,7 @@ export function LoginForm() {
 }
 
 const fieldInputClass = cn(
-  "h-11 rounded-none border-steel/20 bg-ink/70 pl-10 text-[0.95rem] text-foreground",
+  "h-11 rounded-none border-steel/20 bg-ink/70 pl-10 text-[1rem] text-foreground",
   "placeholder:text-steel/40 transition-[border-color,box-shadow,background-color] duration-200",
   "hover:border-gold-dim/60",
   "focus-visible:border-gold/70 focus-visible:bg-ink focus-visible:ring-2 focus-visible:ring-arcane/25 focus-visible:shadow-[0_0_18px_-6px_rgba(95,168,255,0.6)]",
@@ -296,7 +296,7 @@ function FormField({
     <div className="space-y-2">
       <Label
         htmlFor={id}
-        className="font-heading text-[0.7rem] font-semibold tracking-[0.22em] text-gold/90 uppercase"
+        className="font-heading text-2xs font-semibold tracking-[0.22em] text-gold/90 uppercase"
       >
         {label}
       </Label>

@@ -22,11 +22,11 @@ export function SidebarGuildCard() {
         <GuildEmblem className="size-9" />
         <div className="min-w-0">
           <p className="truncate font-heading text-xs leading-snug font-semibold tracking-wider text-gold-bright">{ready ? name : " "}</p>
-          <p className="truncate text-[0.7rem] text-steel/70">{ready ? server || t("Server not set") : " "}</p>
+          <p className="truncate text-2xs text-steel/70">{ready ? server || t("Server not set") : " "}</p>
         </div>
       </div>
       <div className="mt-3">
-        <div className="flex justify-between text-[0.65rem] tracking-wider text-steel/70 uppercase">
+        <div className="flex justify-between text-3xs tracking-wider text-steel/70 uppercase">
           <span>{t("Roster")}</span>
           <span className="text-foreground tabular-nums" data-testid="sidebar-roster-count">
             {known ? memberCount : "—"} / {ready ? memberCap : "—"}

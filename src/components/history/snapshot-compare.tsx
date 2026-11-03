@@ -59,7 +59,7 @@ export function SnapshotCompare({
 
   const picker = (which: "a" | "b", value: string) => (
     <div className="min-w-0 flex-1 space-y-1.5">
-      <Label htmlFor={`cmp-${which}`} className="text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase">
+      <Label htmlFor={`cmp-${which}`} className="text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
         Snapshot {which.toUpperCase()}
       </Label>
       <NativeSelect id={`cmp-${which}`} value={value} onChange={(e) => onChange(which, e.target.value)} className={aionField}>
@@ -97,7 +97,7 @@ export function SnapshotCompare({
           <table className="w-full min-w-[22rem] text-sm">
             <caption className="sr-only">Stat changes</caption>
             <thead>
-              <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+              <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
                 <th scope="col" className="py-2 pr-3 pl-4 font-medium sm:pl-5">Stat</th>
                 <th scope="col" className="px-3 py-2 text-right font-medium">A</th>
                 <th scope="col" className="px-3 py-2 text-right font-medium">B</th>
@@ -111,7 +111,7 @@ export function SnapshotCompare({
                   <td className="px-3 py-1.5 text-right text-steel/80 tabular-nums">{fmtV(m.a, m.decimals)}</td>
                   <td className="px-3 py-1.5 text-right font-semibold text-foreground tabular-nums">{fmtV(m.b, m.decimals)}</td>
                   <td className="py-1.5 pr-4 pl-3 text-right sm:pr-5">
-                    <DeltaChip delta={m.delta} className="px-1 py-0 text-[0.7rem]" />
+                    <DeltaChip delta={m.delta} className="px-1 py-0 text-2xs" />
                   </td>
                 </tr>
               ))}
@@ -126,14 +126,14 @@ export function SnapshotCompare({
             <span><span className="font-semibold text-[#f0a596]">{sum.downgraded}</span> downgraded</span>
             <span><span className="font-semibold text-[#cfe3ff]">{sum.changed}</span> changed</span>
             <span>
-              Enhancement total <DeltaChip delta={sum.enhancementDelta} className="ml-1 px-1 py-0 text-[0.7rem]" />
+              Enhancement total <DeltaChip delta={sum.enhancementDelta} className="ml-1 px-1 py-0 text-2xs" />
             </span>
           </div>
           <div className="relative overflow-x-auto">
             <table className="w-full min-w-[34rem] text-sm">
               <caption className="sr-only">Equipment changes</caption>
               <thead>
-                <tr className="border-y border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+                <tr className="border-y border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
                   <th scope="col" className="py-2 pr-3 pl-4 font-medium sm:pl-5">Slot</th>
                   <th scope="col" className="px-3 py-2 font-medium">B item</th>
                   <th scope="col" className="px-3 py-2 text-right font-medium">iLv</th>
@@ -152,10 +152,10 @@ export function SnapshotCompare({
                           <>
                             <span className="block text-xs font-medium" style={{ color: RARITY_META[item.rarity].color }}>{item.name}</span>
                             {d.a && d.b && d.a.rarity !== d.b.rarity && (
-                              <span className="mt-0.5 flex items-center gap-1 text-[0.6rem] text-steel/60">
-                                <RarityLabel rarity={d.a.rarity} className="px-1 text-[0.55rem]" />
+                              <span className="mt-0.5 flex items-center gap-1 text-4xs text-steel/60">
+                                <RarityLabel rarity={d.a.rarity} className="px-1 text-5xs" />
                                 <ArrowRight aria-label="to" className="size-2.5" />
-                                <RarityLabel rarity={d.b.rarity} className="px-1 text-[0.55rem]" />
+                                <RarityLabel rarity={d.b.rarity} className="px-1 text-5xs" />
                               </span>
                             )}
                           </>
@@ -165,14 +165,14 @@ export function SnapshotCompare({
                       </td>
                       <td className="px-3 py-1.5 text-right text-xs tabular-nums">
                         {d.b?.item_level ?? "—"}
-                        {d.itemLevelDelta !== 0 && <DeltaChip delta={d.itemLevelDelta} className="ml-1 px-1 py-0 text-[0.6rem]" />}
+                        {d.itemLevelDelta !== 0 && <DeltaChip delta={d.itemLevelDelta} className="ml-1 px-1 py-0 text-4xs" />}
                       </td>
                       <td className="px-3 py-1.5 text-right text-xs tabular-nums">
                         +{d.b?.enhancement ?? 0}
-                        {d.enhancementDelta !== 0 && <DeltaChip delta={d.enhancementDelta} className="ml-1 px-1 py-0 text-[0.6rem]" />}
+                        {d.enhancementDelta !== 0 && <DeltaChip delta={d.enhancementDelta} className="ml-1 px-1 py-0 text-4xs" />}
                       </td>
                       <td className="py-1.5 pr-4 pl-3 sm:pr-5">
-                        <span className={cn("inline-flex border px-1.5 py-px text-[0.6rem] font-semibold tracking-[0.12em] uppercase", STATUS_STYLE[d.status])}>
+                        <span className={cn("inline-flex border px-1.5 py-px text-4xs font-semibold tracking-[0.12em] uppercase", STATUS_STYLE[d.status])}>
                           {d.status}
                         </span>
                       </td>

@@ -105,7 +105,7 @@ function StatusPill({ tone, children }: { tone: "ok" | "idle" | "warn"; children
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 border px-2 py-0.5 text-[0.65rem] font-semibold tracking-[0.14em] uppercase",
+        "inline-flex items-center gap-1.5 border px-2 py-0.5 text-3xs font-semibold tracking-[0.14em] uppercase",
         tone === "ok" && "border-[#9af0b3]/40 bg-[#9af0b3]/[0.08] text-[#9af0b3]",
         tone === "idle" && "border-steel/25 bg-ink/60 text-steel",
         tone === "warn" && "border-[#f0cf86]/40 bg-[#f0cf86]/[0.08] text-[#f0cf86]",
@@ -222,7 +222,7 @@ function OverviewStats({ state, onRetry }: { state: ReturnType<typeof useDataOve
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" data-testid="data-overview">
       {items.map(({ icon: Icon, label, value }) => (
         <div key={label} className="border border-steel/12 bg-ink/50 p-3">
-          <dt className="flex items-center gap-1.5 text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase"><Icon className="size-3.5" /> {label}</dt>
+          <dt className="flex items-center gap-1.5 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase"><Icon className="size-3.5" /> {label}</dt>
           <dd className="mt-1.5 font-heading text-2xl text-foreground tabular-nums">{value.toLocaleString()}</dd>
         </div>
       ))}

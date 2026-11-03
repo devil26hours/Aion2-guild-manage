@@ -16,7 +16,7 @@ import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 
 type SearchState = { status: "idle" } | { status: "searching" } | { status: "done"; hits: CharacterHit[] } | { status: "error"; message: string };
 
@@ -138,7 +138,7 @@ export function RegisterForm() {
               {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
           </div>
-          {errors.password ? <p className="text-xs text-[#ef9b89]">{errors.password}</p> : <p className="text-[0.7rem] text-steel/60">{t("At least 8 characters.")}</p>}
+          {errors.password ? <p className="text-xs text-[#ef9b89]">{errors.password}</p> : <p className="text-2xs text-steel/60">{t("At least 8 characters.")}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor={`${ids}-pw2`} className={labelClass}>{t("Confirm password")}</Label>

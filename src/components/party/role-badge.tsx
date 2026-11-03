@@ -17,7 +17,7 @@ export function RoleBadge({ role, className }: { role: PartyRole | null; classNa
   const t = useT();
   if (!role) {
     return (
-      <span className={cn("inline-flex items-center gap-1 border border-dashed border-steel/30 px-1.5 py-px text-[0.6rem] font-semibold tracking-[0.12em] text-steel/70 uppercase", className)}>
+      <span className={cn("inline-flex items-center gap-1 border border-dashed border-steel/30 px-1.5 py-px text-4xs font-semibold tracking-[0.12em] text-steel/70 uppercase", className)}>
         <CircleDashed className="size-3" aria-hidden />
         {t("No role")}</span>
     );
@@ -26,7 +26,7 @@ export function RoleBadge({ role, className }: { role: PartyRole | null; classNa
   const c = ROLE_COLORS[role];
   return (
     <span
-      className={cn("inline-flex items-center gap-1 border px-1.5 py-px text-[0.6rem] font-semibold tracking-[0.12em] uppercase", className)}
+      className={cn("inline-flex items-center gap-1 border px-1.5 py-px text-4xs font-semibold tracking-[0.12em] uppercase", className)}
       style={{ color: c, borderColor: `${c}66`, backgroundColor: `${c}1a` }}
     >
       <Icon className="size-3" aria-hidden />

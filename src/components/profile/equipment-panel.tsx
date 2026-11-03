@@ -20,7 +20,7 @@ const ACCESSORIES: EquipmentSlot[] = ["necklace", "earrings", "ring", "bracelet"
 
 type View = "inventory" | "list";
 
-const groupLabel = "mb-1 px-1.5 text-[0.6rem] tracking-[0.24em] text-gold/60 uppercase";
+const groupLabel = "mb-1 px-1.5 text-4xs tracking-[0.24em] text-gold/60 uppercase";
 
 export function EquipmentPanel({
   equipment,
@@ -103,19 +103,19 @@ export function EquipmentPanel({
             </div>
             <div>
               <p className="font-heading text-sm tracking-[0.14em] text-gold-bright">{characterName}</p>
-              <p className="text-[0.7rem] text-steel/70">
+              <p className="text-2xs text-steel/70">
                 {meta.name} · {meta.role}
               </p>
             </div>
             <div className="w-full border-t border-steel/10 pt-3">
-              <p className="text-[0.6rem] tracking-[0.2em] text-steel/60 uppercase">Soul Binding</p>
+              <p className="text-4xs tracking-[0.2em] text-steel/60 uppercase">Soul Binding</p>
               <p className="mt-1 font-heading text-xl font-bold text-[#9af0b3] tabular-nums">
                 {countSoulBindingLines(equipment)} <span className="text-xs font-normal text-steel">lines</span>
               </p>
               <div className="mt-1 flex justify-center">
                 <BindingRate rate={avgRate === null ? null : Math.round(avgRate * 10) / 10} />
               </div>
-              <p className="mt-1 text-[0.6rem] text-steel/50">avg binding rate</p>
+              <p className="mt-1 text-4xs text-steel/50">avg binding rate</p>
             </div>
           </div>
 
@@ -130,7 +130,7 @@ export function EquipmentPanel({
         <div role="tabpanel" id="eq-panel-list" aria-labelledby="eq-tab-list" className="-mx-4 overflow-x-auto sm:-mx-5">
           <table className="w-full min-w-[54rem] text-sm">
             <thead>
-              <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] text-steel/70 uppercase">
+              <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
                 <th scope="col" className="py-2 pr-3 pl-4 font-medium sm:pl-5">Item</th>
                 <th scope="col" className="px-3 py-2 text-right font-medium">iLv</th>
                 <th scope="col" className="px-3 py-2 text-right font-medium">Enh.</th>
@@ -166,7 +166,7 @@ export function EquipmentPanel({
                           <span className="block font-medium" style={{ color }}>
                             {item.name}
                           </span>
-                          <span className="block text-[0.7rem] text-steel/60">{SLOT_LABELS[slot]}</span>
+                          <span className="block text-2xs text-steel/60">{SLOT_LABELS[slot]}</span>
                         </span>
                       </button>
                     </td>
@@ -190,7 +190,7 @@ export function EquipmentPanel({
               })}
             </tbody>
           </table>
-          <p className="flex items-center gap-2 px-4 pt-3 text-[0.65rem] text-steel/55 sm:px-5">
+          <p className="flex items-center gap-2 px-4 pt-3 text-3xs text-steel/55 sm:px-5">
             <MockTag /> Option names and slot pools follow Global client data; all values are mock.
           </p>
         </div>

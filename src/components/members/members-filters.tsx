@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const labelClass =
-  "text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase";
+  "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
 
 const SORT_OPTIONS: { value: `${SortKey}:${SortDir}`; label: string }[] = (
   ["combat_power", "item_level", "level"] as SortKey[]

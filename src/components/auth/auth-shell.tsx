@@ -39,7 +39,7 @@ export function AuthShell({
             <span className="mt-2 block text-sm font-semibold tracking-[0.5em] text-gold-bright/90 sm:text-base">GUILD COMMAND</span>
           </h1>
           <OrnamentDivider className="mt-4" />
-          <p className="mt-3 text-[0.7rem] tracking-[0.32em] text-steel uppercase">{t("Guild Management System")}</p>
+          <p className="mt-3 text-2xs tracking-[0.32em] text-steel uppercase">{t("Guild Management System")}</p>
         </header>
         <FramedPanel className="px-6 pt-7 pb-6 sm:px-9 sm:pt-9 sm:pb-8">
           <div className="mb-6 text-center">
@@ -48,7 +48,7 @@ export function AuthShell({
           </div>
           {children}
         </FramedPanel>
-        <footer className="mt-6 text-center text-[0.65rem] tracking-[0.2em] text-steel/50 uppercase">{t("Unofficial companion · Not affiliated with NCSOFT")}</footer>
+        <footer className="mt-6 text-center text-3xs tracking-[0.2em] text-steel/50 uppercase">{t("Unofficial companion · Not affiliated with NCSOFT")}</footer>
       </div>
     </>
   );

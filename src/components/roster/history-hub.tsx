@@ -85,7 +85,7 @@ function RosterHistoryList() {
           <div className="relative overflow-x-auto">
             <table className="w-full min-w-[52rem] text-sm" data-testid="roster-history-list">
               <thead>
-                <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
+                <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
                   <th className="py-3 pr-3 pl-4 font-medium sm:pl-5">{t("Character")}</th>
                   <th className="px-3 py-3 font-medium">{t("Class")}</th>
                   <th className="px-3 py-3 text-right font-medium">{t("Level")}</th>
@@ -103,7 +103,7 @@ function RosterHistoryList() {
                     <tr key={m.id} className="border-b border-steel/[0.07] last:border-0 hover:bg-white/[0.025]">
                       <td className="py-2.5 pr-3 pl-4 sm:pl-5">
                         <Link href={href} className="font-medium text-foreground underline-offset-4 hover:text-gold-bright hover:underline">{m.character_name}</Link>
-                        <p className="text-[0.7rem] text-steel/60">{m.server_name ?? "—"} · <span className="uppercase">{m.region}</span></p>
+                        <p className="text-2xs text-steel/60">{m.server_name ?? "—"} · <span className="uppercase">{m.region}</span></p>
                       </td>
                       <td className="px-3 py-2.5 text-xs"><RosterClassBadge className={m.class_name} withIcon /></td>
                       <td className="px-3 py-2.5 text-right text-steel tabular-nums">{m.level ?? "—"}</td>

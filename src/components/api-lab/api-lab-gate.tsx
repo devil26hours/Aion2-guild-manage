@@ -68,7 +68,7 @@ function PasswordScreen({ onUnlock }: { onUnlock: () => void }) {
           <p className="mt-1 text-xs text-steel">{t("Developer tool. Enter the API Lab password to continue.")}</p>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor={`${id}-pw`} className="text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Password")}</Label>
+          <Label htmlFor={`${id}-pw`} className="text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Password")}</Label>
           <div className="relative">
             <KeyRound aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
             <Input

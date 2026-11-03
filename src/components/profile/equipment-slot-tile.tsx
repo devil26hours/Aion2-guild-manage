@@ -37,7 +37,7 @@ export function EquipmentSlotTile({
           <SlotIcon slot={slot} cls={cls} className="size-6" />
         </span>
         <span className="min-w-0">
-          <span className="block text-[0.6rem] tracking-[0.18em] text-steel/50 uppercase">{label}</span>
+          <span className="block text-4xs tracking-[0.18em] text-steel/50 uppercase">{label}</span>
           <span className="block text-xs text-steel/50">Empty</span>
         </span>
       </div>
@@ -63,19 +63,19 @@ export function EquipmentSlotTile({
       >
         <SlotIcon slot={slot} cls={cls} className="size-6 drop-shadow-[0_0_6px_currentColor]" style={{ color }} />
         {item.enhancement > 0 && (
-          <span className="absolute -top-1.5 -left-1.5 border border-gold-dim/60 bg-ink px-1 text-[0.6rem] leading-tight font-bold text-gold-bright tabular-nums">
+          <span className="absolute -top-1.5 -left-1.5 border border-gold-dim/60 bg-ink px-1 text-4xs leading-tight font-bold text-gold-bright tabular-nums">
             +{item.enhancement}
           </span>
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[0.6rem] tracking-[0.18em] text-steel/55 uppercase">{label}</span>
-        <span className="line-clamp-2 block text-[0.8rem] leading-snug font-medium" style={{ color }}>
+        <span className="block text-4xs tracking-[0.18em] text-steel/55 uppercase">{label}</span>
+        <span className="line-clamp-2 block text-[0.875rem] leading-snug font-medium" style={{ color }}>
           {item.name}
         </span>
         <span
           className={cn(
-            "flex items-center gap-2 text-[0.7rem] whitespace-nowrap text-steel/70 tabular-nums",
+            "flex items-center gap-2 text-2xs whitespace-nowrap text-steel/70 tabular-nums",
             align === "right" && "lg:justify-end",
           )}
         >

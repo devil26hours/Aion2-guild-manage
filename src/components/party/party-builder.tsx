@@ -118,6 +118,7 @@ export function PartyBuilder() {
         role: s.role,
         cp: m?.combat_power ?? null,
         itemLevel: m?.item_level ?? null,
+        portraitUrl: m?.profile_image ? `/api/roster/members/${encodeURIComponent(m.id)}/portrait` : null,
       };
     }),
     totalCp: analysis.totalCp,
@@ -251,7 +252,7 @@ export function PartyBuilder() {
           {/* Name editing + reset */}
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <div className="min-w-[12rem] flex-1">
-              <label htmlFor="party-name" className="mb-1.5 block text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase">
+              <label htmlFor="party-name" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
                 {t("Party name")}</label>
               <Input
                 id="party-name"
@@ -272,7 +273,7 @@ export function PartyBuilder() {
               />
             </div>
             <div className="w-36 shrink-0">
-              <label htmlFor="party-size" className="mb-1.5 block text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase">
+              <label htmlFor="party-size" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
                 {t("Party size")}</label>
               <NativeSelect
                 id="party-size"

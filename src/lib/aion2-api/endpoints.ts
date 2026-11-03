@@ -3,7 +3,7 @@
  *
  * Shared by the browser form and the server-side proxy. Definitions mirror
  * the local service's OpenAPI spec (http://127.0.0.1:8000/openapi.json,
- * "AION 2 Notices, Events, Servers & Characters" v1.0.0). Only these five
+ * "AION 2 Notices, Events, Servers & Characters" v1.0.0). Only these
  * endpoints can be reached through the proxy.
  */
 
@@ -13,6 +13,7 @@ export type Region = (typeof REGIONS)[number];
 export const ENDPOINT_IDS = [
   "character-search",
   "character-profile",
+  "character-equipment-item",
   "character-daevanion",
   "character-daevanion-board",
   "servers-roster",
@@ -28,6 +29,8 @@ export interface ParamDef {
   options?: readonly string[];
   placeholder?: string;
   help?: string;
+  /** Query-only "text" params: replaces the default safe-text check (e.g. base64 ids, integers). */
+  pattern?: RegExp;
 }
 
 export interface EndpointDef {
@@ -76,8 +79,38 @@ export const ENDPOINTS: Record<EndpointId, EndpointDef> = {
     label: "Character Profile",
     method: "GET",
     path: "/characters/{name}",
-    summary: "Merged info + equipment response, passed through unchanged (profile, stat, title, ranking, daevanion, equipment, petwing, skill).",
-    params: [NAME_PATH, SERVER_QUERY],
+    summary:
+      "Merged info + equipment response, passed through unchanged (profile, stat, title, ranking, daevanion, equipment, petwing, skill). With item_details=true each equipped item also carries itemDetail (slow: one upstream request per item).",
+    params: [
+      NAME_PATH,
+      SERVER_QUERY,
+      {
+        name: "item_details",
+        in: "query",
+        required: false,
+        label: "Item details",
+        kind: "select",
+        options: ["false", "true"],
+        help: "Optional — true attaches equipment.equipmentList[].itemDetail (one extra upstream request per item; the first load can take ~30 s).",
+      },
+    ],
+  },
+  "character-equipment-item": {
+    id: "character-equipment-item",
+    label: "Equipment Item Detail",
+    method: "GET",
+    path: "/characters/equipment/item",
+    summary:
+      "One equipped item's detail (soulBindRate, mainStats, subStats, subSkills, magicStoneStat, godStoneStat), NCSOFT's response passed through unchanged. characterId/serverId come from a Character Profile's profile, the rest from its equipmentList entry.",
+    params: [
+      { name: "characterId", in: "query", required: true, label: "characterId", kind: "text", placeholder: "profile.characterId", pattern: /^[A-Za-z0-9_\-=+/%]{1,128}$/ },
+      { name: "serverId", in: "query", required: true, label: "serverId", kind: "text", placeholder: "e.g. 1501", pattern: /^\d{4}$/ },
+      { name: "id", in: "query", required: true, label: "Item id", kind: "text", placeholder: "equipmentList[].id", pattern: /^[1-9]\d{0,11}$/ },
+      { name: "slotPos", in: "query", required: true, label: "slotPos", kind: "text", placeholder: "equipmentList[].slotPos", pattern: /^[1-9]\d{0,3}$/ },
+      { name: "enchantLevel", in: "query", required: true, label: "enchantLevel", kind: "text", placeholder: "equipmentList[].enchantLevel", pattern: /^\d{1,4}$/ },
+      { name: "exceedLevel", in: "query", required: true, label: "exceedLevel", kind: "text", placeholder: "equipmentList[].exceedLevel", pattern: /^\d{1,4}$/ },
+      { name: "region", in: "query", required: false, label: "Region", kind: "select", options: REGIONS, help: "Optional — default: the server's own region." },
+    ],
   },
   "character-daevanion": {
     id: "character-daevanion",
@@ -108,6 +141,14 @@ export const ENDPOINTS: Record<EndpointId, EndpointDef> = {
     params: [],
   },
 };
+
+/** `item_details=true` fetches every equipped item one by one upstream (~25 s cold), so it gets a longer timeout. */
+export const ITEM_DETAILS_TIMEOUT_MS = 120_000;
+
+/** Upstream timeout for one proxied request; undefined = the default. */
+export function upstreamTimeoutFor(id: EndpointId, query: Record<string, string>): number | undefined {
+  return id === "character-profile" && query.item_details === "true" ? ITEM_DETAILS_TIMEOUT_MS : undefined;
+}
 
 export function isEndpointId(v: string): v is EndpointId {
   return (ENDPOINT_IDS as readonly string[]).includes(v);
@@ -154,6 +195,9 @@ export function validateRequest(id: EndpointId, raw: Record<string, string | und
     }
     if (p.kind === "select") {
       if (!p.options?.includes(v)) errors.push({ param: p.name, message: `${p.label} must be one of: ${p.options?.join(", ")}.` });
+    } else if (p.pattern) {
+      // Pattern params are query-only, so their values never become a path segment.
+      if (p.in !== "query" || !p.pattern.test(v)) errors.push({ param: p.name, message: `${p.label} has an invalid format.` });
     } else if (!SAFE_TEXT.test(v) || v.includes("..")) {
       // ".." is rejected so a path value can never become a dot-segment.
       errors.push({ param: p.name, message: `${p.label} contains unsupported characters.` });

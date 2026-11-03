@@ -25,7 +25,7 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
             <span className="block font-heading text-base font-bold tracking-[0.2em] text-gold-bright">
               AION II
             </span>
-            <span className="mt-1 block text-[0.6rem] font-semibold tracking-[0.38em] text-steel">
+            <span className="mt-1 block text-4xs font-semibold tracking-[0.38em] text-steel">
               GUILD COMMAND
             </span>
           </span>

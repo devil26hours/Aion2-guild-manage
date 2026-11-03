@@ -12,6 +12,7 @@ export function toPartyMember(m: RosterMember): PartyMember {
     combat_power: m.combat_power,
     item_level: m.item_level,
     server_name: m.server_name,
+    profile_image: m.profile_image,
     role: m.role,
     comment: m.notes,
   };

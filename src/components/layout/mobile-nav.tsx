@@ -37,7 +37,7 @@ export function MobileNav({ footer }: { footer?: ReactNode }) {
             <SheetTitle className="font-heading text-sm tracking-[0.18em] text-gold-bright">
               AION II
             </SheetTitle>
-            <SheetDescription className="mt-1 text-[0.6rem] tracking-[0.3em] text-steel uppercase">
+            <SheetDescription className="mt-1 text-4xs tracking-[0.3em] text-steel uppercase">
               {t("Guild Command")}</SheetDescription>
           </div>
         </div>

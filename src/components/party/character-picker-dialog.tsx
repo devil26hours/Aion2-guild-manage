@@ -3,7 +3,7 @@
 
 import { useT } from "@/lib/i18n";
 import { useMemo, useState } from "react";
-import { CircleAlert, RotateCcw, Search, UserCheck, UserPlus } from "lucide-react";
+import { CircleAlert, MessageSquareText, RotateCcw, Search, UserCheck, UserPlus } from "lucide-react";
 import { RosterClassBadge } from "@/components/roster/roster-class-badge";
 import { aionButtonPrimary, aionButtonSecondary, aionDialog, aionField } from "@/components/aion/styles";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { PARTY_ROLES, type PartyMember, type PartyRole, type PartySlot } from "@
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "./role-badge";
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
 
 type RangeKey = "minCp" | "maxCp" | "minIl" | "maxIl";
 const EMPTY_RANGE: Record<RangeKey, string> = { minCp: "", maxCp: "", minIl: "", maxIl: "" };
@@ -80,6 +80,7 @@ function Picker({
 }) {
   const t = useT();
   const [query, setQuery] = useState("");
+  const [commentQuery, setCommentQuery] = useState("");
   const [cls, setCls] = useState<string>("all");
   const [role, setRole] = useState<PartyRole | "all">(target.current.role ?? "all");
   const [sort, setSort] = useState<"cp" | "il">("cp");
@@ -96,10 +97,13 @@ function Picker({
   const ilInvalid = bounds.minIl !== null && bounds.maxIl !== null && bounds.minIl > bounds.maxIl;
   const rangeInvalid = cpInvalid || ilInvalid;
   const filtersActive =
-    query.trim() !== "" || cls !== "all" || role !== "all" || Object.values(range).some((v) => v !== "");
+    query.trim() !== "" ||
+    commentQuery.trim() !== "" ||
+    cls !== "all" || role !== "all" || Object.values(range).some((v) => v !== "");
 
   function clearFilters() {
     setQuery("");
+    setCommentQuery("");
     setCls("all");
     setRole("all");
     setRange(EMPTY_RANGE);
@@ -124,10 +128,12 @@ function Picker({
     // An invalid range (min > max) matches nothing; the form shows why.
     if (rangeInvalid) return [];
     const q = query.trim().toLowerCase();
+    const cq = commentQuery.trim().toLowerCase();
     return roster
       .filter(
         (m) =>
-          (!q || m.character_name.toLowerCase().includes(q) || m.comment.toLowerCase().includes(q)) &&
+          (!q || m.character_name.toLowerCase().includes(q)) &&
+          (!cq || m.comment.toLowerCase().includes(cq)) &&
           (cls === "all" || (m.class_name ?? UNKNOWN_CLASS) === cls) &&
           (role === "all" || suggestedRole(m) === role) &&
           inRange(m.combat_power, minCp, maxCp) &&
@@ -138,7 +144,7 @@ function Picker({
         const il = (b.item_level ?? -1) - (a.item_level ?? -1);
         return sort === "cp" ? cp || il : il || cp;
       });
-  }, [roster, query, cls, role, sort, minCp, maxCp, minIl, maxIl, rangeInvalid]);
+  }, [roster, query, commentQuery, cls, role, sort, minCp, maxCp, minIl, maxIl, rangeInvalid]);
 
   const selected = roster.find((m) => m.id === selectedId) ?? null;
   const selectedSlot = selected ? slotOf.get(selected.id) : undefined;
@@ -158,11 +164,18 @@ function Picker({
       </DialogHeader>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="col-span-2 space-y-1.5">
+        <div className="space-y-1.5">
           <Label htmlFor="pk-q" className={labelClass}>{t("Search")}</Label>
           <div className="relative">
             <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
-            <Input id="pk-q" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("Name or comment…")} className={cn(aionField, "pl-8")} />
+            <Input id="pk-q" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("Character name…")} className={cn(aionField, "pl-8")} />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="pk-comment" className={labelClass}>{t("Comment")}</Label>
+          <div className="relative">
+            <MessageSquareText aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+            <Input id="pk-comment" value={commentQuery} onChange={(e) => setCommentQuery(e.target.value)} placeholder={t("Search comments…")} className={cn(aionField, "pl-8")} />
           </div>
         </div>
         <div className="space-y-1.5">
@@ -228,7 +241,7 @@ function Picker({
           </NativeSelect>
         </div>
       </div>
-      <p className="-mt-2 text-[0.65rem] text-steel/55">{t("Role filter uses each member's guild role (set on the Members page); you can assign any role per party.")}</p>
+      <p className="-mt-2 text-3xs text-steel/55">{t("Role filter uses each member's guild role (set on the Members page); you can assign any role per party.")}</p>
 
       <div className="grid min-h-0 gap-3 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <ul className="max-h-80 divide-y divide-steel/[0.07] overflow-y-auto border border-steel/10" role="listbox" aria-label={t("Characters")}>
@@ -256,12 +269,12 @@ function Picker({
                       {m.character_name}
                       {m.comment && <span className="ml-1.5 text-xs font-normal text-steel/80 italic">· {m.comment}</span>}
                     </span>
-                    <RosterClassBadge className={m.class_name} wrapperClassName="text-[0.7rem]" />
+                    <RosterClassBadge className={m.class_name} wrapperClassName="text-2xs" />
                     {other.length > 0 && (
                       <span
                         data-testid="picker-elsewhere-badge"
                         title={t("Also in: {list}", { list: describePlacements(other) })}
-                        className="mt-0.5 flex max-w-full items-center gap-1 truncate text-[0.65rem] text-[#f0cf86]"
+                        className="mt-0.5 flex max-w-full items-center gap-1 truncate text-3xs text-[#f0cf86]"
                       >
                         <CircleAlert aria-hidden className="size-3 shrink-0" />
                         {t("In")}{" "}{other[0].presetName}
@@ -274,7 +287,7 @@ function Picker({
                     <span className="block text-steel/60">iLv {m.item_level ?? "—"}</span>
                   </span>
                   {inSlot !== undefined && (
-                    <span className={cn("shrink-0 border px-1 text-[0.55rem] font-semibold tracking-wider uppercase", here ? "border-gold/50 text-gold" : "border-steel/30 text-steel")}>
+                    <span className={cn("shrink-0 border px-1 text-5xs font-semibold tracking-wider uppercase", here ? "border-gold/50 text-gold" : "border-steel/30 text-steel")}>
                       {here ? t("This slot") : `Slot ${inSlot + 1}`}
                     </span>
                   )}
@@ -307,7 +320,7 @@ function Picker({
                   ["Guild Role", selected.role ?? t("Not set")],
                 ].map(([k, v]) => (
                   <div key={k} className="border border-steel/10 px-2 py-1.5">
-                    <dt className="text-[0.6rem] tracking-[0.14em] text-steel/60 uppercase">{t(k)}</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">{t(k)}</dt>
                     <dd className="font-semibold text-foreground">{v}</dd>
                   </div>
                 ))}

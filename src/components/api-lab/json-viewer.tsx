@@ -43,11 +43,11 @@ export function JsonViewer({ text, className }: { text: string; className?: stri
   const nodes = useMemo(() => (text.length <= HIGHLIGHT_LIMIT ? highlight(text) : null), [text]);
   return (
     <div className={cn("relative overflow-auto border border-steel/12 bg-[#060910]", className)}>
-      <pre data-testid="json-viewer" className="min-w-max p-3 font-mono text-[0.75rem] leading-relaxed text-foreground/90">
+      <pre data-testid="json-viewer" className="min-w-max p-3 font-mono text-xs leading-relaxed text-foreground/90">
         {nodes ? nodes.map((n, i) => <Fragment key={i}>{n}</Fragment>) : text}
       </pre>
       {!nodes && (
-        <p className="sticky bottom-0 left-0 border-t border-steel/12 bg-ink px-3 py-1 text-[0.65rem] text-steel/60">
+        <p className="sticky bottom-0 left-0 border-t border-steel/12 bg-ink px-3 py-1 text-3xs text-steel/60">
           Large response — syntax highlighting disabled.
         </p>
       )}

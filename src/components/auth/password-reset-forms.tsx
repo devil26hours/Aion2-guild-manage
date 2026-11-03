@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
  */
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
 
 function ErrorLine({ text }: { text: string }) {
   return (
@@ -127,7 +127,7 @@ export function ResetPasswordForm() {
             {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
         </div>
-        <p className="text-[0.7rem] text-steel/60">{t("At least 8 characters.")}</p>
+        <p className="text-2xs text-steel/60">{t("At least 8 characters.")}</p>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor={`${id}-pw2`} className={labelClass}>{t("Confirm password")}</Label>

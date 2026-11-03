@@ -13,7 +13,7 @@ import { CpValue } from "./cp-value";
 import { MemberRowActions } from "./member-row-actions";
 
 const thBase =
-  "py-3 text-[0.65rem] font-medium tracking-[0.16em] text-steel/70 uppercase whitespace-nowrap";
+  "py-3 text-3xs font-medium tracking-[0.16em] text-steel/70 uppercase whitespace-nowrap";
 
 function SortHeader({
   label,
@@ -140,7 +140,7 @@ export function MembersTable({
                       </span>
                     )}
                   </div>
-                  <p className="text-[0.7rem] text-steel/60">
+                  <p className="text-2xs text-steel/60">
                     {m.server}
                     {m.rank !== "Member" && (
                       <span className="text-gold/70"> · {m.rank}</span>
@@ -171,7 +171,7 @@ export function MembersTable({
                 </td>
                 <td className="px-3 py-2.5 text-right tabular-nums">
                   <span className="text-[#9af0b3]/90">{metrics.soulBindingLines}</span>
-                  <span className="text-[0.65rem] text-steel/50"> lines</span>
+                  <span className="text-3xs text-steel/50"> lines</span>
                 </td>
                 <td className="px-3 py-2.5 text-xs whitespace-nowrap text-steel/75">
                   {refreshing ? (

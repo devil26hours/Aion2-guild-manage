@@ -30,7 +30,7 @@ const SORT_LABELS: Record<HistorySort, string> = {
   il_asc: "Item Level: Low → High",
 };
 
-const labelClass = "text-[0.65rem] font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
 
 export function HistoryList() {
   const members = useMembers();
@@ -154,7 +154,7 @@ export function HistoryList() {
         <div className="relative overflow-x-auto">
           <table className="w-full min-w-[60rem] text-sm">
             <thead>
-              <tr className="border-b border-steel/10 text-left text-[0.65rem] tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
+              <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
                 <th scope="col" className="py-3 pr-3 pl-4 font-medium sm:pl-5">Character</th>
                 <th scope="col" className="px-3 py-3 font-medium">Class</th>
                 <th scope="col" className="px-3 py-3 text-right font-medium">Level</th>
@@ -184,13 +184,13 @@ export function HistoryList() {
                     >
                       {m.character_name}
                     </Link>
-                    <p className="text-[0.7rem] text-steel/60">{m.server}</p>
+                    <p className="text-2xs text-steel/60">{m.server}</p>
                   </td>
                   <td className="px-3 py-2.5 text-xs"><ClassBadge cls={m.class} withIcon /></td>
                   <td className="px-3 py-2.5 text-right text-steel tabular-nums">{m.level}</td>
                   <td className="px-3 py-2.5 text-right">
                     <span className="font-semibold text-gold-bright tabular-nums">{formatNumber(m.combat_power)}</span>
-                    {h.length > 1 && <DeltaChip delta={delta} className="ml-2 px-1 py-0 text-[0.65rem]" />}
+                    {h.length > 1 && <DeltaChip delta={delta} className="ml-2 px-1 py-0 text-3xs" />}
                   </td>
                   <td className="px-3 py-2.5 text-right text-foreground/85 tabular-nums">{m.item_level}</td>
                   <td className="px-3 py-2.5 text-right text-foreground/80 tabular-nums">
