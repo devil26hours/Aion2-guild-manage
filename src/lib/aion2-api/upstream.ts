@@ -47,7 +47,10 @@ export async function fetchUpstream(
   try {
     const res = await fetch(url, {
       method: "GET",
-      headers: { accept: "application/json" },
+      headers: {
+        accept: "application/json",
+        "X-Internal-Key": process.env.AION2_API_INTERNAL_KEY ?? "",
+      },
       cache: "no-store",
       redirect: "error",
       signal: AbortSignal.timeout(timeoutMs),
