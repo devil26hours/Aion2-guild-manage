@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AION2 Guild Management
+
+A web-based guild management platform for **AION2**, designed to help guild leaders manage members, track character progression, review equipment, and organize party compositions in one place.
+
+## Features
+
+### Dashboard
+- Overview of guild statistics and member activity.
+- Character class distribution.
+- Top members and recent updates.
+
+### Member Management
+- Manage guild members and character profiles.
+- Track Combat Power (CP) and character progression.
+- Filter and search members.
+
+### Character Profiles
+- View character information and equipment.
+- Inspect equipment details through interactive tooltips.
+- Load item details on demand when hovering over equipment.
+
+### Character History
+- Track character changes over time.
+- Review historical snapshots.
+- Compare character progression and equipment changes.
+
+### Party Builder
+- Create and manage party compositions.
+- Assign members to party slots.
+- Filter members by character information and comments.
+- Analyze party composition and roles.
+
+### API Lab
+- Explore and inspect AION2 API responses.
+- View character data and API results.
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js 16 | Frontend framework |
+| React 19 | UI library |
+| TypeScript | Type safety |
+| Tailwind CSS 4 | Styling |
+| shadcn/ui | UI components |
+| Supabase | Database and backend services |
+| FastAPI | AION2 API service |
+
+## Project Architecture
+
+The project consists of two main applications:
+
+- **Frontend:** Next.js application responsible for the user interface and application logic.
+- **Backend:** Python FastAPI service responsible for communicating with AION2 APIs and providing character data.
+
+The frontend communicates with the backend through Next.js API routes.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js
+- pnpm
+- Supabase project
+- AION2 API backend
+
+### Installation
+
+Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/devil26hours/Aion2-guild-manage.git
+cd Aion2-guild-manage
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Configure the required environment variables for Supabase and the AION2 API backend.
 
-## Learn More
+Start the development server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Backend
 
-## Deploy on Vercel
+The AION2 API backend is maintained separately:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[https://github.com/devil26hours/aion2_api](https://github.com/devil26hours/aion2_api)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Refer to the backend repository for installation and API configuration instructions.
+
+## Development
+
+Run the development server:
+
+```bash
+pnpm dev
+```
+
+Create a production build:
+
+```bash
+pnpm build
+```
+
+Run the production server:
+
+```bash
+pnpm start
+```
+
+## License
+
+This project is maintained for AION2 guild management purposes.
