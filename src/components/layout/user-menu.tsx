@@ -21,7 +21,7 @@ export function UserMenu() {
   const ready = status === "ready" && !!me;
   // The signed-in account: its character name (or email) and its role in the guild.
   const display = me?.user.character?.name ?? me?.user.email ?? "";
-  const roleLabel = me?.guild?.role === "leader" ? t("Guild Leader") : t("Guild Member");
+  const roleLabel = !me?.guild ? t("No Guild") : me.guild.role === "leader" ? t("Guild Leader") : t("Guild Member");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="group flex items-center gap-2.5 border border-transparent py-1 pr-1.5 pl-1 transition-colors outline-none hover:border-steel/15 hover:bg-surface-hover focus-visible:border-arcane/50 data-[state=open]:border-brand-muted/40">

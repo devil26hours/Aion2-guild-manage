@@ -8,6 +8,7 @@ import {
   Megaphone,
   ScanSearch,
   Settings,
+  Shield,
   Swords,
   UserCog,
   Users,
@@ -28,6 +29,12 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/party-builder", label: "Party Builder", icon: Swords },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/settings", label: "Settings", icon: Settings },
+];
+
+/** Signed-in accounts WITHOUT a guild ("No Guild"): Guest-equivalent pages plus Guild Management (display hint; the proxy and APIs enforce it). */
+export const NO_GUILD_NAV_ITEMS: NavItem[] = [
+  { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
+  { href: "/guild-setup", label: "Guild Management", icon: Shield },
 ];
 
 /** One DEV menu, shown only to a DEV account (display hint; the pages and APIs check the role on the server). */

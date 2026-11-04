@@ -6,6 +6,7 @@
 import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { NO_GUILD_META_KEY } from "@/lib/auth/no-guild";
 import { supabasePublicConfig } from "./config";
 import { authCookieOptions, isPersistent, REMEMBER_COOKIE } from "./cookies";
 
@@ -21,10 +22,10 @@ if (typeof window !== "undefined") {
  */
 export async function updateSupabaseSession(
   request: NextRequest,
-): Promise<{ response: NextResponse; supabase: SupabaseClient | null; userId: string | null }> {
+): Promise<{ response: NextResponse; supabase: SupabaseClient | null; userId: string | null; noGuildChosen: boolean }> {
   let response = NextResponse.next({ request });
   const cfg = supabasePublicConfig();
-  if (!cfg) return { response, supabase: null, userId: null };
+  if (!cfg) return { response, supabase: null, userId: null, noGuildChosen: false };
   const persistent = isPersistent(request.cookies.get(REMEMBER_COOKIE)?.value);
 
   const supabase = createServerClient(cfg.url, cfg.publishableKey, {
@@ -42,7 +43,8 @@ export async function updateSupabaseSession(
   // getClaims() verifies the JWT; do not trust getSession() on the server.
   const { data } = await supabase.auth.getClaims();
   const sub = data?.claims?.sub;
-  return { response, supabase, userId: typeof sub === "string" ? sub : null };
+  const meta = data?.claims?.user_metadata as Record<string, unknown> | undefined;
+  return { response, supabase, userId: typeof sub === "string" ? sub : null, noGuildChosen: meta?.[NO_GUILD_META_KEY] === true };
 }
 
 /** Carry refreshed auth cookies (and cache headers) over to a redirect/JSON response. */

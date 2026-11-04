@@ -207,6 +207,10 @@ export const TH: Record<string, string> = {
   /* -------------------------------- roles --------------------------------- */
   "Guild Leader": "หัวหน้ากิลด์",
   "Guild Member": "สมาชิกกิลด์",
+  "No Guild": "ไม่มีกิลด์",
+  "Guild Management": "จัดการกิลด์",
+  "Continue Without a Guild": "ดำเนินการต่อโดยไม่มีกิลด์",
+  "Stay signed in and use Character Lookup. You can create or join a guild any time from Guild Management.": "ยังคงเข้าสู่ระบบและใช้ค้นหาตัวละครได้ คุณสร้างหรือเข้าร่วมกิลด์ได้ทุกเมื่อที่เมนูจัดการกิลด์",
 
   /* --------------------------------- nav ---------------------------------- */
   "Live Roster": "รายชื่อปัจจุบัน",

@@ -15,8 +15,10 @@ import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy"
  * - A GUEST (signed cookie, no account) may only use Character Lookup and the allowlisted
  *   AION2 lookup endpoints; every other page redirects to /character-lookup, every other API gets 403.
  *   /character-lookup is rewritten to the shell-less /guest-lookup page for guests.
- * - Signed-in users without a guild can only use /guild-setup (and the APIs
- *   it needs — guild handlers enforce membership/leader rights themselves).
+ * - Signed-in users without a guild ("No Guild") have Guest-equivalent page access — Character Lookup,
+ *   plus /support and /cookie-policy — and the Guild Management page /guild-setup (create or join a guild).
+ *   They stay signed in. Every guild page redirects to /guild-setup; guild APIs answer 403 NO_GUILD
+ *   (requireGuild), and /api/aion2 limits them to the lookup endpoints.
  * This is only the first line of defense: Route Handlers and RLS re-check.
  */
 
@@ -39,7 +41,7 @@ const GUEST_LOOKUP = "/guest-lookup";
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const { response, supabase, userId } = await updateSupabaseSession(request).catch(() => ({ response: NextResponse.next({ request }), supabase: null, userId: null }));
+  const { response, supabase, userId, noGuildChosen } = await updateSupabaseSession(request).catch(() => ({ response: NextResponse.next({ request }), supabase: null, userId: null, noGuildChosen: false }));
   if (request.cookies.has(LEGACY_SESSION_COOKIE)) response.cookies.delete(LEGACY_SESSION_COOKIE);
   const redirect = (to: string) => withSessionCookies(response, NextResponse.redirect(new URL(to, request.url)));
   // A valid guest cookie only counts when there is no real session.
@@ -66,7 +68,7 @@ export async function proxy(request: NextRequest) {
 
   if (PUBLIC_PAGES.has(pathname)) {
     if (!userId) return response;
-    return redirect(hasGuild ? "/dashboard" : SETUP);
+    return redirect(hasGuild ? "/dashboard" : noGuildChosen ? LOOKUP : SETUP);
   }
 
   if (pathname.startsWith("/api/")) {
@@ -102,8 +104,8 @@ export async function proxy(request: NextRequest) {
   }
 
   if (NO_GUILD_PAGES.has(pathname)) return response;
-  // Signed in: without a guild only the guild setup page is available.
-  if (!hasGuild && pathname !== SETUP) return redirect(SETUP);
+  // Not in a guild: Guild Management and Character Lookup only. Accounts that already chose "Continue Without a Guild" land on Character Lookup.
+  if (!hasGuild && pathname !== SETUP && pathname !== LOOKUP) return redirect(noGuildChosen ? LOOKUP : SETUP);
   if (hasGuild && pathname === SETUP) return redirect("/dashboard");
   return response;
 }

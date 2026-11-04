@@ -2,12 +2,19 @@
 
 
 import { useT } from "@/lib/i18n";
+import { useMe } from "@/lib/auth/me-store";
 import { useRoster } from "@/lib/roster/roster-store";
 import { useSettingsState } from "@/lib/settings/settings-store";
 import { GuildEmblem } from "./guild-chrome";
 
 /** Guild summary card: shared settings + the persisted real roster count. */
 export function SidebarGuildCard() {
+  const { me } = useMe();
+  // The roster/settings stores fetch guild-only APIs when mounted: skip them for a No-Guild account.
+  return me?.guild ? <GuildCard /> : null;
+}
+
+function GuildCard() {
   const t = useT();
   const roster = useRoster();
   const { status, settings } = useSettingsState();

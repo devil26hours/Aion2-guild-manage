@@ -3,8 +3,9 @@
 
 import { useT } from "@/lib/i18n";
 import { LogOut, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { logout } from "@/lib/auth/client";
+import { useMe } from "@/lib/auth/me-store";
 import { guildImageUrl, useSettingsState } from "@/lib/settings/settings-store";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,16 @@ import { cn } from "@/lib/utils";
  * (Supabase via /api/settings). They render neutral placeholders until the
  * settings have loaded, so no default/demo values flash in.
  */
+
+/**
+ * Renders its children only for an account that is in a guild. The guild-data components below
+ * (settings/roster stores) fetch guild-only APIs as soon as they mount, so a No-Guild account
+ * must not mount them (those calls would just return 403).
+ */
+export function GuildOnly({ children }: { children: ReactNode }) {
+  const { me } = useMe();
+  return me?.guild ? <>{children}</> : null;
+}
 
 /** Guild emblem: the uploaded guild image, or the shield icon. */
 export function GuildEmblem({ className, iconClassName }: { className?: string; iconClassName?: string }) {

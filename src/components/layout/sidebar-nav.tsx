@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useMe } from "@/lib/auth/me-store";
-import { DEV_NAV_ITEMS, NAV_ITEMS, isNavActive } from "./nav-items";
+import { DEV_NAV_ITEMS, NAV_ITEMS, NO_GUILD_NAV_ITEMS, isNavActive } from "./nav-items";
 
 type NavProps = { onNavigate?: () => void };
 
@@ -31,9 +31,24 @@ function ActiveNavList(props: NavProps) {
 
 function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null }) {
   const t = useT();
-  const { me } = useMe();
+  const { me, status } = useMe();
+  // Membership unknown yet: don't guess a role's menu (the full guild menu would flash for No-Guild users).
+  if (!me && status !== "error") {
+    return (
+      <nav aria-label={t("Main")} aria-busy="true" className="flex flex-col gap-1">
+        {[0, 1].map((i) => (
+          <div key={i} className="flex items-center gap-3 border border-transparent px-3 py-2.5">
+            <span className="size-4 shrink-0 animate-pulse rounded-sm bg-steel/15" />
+            <span className="h-3.5 w-28 animate-pulse rounded-sm bg-steel/15" />
+          </div>
+        ))}
+      </nav>
+    );
+  }
+  const noGuild = !!me && !me.guild; // signed in, no guild: Guest-equivalent menu + Guild Management
   const isDev = !!me?.user.is_developer;
-  const items = isDev ? [...NAV_ITEMS, ...DEV_NAV_ITEMS] : NAV_ITEMS;
+  const base = noGuild ? NO_GUILD_NAV_ITEMS : NAV_ITEMS;
+  const items = isDev ? [...base, ...DEV_NAV_ITEMS] : base;
   return (
     <nav aria-label={t("Main")} className="flex flex-col gap-1">
       {items.map(({ href, label, icon: Icon }) => {

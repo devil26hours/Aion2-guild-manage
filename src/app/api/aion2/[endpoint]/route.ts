@@ -1,5 +1,5 @@
 import { clientIp, rateLimit } from "@/lib/auth/config";
-import { requireGuild } from "@/lib/auth/context";
+import { requireUser } from "@/lib/auth/context";
 import { GUEST_COOKIE, GUEST_ENDPOINTS, verifyGuestToken } from "@/lib/auth/guest";
 import { NextResponse, type NextRequest } from "next/server";
 import { ENDPOINTS, isEndpointId, upstreamTimeoutFor, validateRequest } from "@/lib/aion2-api/endpoints";
@@ -28,7 +28,11 @@ function proxyError(status: number, body: ProxyErrorBody, extra: Record<string, 
 
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[endpoint]">) {
   const { endpoint } = await ctx.params;
-  const auth = await requireGuild(request);
+  const auth = await requireUser(request);
+  // A signed-in account without a guild ("No Guild") has Guest-equivalent access: the Character Lookup endpoints only.
+  if (!auth.response && !auth.user.guild_id && !GUEST_ENDPOINTS.has(endpoint)) {
+    return NextResponse.json({ error: { code: "NO_GUILD", message: "Join or create a guild first.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
+  }
   if (auth.response) {
     // No guild member session: a verified GUEST may use only the Character Lookup endpoints.
     const guest = verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);

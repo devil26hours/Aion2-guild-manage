@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ArrowLeft, Crown, ImageUp, KeyRound, Loader2, LogOut, Search, Shield, Users } from "lucide-react";
+import { ArrowLeft, Crown, ImageUp, KeyRound, Loader2, LogOut, ScanSearch, Search, Shield, Users } from "lucide-react";
 import { aionButtonPrimary, aionButtonSecondary, aionField } from "@/components/aion/styles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,22 @@ export function GuildSetup() {
   const t = useT();
   const { me } = useMe();
   const [mode, setMode] = useState<Mode>("choose");
+  const [skipBusy, setSkipBusy] = useState(false);
+  const [skipError, setSkipError] = useState<string | null>(null);
+
+  /** Remember the choice (so the next sign-in goes straight to Character Lookup), then leave with a full reload. */
+  async function continueWithoutGuild() {
+    if (skipBusy) return;
+    setSkipBusy(true);
+    setSkipError(null);
+    const r = await call<{ ok: true }>("/api/auth/no-guild", { method: "POST" });
+    if (r.ok) {
+      window.location.replace("/character-lookup");
+      return;
+    }
+    setSkipBusy(false);
+    setSkipError(r.error.message);
+  }
 
   return (
     <div className="space-y-5" data-testid="guild-setup">
@@ -45,7 +61,7 @@ export function GuildSetup() {
         </p>
       )}
       {mode === "choose" && (
-        <div className="grid gap-4 sm:grid-cols-2" data-testid="guild-choices">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="guild-choices">
           <button
             type="button"
             data-choice="join"
@@ -69,6 +85,21 @@ export function GuildSetup() {
             </span>
             <span className="font-heading text-lg tracking-[0.12em] text-brand-strong uppercase">{t("Create a New Guild")}</span>
             <span className="text-xs text-steel">{t("Start a guild and become its Guild Leader.")}</span>
+          </button>
+          {/* No Guild: stay signed in with Guest-equivalent access (Character Lookup). Guild Management in the sidebar returns here. */}
+          <button
+            type="button"
+            disabled={skipBusy}
+            onClick={() => void continueWithoutGuild()}
+            data-choice="none"
+            className="group flex min-h-48 flex-col items-center justify-center gap-3 border border-steel/25 bg-gradient-to-b from-surface-raised to-surface p-6 text-center transition-colors outline-none hover:border-brand/70 hover:bg-brand/[0.04] focus-visible:border-arcane/60 disabled:opacity-60 sm:col-span-2 lg:col-span-1"
+          >
+            <span className="flex size-14 items-center justify-center border border-steel/30 bg-steel/10 text-steel transition-colors group-hover:text-brand-strong">
+              <ScanSearch className="size-7" />
+            </span>
+            <span className="font-heading text-lg tracking-[0.12em] text-brand-strong uppercase">{t("Continue Without a Guild")}</span>
+            <span className="text-xs text-steel">{t("Stay signed in and use Character Lookup. You can create or join a guild any time from Guild Management.")}</span>
+            {skipError && <span role="alert" className="text-xs text-danger-text">{skipError}</span>}
           </button>
         </div>
       )}

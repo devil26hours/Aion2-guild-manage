@@ -3,7 +3,7 @@
 import { useT } from "@/lib/i18n";
 import Link from "next/link";
 import { SiteLogo } from "@/components/aion/site-logo";
-import { GuildEmblem, GuildName, GuildServerBadge, LogoutButton } from "./guild-chrome";
+import { GuildEmblem, GuildName, GuildOnly, GuildServerBadge, LogoutButton } from "./guild-chrome";
 import { MobileNav } from "./mobile-nav";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
@@ -36,14 +36,16 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
         </Link>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <div className="hidden items-center gap-2 border-r border-steel/15 pr-3 md:flex">
-            <GuildEmblem className="size-6" iconClassName="size-3.5" />
-            <span className="text-xs text-steel">{t("Guild")}</span>
-            <span className="font-heading text-sm font-semibold tracking-wide text-foreground">
-              <GuildName />
-            </span>
-          </div>
-          <GuildServerBadge className="hidden sm:inline-flex" />
+          <GuildOnly>
+            <div className="hidden items-center gap-2 border-r border-steel/15 pr-3 md:flex">
+              <GuildEmblem className="size-6" iconClassName="size-3.5" />
+              <span className="text-xs text-steel">{t("Guild")}</span>
+              <span className="font-heading text-sm font-semibold tracking-wide text-foreground">
+                <GuildName />
+              </span>
+            </div>
+            <GuildServerBadge className="hidden sm:inline-flex" />
+          </GuildOnly>
           <LanguageSwitcher className="hidden sm:flex" />
           <NotificationBell />
           <FeedbackButton />
@@ -53,15 +55,17 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
         </div>
       </div>
       {/* Compact guild / server strip for small screens */}
-      <div className="flex items-center justify-between gap-3 border-t border-steel/10 px-4 py-1.5 md:hidden">
-        <span className="flex min-w-0 items-center gap-1.5">
-          <GuildEmblem className="size-5" iconClassName="size-3" />
-          <span className="truncate font-heading text-xs font-semibold tracking-wide text-foreground">
-            <GuildName />
+      <GuildOnly>
+        <div className="flex items-center justify-between gap-3 border-t border-steel/10 px-4 py-1.5 md:hidden">
+          <span className="flex min-w-0 items-center gap-1.5">
+            <GuildEmblem className="size-5" iconClassName="size-3" />
+            <span className="truncate font-heading text-xs font-semibold tracking-wide text-foreground">
+              <GuildName />
+            </span>
           </span>
-        </span>
-        <GuildServerBadge className="shrink-0 border-0 bg-transparent px-0 py-0 sm:hidden" />
-      </div>
+          <GuildServerBadge className="shrink-0 border-0 bg-transparent px-0 py-0 sm:hidden" />
+        </div>
+      </GuildOnly>
       {/* Hairline sheen */}
       <div
         aria-hidden

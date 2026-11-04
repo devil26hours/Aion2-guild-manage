@@ -1,6 +1,7 @@
 import { characterKey } from "@/lib/accounts/users";
 import { failDelay } from "@/lib/auth/config";
 import { requireUser } from "@/lib/auth/context";
+import { clearNoGuildChoice } from "@/lib/auth/no-guild";
 import { GUILD_ID_RE, JOIN_CODE_RE } from "@/lib/guilds/ids";
 import { fetchCharacterProfile } from "@/lib/roster/api-fetch";
 import { fail, json, readJsonBody, storageFailure } from "@/lib/roster/http";
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
       if (status === "invalid_code") await failDelay();
       return fail(http, errCode, message);
     }
+    await clearNoGuildChoice(supabase); // joined: drop the "Continue Without a Guild" hint
     const member = await findMember(supabase, guildId, characterKey(user.character));
     let outcome: "added" | "linked" = "linked";
     if (member && (await countSnapshots(supabase, member.db_id)) === 0) {

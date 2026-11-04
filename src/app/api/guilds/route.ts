@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth/context";
+import { clearNoGuildChoice } from "@/lib/auth/no-guild";
 import { JOIN_CODE_RE } from "@/lib/guilds/ids";
 import { seedDefaultPresets } from "@/lib/party/storage";
 import { fetchCharacterProfile } from "@/lib/roster/api-fetch";
@@ -97,6 +98,7 @@ export async function POST(request: Request) {
     });
     if (error) throw toDbError(error);
     const guildId = gid as string;
+    await clearNoGuildChoice(supabase); // the guild exists now: drop the "Continue Without a Guild" hint
     // Follow-up writes as the new leader; failures here leave a usable guild.
     await writeGuildSection(supabase, guildId, { ...applied.next.guild, leader: fetched.mapped.character_name.slice(0, 24) }).catch(() => undefined);
     const member = await findMember(supabase, guildId, characterKey(user.character));
