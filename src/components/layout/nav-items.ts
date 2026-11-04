@@ -56,7 +56,7 @@ export const DEV_NAV_ITEMS: NavItem[] = [
 ];
 
 /** Legacy paths that redirect to a current page (keep their menu item active). */
-const ALIASES: Record<string, string> = { "/history": "/character-history", "/party": "/party-builder" };
+const ALIASES: Record<string, string> = { "/history": "/character-history", "/party": "/party-builder", "/guest-lookup": "/character-lookup" };
 
 export function isNavActive(pathname: string, href: string): boolean {
   const path = ALIASES[pathname] ?? pathname;

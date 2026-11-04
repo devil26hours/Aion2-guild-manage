@@ -43,7 +43,7 @@ function CookiePolicyLink({ className }: { className?: string }) {
 export function SiteFooter({ className, support = false }: { className?: string; support?: boolean }) {
   const t = useT();
   return (
-    <footer className={cn("space-y-1.5 text-left text-2xs leading-relaxed text-subtle", className)}>
+    <footer className={cn("space-y-1.5 text-center text-2xs leading-relaxed text-subtle", className)}>
       <p>{t("An independent community project, built with passion for AION2 players.")}</p>
       <p>{t("Not affiliated with NCSOFT.")}</p>
       <p>
