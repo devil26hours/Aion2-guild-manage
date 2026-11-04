@@ -6,6 +6,7 @@ import { SupportBackLink } from "@/components/support/support-view";
 
 export const metadata: Metadata = {
   title: "Cookie Policy — ChumChon AION2",
+  alternates: { canonical: "/cookie-policy" },
 };
 
 /** Public page (signed in, signed out or guest): the proxy lists /cookie-policy in OPEN_PAGES. */

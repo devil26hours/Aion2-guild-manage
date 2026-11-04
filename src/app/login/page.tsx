@@ -6,6 +6,16 @@ import { SupportButton } from "@/components/support/support-button";
 
 export const metadata: Metadata = {
   title: "Sign In — ChumChon AION2",
+  description: "Sign in to ChumChon AION2, the guild management site for AION 2 Global: guild roster, equipment inspection, combat power and dungeon parties.",
+  alternates: { canonical: "/login" },
+  openGraph: {
+    type: "website",
+    siteName: "ChumChon AION2",
+    url: "/login",
+    title: "Sign In — ChumChon AION2",
+    description: "Guild management for AION 2 Global: roster, equipment inspection, combat power and dungeon parties.",
+    images: ["/image/logo/logo_png.png"],
+  },
 };
 
 export default function LoginPage() {

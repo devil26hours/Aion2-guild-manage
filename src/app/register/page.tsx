@@ -5,6 +5,7 @@ import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
   title: "Register — ChumChon AION2",
+  robots: { index: false, follow: true },
 };
 
 export default function RegisterPage() {

@@ -5,6 +5,7 @@ import { SupportBackLink, SupportView } from "@/components/support/support-view"
 
 export const metadata: Metadata = {
   title: "Support — ChumChon AION2",
+  alternates: { canonical: "/support" },
 };
 
 /** Public page (signed in, signed out or guest): the proxy lists /support in OPEN_PAGES. */

@@ -5,6 +5,7 @@ import { ForgotPasswordForm } from "@/components/auth/password-reset-forms";
 
 export const metadata: Metadata = {
   title: "Forgot Password — ChumChon AION2",
+  robots: { index: false, follow: true },
 };
 
 export default function ForgotPasswordPage() {

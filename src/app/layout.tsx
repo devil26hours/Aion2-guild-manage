@@ -37,9 +37,17 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://justkiddinglab.com"),
   title: "ChumChon AION2",
   description:
     "ชุมชนผู้เล่น AION2 · AION2 Player Community — Private guild management system for AION 2 Global. Guild roster, equipment inspection, combat power and dungeon party organisation.",
+  openGraph: {
+    type: "website",
+    siteName: "ChumChon AION2",
+    title: "ChumChon AION2",
+    description: "Guild roster, equipment inspection, combat power and dungeon party organisation for AION 2 Global.",
+    images: ["/image/logo/logo_png.png"],
+  },
   icons: {
     icon: "/image/logo/logo_png.png",
     apple: "/image/logo/logo_png.png",
