@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
-import { Check, CircleAlert, ImageDown, Loader2, Search, Share2 } from "lucide-react";
+import { Check, CircleAlert, History, ImageDown, Loader2, Search, Share2, X } from "lucide-react";
 import { CharacterHitsTable } from "@/components/api-lab/character-hits-table";
 import { aionButtonSecondary, aionField } from "@/components/aion/styles";
 import { PageHeader } from "@/components/layout/page-header";
@@ -24,6 +24,28 @@ import { cn } from "@/lib/utils";
 const SHARE_ID = /^[\w:.=+/-]{1,64}$/;
 
 const SHOW_EXPORT_IMAGE: boolean = false;
+
+/** Recent lookups live only in this browser's localStorage (public lookup fields only). */
+const RECENT_KEY = "aion2.lookup.recent";
+const RECENT_MAX = 10;
+interface RecentLookup { name: string; region: string; server: string; id: string; serverName: string | null }
+
+function loadRecent(): RecentLookup[] {
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]");
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter((r): r is RecentLookup => !!r && typeof r.name === "string" && typeof r.region === "string" && typeof r.server === "string" && typeof r.id === "string")
+      .map((r) => ({ name: r.name, region: r.region, server: r.server, id: r.id, serverName: typeof r.serverName === "string" ? r.serverName : null }))
+      .slice(0, RECENT_MAX);
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(list: RecentLookup[]) {
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch { /* storage unavailable: skip */ }
+}
 
 export interface ShareParams { name: string; region: string; server: string; id: string }
 
@@ -79,6 +101,34 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
   const autoRan = useRef(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const [exportState, setExportState] = useState<"idle" | "busy" | "failed">("idle");
+  const [recent, setRecent] = useState<RecentLookup[]>([]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
+    setRecent(loadRecent());
+  }, []);
+
+  function remember(hit: CharacterHit) {
+    const entry: RecentLookup = { name: hit.name, region: hit.region, server: hit.server_id, id: hit.character_id, serverName: hit.server_name };
+    const next = [entry, ...loadRecent().filter((r) => !(r.id === entry.id && r.server === entry.server))].slice(0, RECENT_MAX);
+    saveRecent(next);
+    setRecent(next);
+  }
+
+  function forget(r: RecentLookup) {
+    const next = loadRecent().filter((x) => !(x.id === r.id && x.server === r.server));
+    saveRecent(next);
+    setRecent(next);
+  }
+
+  function openRecent(r: RecentLookup) {
+    setName(r.name);
+    setRegion(r.region);
+    setServer(r.server);
+    setNameError(null);
+    setProfile({ status: "idle" });
+    void autoLoad(r.name, r.region, r.server, r.id);
+  }
 
   useEffect(() => {
     let alive = true;
@@ -204,6 +254,7 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
         last_refresh_error: null,
       };
       setProfile({ status: "ready", member, raw: body });
+      remember(hit);
     } catch {
       setProfile({ status: "error", message: t("Could not reach the app server.") });
     }
@@ -230,7 +281,7 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
       <PageHeader
         eyebrow="ChumChon AION2"
         title={t("Character Lookup")}
-        description={t("Search any public character and view their profile and equipment. Nothing you look up is saved.")}
+        description={t("Search any public character and view their profile and equipment. Your last 10 lookups are remembered in this browser only.")}
       />
 
       <form onSubmit={runSearch} noValidate className="grid gap-3 sm:grid-cols-[1.4fr_1fr_1fr_auto] sm:items-end">
@@ -267,6 +318,25 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
         </Button>
       </form>
       {nameError && <p className="text-xs text-danger-text">{nameError}</p>}
+
+      {recent.length > 0 && (
+        <section aria-label={t("Recent lookups")} className="space-y-1.5" data-testid="lookup-recent">
+          <p className={cn(labelClass, "flex items-center gap-1.5")}><History className="size-3" /> {t("Recent lookups")}</p>
+          <ul className="flex flex-wrap gap-2">
+            {recent.map((r) => (
+              <li key={`${r.server}:${r.id}`} className="flex items-stretch border border-border bg-card text-sm">
+                <button type="button" onClick={() => openRecent(r)} className="px-2.5 py-1 text-left hover:bg-muted" title={`${r.name} · ${r.serverName ?? r.server}`}>
+                  <span className="font-medium text-foreground">{r.name}</span>
+                  <span className="ml-1.5 text-xs text-steel">{r.serverName ?? r.server}</span>
+                </button>
+                <button type="button" onClick={() => forget(r)} aria-label={`${t("Remove")} ${r.name}`} className="px-1.5 text-steel hover:bg-muted hover:text-foreground">
+                  <X className="size-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div aria-live="polite" className="space-y-2">
         {search.status === "searching" && <p className="text-sm text-steel">{t("Searching the AION2 API… (can take a few seconds)")}</p>}

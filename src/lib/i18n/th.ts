@@ -8,7 +8,8 @@
  * `error:CODE` entries localize server error messages by their code.
  */
 export const TH: Record<string, string> = {
-  "Search any public character and view their profile and equipment. Nothing you look up is saved.": "ค้นหาตัวละครสาธารณะและดูโปรไฟล์กับอุปกรณ์ ข้อมูลที่ค้นหาจะไม่ถูกบันทึก",
+  "Search any public character and view their profile and equipment. Your last 10 lookups are remembered in this browser only.": "ค้นหาตัวละครสาธารณะและดูโปรไฟล์กับอุปกรณ์ ระบบจำการค้นหาล่าสุด 10 คนไว้ในเบราว์เซอร์นี้เท่านั้น",
+  "Recent lookups": "ค้นหาล่าสุด",
   /* ------------------------------- common -------------------------------- */
   Back: "ย้อนกลับ",
   Cancel: "ยกเลิก",
