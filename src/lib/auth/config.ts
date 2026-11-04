@@ -1,29 +1,12 @@
 /**
- * SERVER-ONLY authentication configuration. Never sent to the browser.
+ * SERVER-ONLY authentication helpers. Never sent to the browser.
  *
  * Accounts are Supabase Auth users; no login credentials are configured here.
- *   API_LAB_PASSWORD            — the API Lab gate (development fallback below).
+ * (The API Lab password is a hash in the database, managed by DEV; see lib/auth/developer.)
  */
-
-import { createHash, timingSafeEqual } from "node:crypto";
 
 if (typeof window !== "undefined") {
   throw new Error("auth/config is server-only.");
-}
-
-const DEV_API_LAB_PASSWORD = "aion2-lab-dev";
-
-const apiLabPassword = () => process.env.API_LAB_PASSWORD || DEV_API_LAB_PASSWORD;
-
-/** Constant-time string comparison (hashing first equalizes lengths). */
-export function safeEqual(a: string, b: string): boolean {
-  const ha = createHash("sha256").update(a, "utf8").digest();
-  const hb = createHash("sha256").update(b, "utf8").digest();
-  return timingSafeEqual(ha, hb);
-}
-
-export function checkApiLabPassword(password: string): boolean {
-  return safeEqual(password, apiLabPassword());
 }
 
 /** Small fixed delay for failed attempts (slows down guessing). */

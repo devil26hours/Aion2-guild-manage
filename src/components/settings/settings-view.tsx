@@ -15,6 +15,7 @@ import {
   Languages,
   LayoutDashboard,
   Loader2,
+  LogOut,
   RotateCcw,
   Shield,
   SlidersHorizontal,
@@ -32,6 +33,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { useRoster } from "@/lib/roster/roster-store";
 import { DataManagement } from "./data-management";
+import { LeaveGuild } from "./leave-guild";
 import {
   GUILD_IMAGE_MAX_BYTES,
   guildImageUrl,
@@ -570,6 +572,9 @@ export function SettingsView() {
       )}
       <SectionPanel title={t("Data Management")} icon={DatabaseBackup}>
         <DataManagement isLeader={isLeader} onReset={() => setSaved({ guild: false, admin: false })} />
+      </SectionPanel>
+      <SectionPanel title={t("Leave Guild")} icon={LogOut}>
+        <LeaveGuild />
       </SectionPanel>
     </div>
   );

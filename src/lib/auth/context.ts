@@ -31,6 +31,8 @@ export interface SessionUser {
   character: OwnedCharacter | null;
   guild_id: string | null;
   role: "leader" | "member" | null;
+  /** A DEV suspended this account (public.user_suspensions). */
+  suspended: boolean;
 }
 
 export interface AuthContext {
@@ -53,6 +55,8 @@ export interface GuildContext extends AuthContext {
 const denied = (status: number, code: string, message: string) =>
   NextResponse.json({ error: { code, message, status: null } }, { status, headers: { "cache-control": "no-store" } });
 
+const SCHEMA_MISSING = new Set(["PGRST205", "42P01"]);
+
 interface OwnershipRow {
   character_id: string;
   characters: { region: Region; server_id: string; character_id: string; character_name: string } | null;
@@ -64,12 +68,15 @@ export async function loadSessionUser(supabase: SupabaseClient): Promise<Session
   const claims = data?.claims;
   if (!claims || typeof claims.sub !== "string") return null;
   const uid = claims.sub;
-  const [membership, ownership] = await Promise.all([
+  const [membership, ownership, suspension] = await Promise.all([
     supabase.from("guild_memberships").select("guild_id, role").eq("user_id", uid).maybeSingle(),
     supabase.from("character_ownerships").select("character_id, characters(region, server_id, character_id, character_name)").eq("user_id", uid).maybeSingle(),
+    supabase.from("user_suspensions").select("user_id").eq("user_id", uid).maybeSingle(),
   ]);
   if (membership.error) throw toDbError(membership.error);
   if (ownership.error) throw toDbError(ownership.error);
+  // A missing table (migration 0009 not run yet) means nobody is suspended; any other error fails closed.
+  if (suspension.error && !SCHEMA_MISSING.has(suspension.error.code)) throw toDbError(suspension.error);
   const own = ownership.data as OwnershipRow | null;
   const c = own?.characters ?? null;
   return {
@@ -78,6 +85,7 @@ export async function loadSessionUser(supabase: SupabaseClient): Promise<Session
     character: own && c ? { db_id: own.character_id, region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.character_name } : null,
     guild_id: (membership.data?.guild_id as string | undefined) ?? null,
     role: (membership.data?.role as "leader" | "member" | undefined) ?? null,
+    suspended: !suspension.error && !!suspension.data,
   };
 }
 
@@ -92,6 +100,7 @@ export async function requireUser(request: Request): Promise<(AuthContext & { re
   }
   try {
     const user = await loadSessionUser(supabase);
+    if (user?.suspended) return { response: denied(403, "ACCOUNT_SUSPENDED", "This account has been suspended.") };
     return user ? { user, supabase } : { response: unauthorized() };
   } catch (e) {
     const err = toDbError(e as { message?: string; code?: string });

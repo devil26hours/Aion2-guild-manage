@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireGuild } from "@/lib/auth/context";
+import { isDeveloper } from "@/lib/auth/developer";
 import { readPartyFile } from "@/lib/party/storage";
 import { storageFailure } from "@/lib/roster/http";
 import { guildSnapshots, listMembers, toPublicMember } from "@/lib/roster/storage";
@@ -22,8 +23,10 @@ export async function GET(request: Request) {
   if (auth.response) return auth.response;
   const { guildId, guild, supabase } = auth;
   try {
+    // Raw AION 2 API responses are developer data: they are in the export only for DEV accounts.
+    const dev = await isDeveloper(supabase);
     const [members, snapshots, parties, settings, memberships, code] = await Promise.all([
-      listMembers(supabase, guildId, { raw: true }),
+      listMembers(supabase, guildId, { raw: dev }),
       guildSnapshots(supabase, guildId, { equipment: true }),
       readPartyFile(supabase, guildId),
       readSettingsFile(supabase, guildId),
@@ -44,7 +47,7 @@ export async function GET(request: Request) {
       settings: toSettings(settings),
       roster: {
         version: 1,
-        members: members.map((m) => ({ ...toPublicMember(m), api_raw: m.api_raw ?? null, snapshots: snapshots.get(m.db_id) ?? [] })),
+        members: members.map((m) => ({ ...toPublicMember(m), ...(dev ? { api_raw: m.api_raw ?? null } : {}), snapshots: snapshots.get(m.db_id) ?? [] })),
       },
       party_presets: parties,
     };

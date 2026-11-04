@@ -2,11 +2,12 @@
 
 
 import { useT } from "@/lib/i18n";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS, isNavActive } from "./nav-items";
+import { useMe } from "@/lib/auth/me-store";
+import { DEV_NAV_ITEMS, NAV_ITEMS, isNavActive } from "./nav-items";
 
 type NavProps = { onNavigate?: () => void };
 
@@ -30,13 +31,19 @@ function ActiveNavList(props: NavProps) {
 
 function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null }) {
   const t = useT();
+  const { me } = useMe();
+  const isDev = !!me?.user.is_developer;
+  const items = isDev ? [...NAV_ITEMS, ...DEV_NAV_ITEMS] : NAV_ITEMS;
   return (
     <nav aria-label={t("Main")} className="flex flex-col gap-1">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, label, icon: Icon }) => {
         const active = pathname !== null && isNavActive(pathname, href);
         return (
+          <Fragment key={href}>
+          {isDev && href === DEV_NAV_ITEMS[0].href && (
+            <p className="mt-4 mb-1 border-t border-gold/25 px-3 pt-4 font-heading text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">{t("Developer")}</p>
+          )}
           <Link
-            key={href}
             href={href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
@@ -66,6 +73,7 @@ function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null 
             />
             <span className="tracking-wide">{t(label)}</span>
           </Link>
+          </Fragment>
         );
       })}
     </nav>

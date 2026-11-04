@@ -30,9 +30,9 @@ A web-based guild management platform for **AION2**, designed to help guild lead
 - Filter members by character information and comments.
 - Analyze party composition and roles.
 
-### API Lab
-- Explore and inspect AION2 API responses.
-- View character data and API results.
+### Developer tools (DEV accounts only)
+- User management, announcements and notifications, feedback management, system overview.
+- API Lab: explore and inspect AION2 API responses, behind an extra password.
 
 ## Tech Stack
 

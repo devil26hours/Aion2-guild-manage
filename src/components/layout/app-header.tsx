@@ -7,6 +7,8 @@ import { GuildEmblem, GuildName, GuildServerBadge, LogoutButton } from "./guild-
 import { MobileNav } from "./mobile-nav";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { FeedbackButton } from "@/components/feedback/feedback-dialog";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { ReactNode } from "react";
 
@@ -43,6 +45,8 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
           </div>
           <GuildServerBadge className="hidden sm:inline-flex" />
           <LanguageSwitcher className="hidden sm:flex" />
+          <NotificationBell />
+          <FeedbackButton />
           <ThemeToggle />
           <UserMenu />
           <LogoutButton />

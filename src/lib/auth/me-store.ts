@@ -13,6 +13,8 @@ export interface Me {
     character: { region: string; server_id: string; character_id: string; name: string } | null;
     guild_id: string | null;
     bootstrap: boolean;
+    /** Display hint only (shows the DEV menu entry). The server re-checks on every DEV request. */
+    is_developer?: boolean;
   };
   guild: { id: string; name: string; role: "leader" | "member"; join_code_set: boolean } | null;
 }
@@ -44,6 +46,12 @@ function subscribe(l: () => void) {
 
 export function useMe(): MeState {
   return useSyncExternalStore(subscribe, () => state, () => SERVER);
+}
+
+/** True only once the server confirmed this account is a DEV (display gate; the DEV APIs check the role themselves). */
+export function useIsDeveloper(): boolean {
+  const s = useMe();
+  return s.status === "ready" && s.me?.user.is_developer === true;
 }
 
 /** True only once the server confirmed this account leads its guild. */

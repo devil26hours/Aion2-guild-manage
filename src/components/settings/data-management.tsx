@@ -47,6 +47,7 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useIsDeveloper } from "@/lib/auth/me-store";
 import { call } from "@/lib/client/api";
 import { useT } from "@/lib/i18n";
 import { resetParties, usePartyState } from "@/lib/party/party-store";
@@ -117,8 +118,10 @@ function StatusPill({ tone, children }: { tone: "ok" | "idle" | "warn"; children
   );
 }
 
-function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof useDataOverview>; isLeader: boolean }) {
+function StorageStatus({ overview }: { overview: ReturnType<typeof useDataOverview> }) {
   const t = useT();
+  // The live connection test is technical diagnostics: DEV only (the route checks the role too).
+  const isDev = useIsDeveloper();
   const [check, setCheck] = useState<{ busy: boolean; result: ConnectionCheck | null; error: string | null }>({ busy: false, result: null, error: null });
   const data = overview.data;
 
@@ -164,7 +167,7 @@ function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof use
             ? t("The server cannot save AION 2 API data yet, so adding, refreshing and registering characters is unavailable. The server administrator must configure the server-only database key.")
             : t("The server saves AION 2 API data (profiles, snapshots, equipment) after fetching it itself.")}
         </p>
-        {isLeader && (
+        {isDev && (
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <Button type="button" variant="outline" disabled={check.busy} onClick={() => void runCheck()} className={aionButtonSecondary}>
               {check.busy ? <Loader2 className="size-3.5 animate-spin" /> : <Wifi className="size-3.5" />} {t("Test connection")}
@@ -266,7 +269,7 @@ function ExportBackup() {
       <div className="min-w-0 space-y-1">
         <p className={cn(subHeading, "flex items-center gap-2")}><Download className="size-4 text-brand" /> {t("Export guild data")}</p>
         <p className="text-xs text-steel">
-          {t("Downloads this guild's data as one JSON file: guild info and settings, member accounts (id and role), the roster with each character's stored API response, snapshot history with equipment, and party presets with their slots. Read-only — nothing is changed.")}
+          {t("Downloads this guild's data as one JSON file: guild info and settings, member accounts (id and role), the roster, snapshot history with equipment, and party presets with their slots. Read-only — nothing is changed.")}
         </p>
         <p className="text-xs text-subtle">{t("Never included: passwords, emails, sessions or tokens, the join code, keys, other guilds' data, or the guild image file.")}</p>
         <p className="text-xs text-warning-text">{t("This is a guild-level export, not a full database backup.")}</p>
@@ -339,7 +342,7 @@ export function DataManagement({ isLeader, onReset }: { isLeader: boolean; onRes
   return (
     <div className="space-y-5">
       <section aria-label={t("Database information")} className="space-y-2">
-        <StorageStatus overview={overview} isLeader={isLeader} />
+        <StorageStatus overview={overview} />
       </section>
 
       <section aria-label={t("Data overview")} className="space-y-2">

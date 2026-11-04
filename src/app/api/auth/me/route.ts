@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth/context";
+import { isDeveloper } from "@/lib/auth/developer";
 import { json, storageFailure } from "@/lib/roster/http";
 import { toDbError } from "@/lib/supabase/errors";
 
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
       if (g.data) guild = { id: g.data.id as string, name: g.data.name as string, role: user.role ?? "member", join_code_set: code.data === true };
     }
     const c = user.character;
+    const is_developer = await isDeveloper(supabase);
     return json({
       user: {
         id: user.id,
@@ -26,6 +28,7 @@ export async function GET(request: Request) {
         character: c ? { region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.name } : null,
         guild_id: guild ? user.guild_id : null,
         bootstrap: false,
+        is_developer,
       },
       guild,
     });

@@ -27,6 +27,15 @@ export async function login(email: string, password: string, remember: boolean):
   return r.ok ? { ok: true } : { ok: false, error: r.error.message };
 }
 
+/** Starts a GUEST session (signed cookie, Character Lookup only), then hard-navigates there so the proxy sees it. */
+export async function continueAsGuest(): Promise<LoginResult> {
+  const r = await call<{ ok: true }>("/api/auth/guest", { method: "POST" });
+  if (!r.ok) return { ok: false, error: r.error.message };
+
+  window.location.replace("/character-lookup");
+  return { ok: true };
+}
+
 /** Invalidates the server session, then hard-navigates to /login (clears all client state). */
 export async function logout(): Promise<void> {
   try {

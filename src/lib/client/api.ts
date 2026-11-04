@@ -46,6 +46,7 @@ export async function call<T>(url: string, init?: RequestInit): Promise<ApiResul
     });
     const body = (await res.json().catch(() => null)) as (T & { error?: { code?: string; message?: string; status?: number | null } }) | null;
     if (res.status === 401 && body?.error?.code === "UNAUTHENTICATED") toLogin();
+    if (res.status === 403 && body?.error?.code === "ACCOUNT_SUSPENDED" && typeof window !== "undefined") window.location.replace("/suspended");
     if (res.ok && body) return { ok: true, data: body };
     return {
       ok: false,

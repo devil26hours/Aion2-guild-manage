@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { FramedPanel } from "@/components/aion/framed-panel";
 import { OrnamentDivider } from "@/components/aion/ornaments";
 import { SiteLogo } from "@/components/aion/site-logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { FeedbackButton } from "@/components/feedback/feedback-dialog";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { useT } from "@/lib/i18n";
@@ -38,12 +40,15 @@ export function AuthShell({
     <>
       <div data-theme={chromeTheme} className="absolute top-4 right-4 flex items-center gap-2 sm:top-6 sm:right-6">
         {topRight}
+        <FeedbackButton />
         <LanguageSwitcher />
         <ThemeToggle />
       </div>
       <div className={cn("aion-enter relative w-full", wide ? "max-w-4xl" : "max-w-[26rem]")}>
         <header data-theme={chromeTheme} className={cn("mb-7 flex flex-col items-center text-center", compact && "pc:mb-2")}>
-          <SiteLogo preload className={cn("mb-3 h-32 sm:h-44", compact && "pc:mb-1 pc:h-[clamp(4.5rem,12dvh,8rem)]")} />
+          <Link href="/login" className={cn("mb-3 flex", compact && "pc:mb-1")}>
+            <SiteLogo preload className={cn("h-32 sm:h-44", compact && "pc:h-[clamp(4.5rem,12dvh,8rem)]")} />
+          </Link>
           <h1 className="font-display leading-none">
             <span className={cn("block bg-[image:var(--wordmark)] bg-clip-text text-4xl font-bold tracking-[0.18em] text-transparent drop-shadow-[var(--wordmark-shadow)] sm:text-5xl", compact && "pc:text-4xl/none")}>
               ChumChon

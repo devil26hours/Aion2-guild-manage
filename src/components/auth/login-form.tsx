@@ -11,6 +11,7 @@ import {
   KeyRound,
   Loader2,
   Mail,
+  ScanSearch,
   ShieldCheck,
   Swords,
 } from "lucide-react";
@@ -21,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { login, safeNextPath, validateLogin, type LoginFieldErrors } from "@/lib/auth/client";
+import { continueAsGuest, login, safeNextPath, validateLogin, type LoginFieldErrors } from "@/lib/auth/client";
 
 const REMEMBER_KEY = "aion2-gc:remembered-email";
 
@@ -59,7 +60,21 @@ export function LoginForm() {
   const [notice, setNotice] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
 
-  const busy = status !== "idle";
+  const [guestBusy, setGuestBusy] = useState(false);
+
+  const busy = status !== "idle" || guestBusy;
+
+  async function handleGuest() {
+    if (busy) return;
+    setAuthError(null);
+    setGuestBusy(true);
+    const result = await continueAsGuest();
+    // On success the page navigates away; only a failure comes back here.
+    if (!result.ok) {
+      setGuestBusy(false);
+      setAuthError(result.error);
+    }
+  }
 
   // Restore a remembered email (client-only, after hydration).
   useEffect(() => {
@@ -260,6 +275,18 @@ export function LoginForm() {
             {t("Enter the Guild Hall")}</>
         )}
       </Button>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={busy}
+        onClick={() => void handleGuest()}
+        data-testid="guest-button"
+        className="h-10 w-full rounded-md border-steel/25 bg-surface/60 text-xs font-semibold tracking-[0.2em] text-steel uppercase hover:border-gold/60 hover:bg-brand/[0.08] hover:text-brand-strong"
+      >
+        {guestBusy ? <Loader2 className="size-4 animate-spin" /> : <ScanSearch className="size-4" />}
+        {t("Continue as Guest")}
+      </Button>
+      <p className="-mt-2 text-center text-3xs text-subtle">{t("Guests can only use Character Lookup.")}</p>
       <p className="text-center text-xs text-steel">
         {t("New here?")}{" "}
         <Link href="/register" className="text-brand underline-offset-4 hover:underline" data-testid="register-link">{t("Create an account")}</Link>

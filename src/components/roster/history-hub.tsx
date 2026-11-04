@@ -20,6 +20,9 @@ import { RosterClassBadge } from "./roster-class-badge";
 
 type Tab = "roster" | "demo";
 
+/** The simulated demo tab is hidden for now; its implementation (HistoryList) stays for later. */
+const SHOW_DEMO_TAB = false;
+
 /**
  * /character-history: the real guild roster (default) with the existing
  * simulated demo history kept under a secondary tab.
@@ -29,7 +32,7 @@ export function HistoryHub() {
   const [tab, setTab] = useState<Tab>("roster");
   return (
     <div>
-      <div role="tablist" aria-label={t("History source")} className="mx-auto mb-4 flex max-w-7xl border-b border-steel/15">
+      {SHOW_DEMO_TAB && <div role="tablist" aria-label={t("History source")} className="mx-auto mb-4 flex max-w-7xl border-b border-steel/15">
         {(
           [
             ["roster", "Guild Roster", Database],
@@ -52,8 +55,8 @@ export function HistoryHub() {
             {t(label)}
           </button>
         ))}
-      </div>
-      {tab === "roster" ? <RosterHistoryList /> : <HistoryList />}
+      </div>}
+      {tab === "roster" || !SHOW_DEMO_TAB ? <RosterHistoryList /> : <HistoryList />}
     </div>
   );
 }

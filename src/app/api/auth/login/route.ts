@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { normalizeEmail } from "@/lib/accounts/users";
 import { claimPendingCharacter } from "@/lib/auth/claim";
 import { clientIp, failDelay, rateLimit } from "@/lib/auth/config";
+import { GUEST_COOKIE } from "@/lib/auth/guest";
 import { readJsonBody } from "@/lib/roster/http";
 import { LEGACY_SESSION_COOKIE, REMEMBER_COOKIE, rememberCookieOptions } from "@/lib/supabase/cookies";
 import { createSupabaseServerClient, SupabaseNotConfiguredError } from "@/lib/supabase/server";
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
   }
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error || !data.user) {
+    if (error?.code === "user_banned") return fail(403, "ACCOUNT_SUSPENDED", "This account has been suspended.");
     if (error?.code === "email_not_confirmed") return fail(403, "EMAIL_NOT_CONFIRMED", "Confirm your email address first — check your inbox for the confirmation link.");
     if (error?.status === 429 || error?.code === "over_request_rate_limit") return fail(429, "RATE_LIMITED", "Too many sign-in attempts. Wait a few minutes and try again.");
     if (error && error.status && error.status >= 500) return fail(502, "AUTH_UNAVAILABLE", "The sign-in service is unavailable. Try again later.");
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
   const secure = process.env.NODE_ENV === "production" && new URL(request.url).protocol === "https:";
   cookieStore.set(REMEMBER_COOKIE, remember ? "1" : "0", rememberCookieOptions(remember, secure));
   cookieStore.delete(LEGACY_SESSION_COOKIE);
+  cookieStore.delete(GUEST_COOKIE); // a real account replaces any guest session
 
   await claimPendingCharacter(supabase).catch(() => "failed");
   const { data: m } = await supabase.from("guild_memberships").select("guild_id").eq("user_id", data.user.id).maybeSingle();

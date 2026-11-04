@@ -16,6 +16,8 @@ The project started **fresh**: no JSON data was imported (see "Data migration st
 | `migrations/20261103000005_storage_guild_images.sql` | Private `guild-images` bucket (1 MB, PNG/JPEG) and its storage policies |
 | `migrations/20261103000006_gap_rpcs.sql` | `list_joinable_guilds`, `guild_join_code_set`, `add_roster_member` (owner auto-join), `save_party_preset` (SECURITY INVOKER, atomic per preset). Changes no existing table, policy or grant |
 | `migrations/20261103000007_party_preset_content.sql` | `party_presets.content_type` and `dungeon_name` (both nullable), their column grants, and `save_party_preset` replaced with a version that writes them |
+| `migrations/20261104000008_feedback_and_dev_role.sql` | `developers` (DEV role), `feedback` and `feedback_dev_notes` with RLS, `is_developer()`, `submit_feedback()` (service_role only), `dev_list_feedback()`, `dev_update_feedback()`. Additive; changes no existing object |
+| `migrations/20261104000009_dev_tools.sql` | `user_suspensions`, `notifications`, `notification_reads`, `dev_secrets` (RLS on, no client access) and the `dev_*` / `my_*` functions for user suspension, announcements and notifications, the API Lab password hash and the system overview. Additive; changes no existing object |
 
 The files are written to be re-runnable (`if not exists`, `create or replace`, `drop policy if exists`).
 After re-running 0004 or 0006, re-run 0007: 0004 revokes its column grants, and 0006 recreates the old `save_party_preset` signature.
@@ -97,7 +99,7 @@ A roster entry counts as "linked" when its character has an owner. The JSON `mem
    - JSON keeps the old id and shows the slot as "removed".
    - The DB sets `roster_member_id` to null (the FK uses `on delete set null`), so the slot shows as empty.
    - During import, a slot whose id isn't in the roster becomes null.
-2. **The leader can't delete their own account while leading.** Leadership transfer comes later.
+2. **The leader can't delete their own account while leading.** A leader can transfer leadership and leave through `leave_guild` (migration 0011); account deletion is still blocked while leading.
 3. **The migrated bootstrap leader (`admin@guild.local`, no character)** keeps no ownership row until they claim a character.
 
 ## Data migration strategy (superseded — fresh start chosen 2026-11-03)

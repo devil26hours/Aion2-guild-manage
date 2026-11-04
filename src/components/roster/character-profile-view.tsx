@@ -6,6 +6,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "re
 import { createPortal } from "react-dom";
 import { BookOpen, ChevronDown, Feather, Gem, ScrollText, Shield, Sparkles, Swords, X } from "lucide-react";
 import { JsonViewer } from "@/components/api-lab/json-viewer";
+import { useIsDeveloper } from "@/lib/auth/me-store";
 import { RelativeTime } from "@/components/aion/relative-time";
 import { SectionPanel } from "@/components/aion/section-panel";
 import { RoleBadge } from "@/components/party/role-badge";
@@ -496,6 +497,8 @@ export function CharacterProfileView({
   const t = useT();
   const view = useMemo(() => buildProfileView(raw), [raw]);
   const identity = useMemo(() => profileIdentity(raw), [raw]);
+  // Raw API data is a debugging aid: only DEV accounts get it (members, leaders and guests never see it).
+  const isDev = useIsDeveloper();
   const has = (s: ProfileSection) => sections.includes(s);
   const activeSkills = view?.skills.filter((s) => s.category === "Active") ?? [];
   const passiveSkills = view?.skills.filter((s) => s.category === "Passive") ?? [];
@@ -672,9 +675,9 @@ export function CharacterProfileView({
         </Collapsible>
       )}
 
-      {has("raw") && raw !== undefined && (
+      {isDev && has("raw") && raw !== undefined && (
         <Collapsible title={t("Raw API Data")} testId="raw-api-data">
-          <p className="mb-2 text-3xs text-subtle">{t("The stored response, unmodified — for admin/debugging.")}</p>
+          <p className="mb-2 text-3xs text-subtle">{t("The stored response, unmodified — for developers only.")}</p>
           <JsonViewer text={JSON.stringify(raw, null, 2)} className="max-h-80" />
         </Collapsible>
       )}

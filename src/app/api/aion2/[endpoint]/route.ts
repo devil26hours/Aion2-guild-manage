@@ -1,4 +1,6 @@
+import { clientIp, rateLimit } from "@/lib/auth/config";
 import { requireGuild } from "@/lib/auth/context";
+import { GUEST_COOKIE, GUEST_ENDPOINTS, verifyGuestToken } from "@/lib/auth/guest";
 import { NextResponse, type NextRequest } from "next/server";
 import { ENDPOINTS, isEndpointId, upstreamTimeoutFor, validateRequest } from "@/lib/aion2-api/endpoints";
 import type { ProxyErrorBody } from "@/lib/aion2-api/types";
@@ -25,9 +27,19 @@ function proxyError(status: number, body: ProxyErrorBody, extra: Record<string, 
 }
 
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[endpoint]">) {
-  const auth = await requireGuild(request);
-  if (auth.response) return auth.response;
   const { endpoint } = await ctx.params;
+  const auth = await requireGuild(request);
+  if (auth.response) {
+    // No guild member session: a verified GUEST may use only the Character Lookup endpoints.
+    const guest = verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
+    if (!guest || auth.response.status !== 401) return auth.response;
+    if (!GUEST_ENDPOINTS.has(endpoint)) {
+      return NextResponse.json({ error: { code: "GUEST_FORBIDDEN", message: "Guests can only use Character Lookup.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
+    }
+    if (!rateLimit(`guest-api:${clientIp(request)}`, 90, 60 * 1000)) {
+      return NextResponse.json({ error: { code: "RATE_LIMITED", message: "Too many requests. Wait a moment and try again.", status: null } }, { status: 429, headers: { "cache-control": "no-store" } });
+    }
+  }
 
   if (!isEndpointId(endpoint)) {
     return proxyError(404, {

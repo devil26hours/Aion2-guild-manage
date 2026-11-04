@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { GUEST_COOKIE } from "@/lib/auth/guest";
 import { LEGACY_SESSION_COOKIE, REMEMBER_COOKIE } from "@/lib/supabase/cookies";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-/** POST /api/auth/logout — revokes this session's refresh token in Supabase Auth and clears the auth cookies. */
+/** POST /api/auth/logout — revokes this session's refresh token in Supabase Auth and clears the auth and guest cookies. */
 export async function POST() {
   try {
     const supabase = await createSupabaseServerClient();
@@ -15,5 +16,6 @@ export async function POST() {
   for (const c of cookieStore.getAll()) if (/^sb-.*-auth-token/.test(c.name)) cookieStore.delete(c.name);
   cookieStore.delete(REMEMBER_COOKIE);
   cookieStore.delete(LEGACY_SESSION_COOKIE);
+  cookieStore.delete(GUEST_COOKIE);
   return NextResponse.json({ ok: true }, { headers: { "cache-control": "no-store" } });
 }
