@@ -31,6 +31,7 @@ import {
   clearPartyError,
   clearSlot,
   describePlacements,
+  moveSlot,
   loadParties,
   placementsElsewhere,
   renamePreset,
@@ -54,6 +55,7 @@ import { PartyAnalysisPanel } from "./party-analysis-panel";
 import { PartySlotView } from "./party-slot";
 import { PresetToolbar } from "./preset-toolbar";
 import { SuggestionsPanel } from "./suggestions-panel";
+import { useSlotDrag } from "./use-slot-drag";
 
 type Notice = { tone: "ok" | "warn" | "error"; text: string; id: number };
 
@@ -93,6 +95,24 @@ export function PartyBuilder() {
 
   const say = (text: string, tone: Notice["tone"] = "ok") => setNotice({ text, tone, id: Date.now() });
   const size = preset.slots.length;
+
+  const { drag, onPointerDown: onSlotPointerDown } = useSlotDrag({
+    enabled: !readOnly && !picker,
+    onDrop: (from, to) => {
+      const a = preset.slots[from];
+      const b = preset.slots[to];
+      if (!a || !b) return;
+      moveSlot(preset.id, from, to);
+      setSuggestions(null);
+      const nameOf = (id: string | null) => (id ? (byId.get(id)?.character_name ?? t("Character")) : null);
+      const first = nameOf(a.member_id);
+      const second = nameOf(b.member_id);
+      if (first && second) say(t("Swapped {a} (slot {from}) with {b} (slot {to}).", { a: first, b: second, from: from + 1, to: to + 1 }));
+      else if (first) say(t("{name} moved to slot {slot}.", { name: first, slot: to + 1 }));
+      else if (second) say(t("{name} moved to slot {slot}.", { name: second, slot: from + 1 }));
+    },
+  });
+  const dragName = drag ? (preset.slots[drag.from]?.member_id ? byId.get(preset.slots[drag.from].member_id!)?.character_name : null) : null;
 
   function applySize(n: number) {
     setPartySize(preset.id, n);
@@ -378,6 +398,13 @@ export function PartyBuilder() {
                   duplicate={!!s.member_id && dupSet.has(s.member_id)}
                   elsewhere={s.member_id ? elsewhere.get(s.member_id) : undefined}
                   view={view}
+                  onDragPointerDown={(e) => onSlotPointerDown(e, i)}
+                  dragRole={
+                    !drag ? undefined
+                    : drag.from === i ? "source"
+                    : drag.over === i ? (s.member_id ? "swap" : "move")
+                    : undefined
+                  }
                   onAssign={() => setPicker({ index: i, current: s })}
                   onRemove={() => {
                     const name = s.member_id ? byId.get(s.member_id)?.character_name : null;
@@ -389,6 +416,16 @@ export function PartyBuilder() {
               </li>
             ))}
           </ol>
+          {drag && (
+            <div
+              aria-hidden
+              data-testid="drag-ghost"
+              className="pointer-events-none fixed z-50 border border-brand/60 bg-surface-raised px-3 py-1.5 text-xs font-semibold text-brand-strong shadow-lg"
+              style={{ left: drag.x + 12, top: drag.y + 12 }}
+            >
+              {dragName ?? t("Empty slot")} · {drag.from + 1}{drag.over !== null && drag.over !== drag.from ? ` → ${drag.over + 1}` : ""}
+            </div>
+          )}
         </SectionPanel>
 
         <div className="space-y-4 sm:space-y-6">

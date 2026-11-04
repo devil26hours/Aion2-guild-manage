@@ -129,6 +129,19 @@ Private guild-management web app for AION 2 (modern fantasy look, light and dark
   - Server errors are localized by code (`error:CODE` entries).
   - Game and feature terms stay English.
 
+## 5a. Support page (/support)
+- **Buy Me a Coffee** button in the footer bar next to Discord (larger; always shown) and in the guest/auth footer; **Support** button in the login page's top row beside Feedback. Both link to `/support`.
+- `/support` is public (listed in `OPEN_PAGES` in `src/proxy.ts`), so signed-in users, signed-out visitors and guests can open it. Components: `components/support/support-view.tsx`, `support-button.tsx`; page `app/support/page.tsx`.
+- Shows the Krungsri bank-transfer details with a **Copy Account Number** button (Clipboard API, falls back to `execCommand`; copies digits only, `1701608758`). The project has no toast system, so feedback is an inline `aria-live` message.
+- No QR code (no PromptPay data supplied), no payment gateway, no tiers or perks. Bank details are constants in `support-view.tsx`.
+- Thai/English strings are in `lib/i18n/th.ts` under "support".
+
+## 5a-2. Cookies, PDPA notice & footer (2026-11-04)
+- **Audit:** no analytics, ads, tracking scripts or third-party integrations exist (fonts are self-hosted by `next/font`). Cookies: Supabase Auth `sb-<project>-auth-token` (+ chunks), `aion2_remember`, `aion2_guest` (strictly necessary); `aion2_lang` (user-requested preference, not read by the server). localStorage: `aion2-gc:{theme,lang,remembered-email,active-preset,cookie-notice}`.
+- **No consent banner**: with no optional cookies there is nothing to accept or reject, so there are no consent toggles. A one-time **cookie notice** (`components/cookies/cookie-notice.tsx`, state in `lib/cookie-notice.ts`) is dismissed only by the "Understood" button and stores the policy version and timestamp. Bump `COOKIE_POLICY_VERSION` on a material change to show it again.
+- **/cookie-policy** (public, in `OPEN_PAGES`) was re-audited against the code (policy version `2026-11-04-r2`). Facts: the Supabase cookie is not HttpOnly (library default), holds tokens plus user ID/email, lasts until the browser closes or up to 400 days (Remember me); `aion2_remember` is functional, 400 days or session; `aion2_guest` is an HMAC-signed `{r:guest,exp}` token, 8 h, no identifiers; `aion2_lang` is never read by the server; `aion2-gc:remembered-email` holds the plain email and is NOT cleared on sign-out; item icons/portraits load straight from API-supplied URLs (third-party hosts). It lists every cookie/storage entry above; update `components/cookies/cookie-policy-view.tsx` whenever a cookie or storage key is added. If optional cookies are ever added, build the consent categories first and gate their scripts behind consent.
+- **Footer:** larger text, 40px Buy Me a Coffee and 36px Discord pills, stacked on mobile; `--footer-bar-h` is now 6.5rem (mobile) / 4rem (sm+). A Cookie Policy link is in both footers.
+
 ## 5b. Community feedback & DEV dashboard (2026-11-04)
 **Code complete; typecheck, lint and build pass. Not run against a live Supabase project** (migration 0008 not applied by me). There is no test framework in the project, so no automated tests exist for this.
 

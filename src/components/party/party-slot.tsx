@@ -26,7 +26,30 @@ interface Props {
   onRole: (role: PartyRole | null) => void;
   /** Guild Members: view only (no assign/replace/remove/role). */
   readOnly?: boolean;
+  /** Drag-and-drop: pointer handler for the card body, and this slot's role in the current drag. */
+  onDragPointerDown?: (e: React.PointerEvent) => void;
+  dragRole?: "source" | "swap" | "move";
 }
+
+/** Highlight + hint shown on the dragged card and on the slot it would land on. */
+function DropHint({ mode }: { mode: "swap" | "move" }) {
+  const t = useT();
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute -top-2.5 right-2 z-10 border border-arcane/60 bg-surface px-1.5 py-0.5 text-3xs font-semibold tracking-[0.14em] text-arcane uppercase"
+    >
+      {mode === "swap" ? t("Swap here") : t("Move here")}
+    </span>
+  );
+}
+
+const dragClasses = (readOnly: boolean, role: Props["dragRole"]) =>
+  cn(
+    !readOnly && "cursor-grab touch-manipulation select-none",
+    role === "source" && "cursor-grabbing opacity-50 ring-2 ring-brand/60",
+    (role === "swap" || role === "move") && "border-arcane bg-arcane/10 ring-2 ring-arcane/50",
+  );
 
 function RoleSelect({ index, value, onRole, disabled }: { index: number; value: PartyRole | null; onRole: Props["onRole"]; disabled?: boolean }) {
   const t = useT();
@@ -50,7 +73,7 @@ function RoleSelect({ index, value, onRole, disabled }: { index: number; value: 
 const iconBtn =
   "flex size-8 shrink-0 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-brand-muted/60 hover:text-brand-strong focus-visible:border-arcane/60";
 
-export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], view, onAssign, onRemove, onRole, readOnly = false }: Props) {
+export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], view, onAssign, onRemove, onRole, readOnly = false, onDragPointerDown, dragRole }: Props) {
   const t = useT();
   const missing = !!slot.member_id && !member;
   const roleColor = slot.role ? ROLE_COLORS[slot.role] : null;
@@ -61,11 +84,14 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
       <div
         data-slot-index={index}
         data-state="empty"
+        onPointerDown={readOnly ? undefined : onDragPointerDown}
         className={cn(
-          "group flex items-center gap-3 border border-dashed border-steel/20 bg-surface/30 transition-colors hover:border-brand-muted/50",
-          view === "cards" ? "min-h-[6.5rem] p-3" : "px-3 py-2",
+          "group relative flex items-center gap-3 border border-dashed border-steel/20 bg-surface/30 transition-colors hover:border-brand-muted/50",
+          view === "cards" ? "h-full min-h-[9rem] p-2.5" : "px-3 py-2",
+          dragClasses(readOnly, dragRole),
         )}
       >
+        {(dragRole === "swap" || dragRole === "move") && <DropHint mode={dragRole} />}
         <span className="flex size-7 shrink-0 items-center justify-center border border-steel/20 text-xs font-bold text-subtle tabular-nums">
           {index + 1}
         </span>
@@ -88,14 +114,18 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
     <div
       data-slot-index={index}
       data-state={missing ? "missing" : "filled"}
+      onPointerDown={readOnly ? undefined : onDragPointerDown}
       className={cn(
         "relative border bg-gradient-to-br from-surface-raised to-surface transition-colors",
+        view === "cards" && "flex h-full min-h-[9rem] flex-col",
         missing || duplicate ? "border-destructive/50" : "border-steel/15 hover:border-brand-muted/50",
-        view === "cards" ? "p-3" : "px-3 py-2",
+        view === "cards" ? "p-2.5" : "px-3 py-2",
+        dragClasses(readOnly, dragRole),
       )}
       style={roleColor && !missing ? { boxShadow: `inset 3px 0 0 ${roleColor}` } : undefined}
     >
-      <div className={cn("flex gap-3", view === "cards" ? "items-start" : "flex-wrap items-center")}>
+      {(dragRole === "swap" || dragRole === "move") && <DropHint mode={dragRole} />}
+      <div className={cn("flex gap-3", view === "cards" ? "mb-2 items-start" : "flex-wrap items-center")}>
         <span className="flex size-7 shrink-0 items-center justify-center border border-brand-muted/50 bg-brand/10 text-xs font-bold text-brand-strong tabular-nums">
           {index + 1}
         </span>
@@ -106,7 +136,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
             src={member.profile_image}
             name={name}
             className={member.class_name}
-            size={view === "cards" ? 44 : 32}
+            size={view === "cards" ? 40 : 32}
           />
         )}
 
@@ -122,7 +152,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
                   title={member.comment}
                   className={cn(
                     "text-xs break-words text-info-text italic",
-                    view === "cards" ? "line-clamp-2" : "truncate",
+                    view === "cards" ? "line-clamp-2 min-h-[2rem] leading-4" : "truncate",
                   )}
                 >
                   “{member.comment}”
@@ -169,7 +199,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
       </div>
 
       {member && view === "cards" && (
-        <div className="mt-3 flex items-end justify-between gap-2 border-t border-steel/10 pt-2.5">
+        <div className="mt-auto flex items-end justify-between gap-2 border-t border-steel/10 pt-2">
           <dl className="flex gap-4 text-xs tabular-nums">
             <div>
               <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">CP</dt>
@@ -183,8 +213,8 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
           {readOnly ? <RoleBadge role={slot.role} /> : <RoleSelect index={index} value={slot.role} onRole={onRole} />}
         </div>
       )}
-      {member && slot.role === null && (
-        <p className="mt-1.5 text-3xs text-subtle">
+      {member && (slot.role === null || view === "cards") && (
+        <p className={cn("mt-1 text-3xs text-subtle", slot.role !== null && "invisible")} aria-hidden={slot.role !== null || undefined}>
           {t("Guild role:")}{" "}{member.role ?? t("not set")}
         </p>
       )}

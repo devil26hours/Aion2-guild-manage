@@ -11,7 +11,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const guildCard = <SidebarGuildCard />;
 
   return (
-    <div className="aion-app-frame relative flex min-h-dvh flex-1 flex-col bg-[image:var(--app-sky)][--footer-bar-h:2.75rem] sm:[--footer-bar-h:2.25rem]">
+    <div className="aion-app-frame relative flex min-h-dvh flex-1 flex-col bg-[image:var(--app-sky)][--footer-bar-h:6.5rem] sm:[--footer-bar-h:4rem]">
       {/* Page headings sit directly on the photo, so the scrim follows the theme: pale under dark ink, dark under light ink. */}
       <PhotoBackdrop
         src={mainBg}

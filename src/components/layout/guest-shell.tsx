@@ -52,7 +52,7 @@ export function GuestShell({ children }: { children: ReactNode }) {
         <div aria-hidden className="h-px bg-gradient-to-r via-gold/70 from-transparent to-transparent" />
       </header>
       <main className="relative min-w-0 flex-1 px-4 pt-6 pb-8 sm:px-6 lg:px-8 lg:pt-8">{children}</main>
-      <SiteFooter className="relative pb-4" />
+      <SiteFooter support className="relative pb-4" />
     </div>
   );
 }

@@ -96,6 +96,7 @@ export type PartyOp =
   | { op: "assign"; presetId: string; index: number; memberId: string; role: PartyRole | null }
   | { op: "setRole"; presetId: string; index: number; role: PartyRole | null }
   | { op: "clear"; presetId: string; index: number }
+  | { op: "move"; presetId: string; from: number; to: number }
   | { op: "reset"; presetId: string }
   | { op: "setSize"; presetId: string; size: number }
   | { op: "setContentType"; presetId: string; contentType: PartyContentType | null }
@@ -143,6 +144,10 @@ export function parsePartyOp(v: unknown): PartyOp | null {
       return pid && idx && roleOk ? { op: "setRole", presetId: v.presetId as string, index: v.index as number, role: v.role as PartyRole | null } : null;
     case "clear":
       return pid && idx ? { op: "clear", presetId: v.presetId as string, index: v.index as number } : null;
+    case "move": {
+      const inIdx = (n: unknown) => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < MAX_PARTY_SIZE;
+      return pid && inIdx(v.from) && inIdx(v.to) ? { op: "move", presetId: v.presetId as string, from: v.from as number, to: v.to as number } : null;
+    }
     case "setSize":
       return pid && isSize(v.size) ? { op: "setSize", presetId: v.presetId as string, size: v.size } : null;
     case "setContentType":
@@ -215,6 +220,15 @@ export function applyPartyOp(presets: PartyPreset[], op: PartyOp, now: string, r
       return update(op.presetId, (p) => (inRange(p, op.index) ? { ...p, slots: p.slots.map((s, i) => (i === op.index ? { ...s, role: op.role } : s)) } : "Invalid slot."));
     case "clear":
       return update(op.presetId, (p) => (inRange(p, op.index) ? { ...p, slots: p.slots.map((s, i) => (i === op.index ? slot() : s)) } : "Invalid slot."));
+    case "move":
+      return update(op.presetId, (p) => {
+        if (!inRange(p, op.from) || !inRange(p, op.to)) return "Invalid slot.";
+        if (op.from === op.to) return p;
+        // Swap whole slots (character + role); an empty target simply receives the character.
+        const slots = p.slots.map((s) => ({ ...s }));
+        [slots[op.from], slots[op.to]] = [slots[op.to], slots[op.from]];
+        return { ...p, slots };
+      });
     case "reset":
       return update(op.presetId, (p) => ({ ...p, slots: emptySlots(p.slots.length) }));
     case "setSize":

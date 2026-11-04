@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Cinzel, Geist, Geist_Mono, Noto_Sans_Thai, Sora } from "next/font/google";
+import { CookieNotice } from "@/components/cookies/cookie-notice";
 import { ThemeSync } from "@/components/theme/theme-sync";
 import { THEME_INIT_SCRIPT } from "@/lib/theme/script";
 import "./globals.css";
@@ -58,6 +60,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <ThemeSync />
         {children}
+        <Suspense fallback={null}>
+          <CookieNotice />
+        </Suspense>
       </body>
     </html>
   );

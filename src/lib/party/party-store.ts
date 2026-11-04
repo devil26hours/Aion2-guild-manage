@@ -165,6 +165,11 @@ export function clearSlot(presetId: string, index: number) {
   dispatch({ op: "clear", presetId, index });
 }
 
+/** Drag-and-drop: swap two slots, or move a character into an empty slot. */
+export function moveSlot(presetId: string, from: number, to: number) {
+  dispatch({ op: "move", presetId, from, to });
+}
+
 /** Empty every slot of a party (keeps its name and size). */
 export function resetPartySlots(presetId: string) {
   dispatch({ op: "reset", presetId });
