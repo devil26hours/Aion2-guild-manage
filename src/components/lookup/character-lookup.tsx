@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
-import { CircleAlert, Loader2, Search } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
+import { Check, CircleAlert, ImageDown, Loader2, Search, Share2 } from "lucide-react";
 import { CharacterHitsTable } from "@/components/api-lab/character-hits-table";
 import { aionButtonSecondary, aionField } from "@/components/aion/styles";
 import { PageHeader } from "@/components/layout/page-header";
@@ -13,9 +14,46 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { describeStatus, REGIONS, regionLabel, validateRequest, type Region } from "@/lib/aion2-api/endpoints";
 import { detailString, isCharacterHitList, isProxyErrorBody, isServerRosterList, type CharacterHit, type ServerRosterEntry } from "@/lib/aion2-api/types";
 import { useT } from "@/lib/i18n";
+import { equipmentFileName, renderEquipmentPng } from "@/lib/lookup/export-equipment";
+import { downloadBlob } from "@/lib/party/export-png";
 import { mapCharacterProfile } from "@/lib/roster/mapping";
 import { rosterId, type RosterMember } from "@/lib/roster/types";
 import { cn } from "@/lib/utils";
+
+/** Share links carry only public lookup fields: character name, region, server and the public character id. */
+const SHARE_ID = /^[\w:.=+/-]{1,64}$/;
+
+const SHOW_EXPORT_IMAGE: boolean = false;
+
+export interface ShareParams { name: string; region: string; server: string; id: string }
+
+/** Validates the share-link query (untrusted input); returns null when there is nothing usable to look up. */
+export function parseShareParams(sp: Record<string, string | string[] | undefined>): ShareParams | null {
+  const one = (k: string) => { const v = sp[k]; return (Array.isArray(v) ? v[0] : v) ?? ""; };
+  const name = one("name").trim().slice(0, 64);
+  if (!name) return null;
+  const region = one("region"), server = one("server"), id = one("id");
+  return {
+    name,
+    region: (REGIONS as readonly string[]).includes(region) ? region : "",
+    server: SHARE_ID.test(server) ? server : "",
+    id: SHARE_ID.test(id) ? id : "",
+  };
+}
+
+function FromUrl() {
+  const sp = useSearchParams();
+  return <CharacterLookup initial={parseShareParams(Object.fromEntries(sp)) ?? undefined} />;
+}
+
+/** Page entry: reads a share link's query (?name=&region=&server=&id=) and opens that character automatically. */
+export function CharacterLookupFromUrl() {
+  return (
+    <Suspense fallback={null}>
+      <FromUrl />
+    </Suspense>
+  );
+}
 
 const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 
@@ -27,16 +65,20 @@ type Profile = { status: "idle" } | { status: "loading"; hit: CharacterHit } | {
  * profile components as the guild pages, but keeps everything in component
  * state: nothing is written to the roster, snapshots or Supabase.
  */
-export function CharacterLookup() {
+export function CharacterLookup({ initial }: { initial?: ShareParams }) {
   const t = useT();
   const ids = useId();
-  const [name, setName] = useState("");
-  const [region, setRegion] = useState("");
-  const [server, setServer] = useState("");
+  const [name, setName] = useState(initial?.name ?? "");
+  const [region, setRegion] = useState(initial?.region ?? "");
+  const [server, setServer] = useState(initial?.server ?? "");
   const [roster, setRoster] = useState<ServerRosterEntry[]>([]);
   const [nameError, setNameError] = useState<string | null>(null);
   const [search, setSearch] = useState<Search>({ status: "idle" });
   const [profile, setProfile] = useState<Profile>({ status: "idle" });
+  const [shareState, setShareState] = useState<"idle" | "copied" | "failed">("idle");
+  const autoRan = useRef(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const [exportState, setExportState] = useState<"idle" | "busy" | "failed">("idle");
 
   useEffect(() => {
     let alive = true;
@@ -73,6 +115,69 @@ export function CharacterLookup() {
       else setSearch({ status: "error", message: failure(res, body) });
     } catch {
       setSearch({ status: "error", message: t("Could not reach the app server.") });
+    }
+  }
+
+  /** Opens a shared link: ?name=&server=&region=&id= -> search, pick the matching character, show the profile. */
+  async function autoLoad(n: string, r: string, srv: string, id: string) {
+    const params: Record<string, string> = { name: n };
+    if (r) params.region = r;
+    const check = validateRequest("character-search", params);
+    if (!check.ok) {
+      setNameError(check.errors.map((x) => x.message).join(" "));
+      return;
+    }
+    setSearch({ status: "searching" });
+    try {
+      const res = await fetch(`/api/aion2/character-search?${new URLSearchParams(params)}`, { cache: "no-store" });
+      const body: unknown = await res.json().catch(() => null);
+      if (!(res.ok && isCharacterHitList(body))) {
+        setSearch({ status: "error", message: failure(res, body) });
+        return;
+      }
+      setSearch({ status: "done", hits: body });
+      if (!srv && !id) return; // not enough to identify one character: show the search results and let the visitor choose
+      const match =
+        body.find((h) => (!id || h.character_id === id) && (!srv || h.server_id === srv) && (!r || h.region === r)) ??
+        (id ? body.find((h) => h.character_id === id) : undefined);
+      if (match) void view(match);
+      else setProfile({ status: "error", message: t("The shared character could not be found. They may have been renamed or moved to another server.") });
+    } catch {
+      setSearch({ status: "error", message: t("Could not reach the app server.") });
+    }
+  }
+
+  useEffect(() => {
+    if (autoRan.current) return;
+    autoRan.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- starts the shared-link fetch once; its only synchronous setState is the loading flag
+    if (initial) void autoLoad(initial.name, initial.region, initial.server, initial.id);
+    // one-shot on mount; autoLoad only uses setters and fetch
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function share(m: RosterMember) {
+    const q = new URLSearchParams({ name: m.character_name, region: m.region, server: m.server_id, id: m.character_id });
+    const url = `${window.location.origin}/character-lookup?${q}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareState("copied");
+    } catch {
+      setShareState("failed");
+      window.prompt(t("Copy this link"), url);
+    }
+    setTimeout(() => setShareState("idle"), 2500);
+  }
+
+  async function exportImage(m: RosterMember) {
+    const node = profileRef.current?.querySelector<HTMLElement>('[data-testid="equipment"]');
+    if (!node || exportState === "busy") return;
+    setExportState("busy");
+    try {
+      downloadBlob(await renderEquipmentPng(node), equipmentFileName(m.character_name));
+      setExportState("idle");
+    } catch {
+      setExportState("failed");
     }
   }
 
@@ -191,7 +296,27 @@ export function CharacterLookup() {
           <CircleAlert className="mt-0.5 size-4 shrink-0" /> {profile.message}
         </p>
       )}
-      {profile.status === "ready" && <CharacterProfileView key={profile.member.id} member={profile.member} raw={profile.raw} itemDetails />}
+      {profile.status === "ready" && (
+        <div className="flex items-center justify-end gap-2">
+          {exportState === "failed" && <span className="text-xs text-danger-text" role="alert">{t("Could not create the image.")}</span>}
+          {/* Export image temporarily hidden */}
+          {SHOW_EXPORT_IMAGE && (
+            <Button type="button" variant="outline" disabled={exportState === "busy"} onClick={() => void exportImage(profile.member)} data-testid="lookup-export" className={cn(aionButtonSecondary, "text-foreground")}>
+              {exportState === "busy" ? <Loader2 className="size-3.5 animate-spin" /> : <ImageDown className="size-3.5" />}
+              {t("Export image")}
+            </Button>
+          )}
+          <Button type="button" variant="outline" onClick={() => void share(profile.member)} data-testid="lookup-share" className={cn(aionButtonSecondary, "text-foreground")}>
+            {shareState === "copied" ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}
+            {shareState === "copied" ? t("Link copied") : t("Share")}
+          </Button>
+        </div>
+      )}
+      {profile.status === "ready" && (
+        <div ref={profileRef}>
+          <CharacterProfileView key={profile.member.id} member={profile.member} raw={profile.raw} itemDetails />
+        </div>
+      )}
     </div>
   );
 }

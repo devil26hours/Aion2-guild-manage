@@ -7,7 +7,7 @@ const SITE_URL = "https://justkiddinglab.com";
  * landing page ("/" redirects to it). Left out: "/" (redirect), /register and /forgot-password
  * (no search value), the signed-in app pages, /reset-password, /suspended, /auth/confirm, /api/*.
  */
-const PUBLIC_PATHS = ["/login", "/support", "/cookie-policy"];
+const PUBLIC_PATHS = ["/login", "/map", "/support", "/cookie-policy"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return PUBLIC_PATHS.map((path) => ({ url: `${SITE_URL}${path}` }));

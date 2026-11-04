@@ -5,6 +5,7 @@ import {
   History,
   Inbox,
   LayoutDashboard,
+  Map as MapIcon,
   Megaphone,
   ScanSearch,
   Settings,
@@ -22,6 +23,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  { href: "/map", label: "Interactive Map", icon: MapIcon },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/members", label: "Members", icon: Users },
   { href: "/character-history", label: "Character History", icon: History },
@@ -33,8 +35,15 @@ export const NAV_ITEMS: NavItem[] = [
 
 /** Signed-in accounts WITHOUT a guild ("No Guild"): Guest-equivalent pages plus Guild Management (display hint; the proxy and APIs enforce it). */
 export const NO_GUILD_NAV_ITEMS: NavItem[] = [
+  { href: "/map", label: "Interactive Map", icon: MapIcon },
   { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
   { href: "/guild-setup", label: "Guild Management", icon: Shield },
+];
+
+/** Guest menu (also shown to anyone viewing an open page without an account): the Map comes first. */
+export const GUEST_NAV_ITEMS: NavItem[] = [
+  { href: "/map", label: "Interactive Map", icon: MapIcon },
+  { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
 ];
 
 /** One DEV menu, shown only to a DEV account (display hint; the pages and APIs check the role on the server). */

@@ -1,0 +1,606 @@
+{
+ "when": "2026-11-04T16:06:17.998Z",
+ "base": "http://localhost:3102",
+ "pass": 50,
+ "total": 50,
+ "results": [
+  {
+   "name": "T01a anonymous GET /map is 200 (no redirect to /login)",
+   "pass": true,
+   "detail": {
+    "status": 200,
+    "location": null
+   }
+  },
+  {
+   "name": "T01b other pages are unchanged: anonymous visitors are still redirected to /login",
+   "pass": true,
+   "detail": [
+    {
+     "status": 307,
+     "location": "/login?next=%2Fmembers"
+    },
+    {
+     "status": 307,
+     "location": "/login?next=%2Fdashboard"
+    },
+    {
+     "status": 307,
+     "location": "/login?next=%2Fparty-builder"
+    },
+    {
+     "status": 307,
+     "location": "/login?next=%2Fsettings"
+    }
+   ]
+  },
+  {
+   "name": "T01c map data and assets are served to anonymous visitors (200)",
+   "pass": true,
+   "detail": [
+    {
+     "status": 200,
+     "location": null
+    },
+    {
+     "status": 200,
+     "location": null
+    },
+    {
+     "status": 200,
+     "location": null
+    }
+   ]
+  },
+  {
+   "name": "T01d the browser stays on /map as a guest (no login redirect) and renders the guest frame",
+   "pass": true,
+   "detail": "/map"
+  },
+  {
+   "name": "T01e the Map is the FIRST item of the guest menu",
+   "pass": true,
+   "detail": [
+    "/map",
+    "/character-lookup"
+   ]
+  },
+  {
+   "name": "T02a initial load fetches spawn/entity data for ONLY the selected map; search index and other locales are not fetched",
+   "pass": true,
+   "detail": {
+    "spawnReq": [
+     "http://localhost:3102/map-data/v1/data/spawns/World_D_A.json"
+    ],
+    "entReq": [
+     "http://localhost:3102/map-data/v1/data/entities/World_D_A.json"
+    ]
+   }
+  },
+  {
+   "name": "T02b the whole map loads: 64/64 tiles, none failed, all 20,022 spawns present",
+   "pass": true,
+   "detail": {
+    "map": "World_D_A",
+    "markers": 20022,
+    "stats": {
+     "markers": 5193,
+     "clusters": 157,
+     "mode": "clustered",
+     "drawMs": 2.2000000178813934
+    },
+    "scale": 13.08626198083067,
+    "tiles": {
+     "loaded": 64,
+     "failed": 0,
+     "total": 64
+    },
+    "hits": 188
+   }
+  },
+  {
+   "name": "T03a every spawn pixel equals the documented world->pixel transform (<= 0.6 px) and lies inside the map canvas",
+   "pass": true,
+   "detail": {
+    "rows": 20022,
+    "worstPx": 0.05498039215672179,
+    "inb": true,
+    "canvas": [
+     8192,
+     8192
+    ]
+   }
+  },
+  {
+   "name": "T04a mouse-wheel zoom works (image px per screen px shrinks)",
+   "pass": true,
+   "detail": {
+    "homeScale": 13.08626198083067,
+    "zScale": 5.259075191627552
+   }
+  },
+  {
+   "name": "T04b after wheel-zoom + drag-pan every marker is drawn exactly at its image-space position (<0.01 px error)",
+   "pass": true,
+   "detail": {
+    "n": 130,
+    "worst": 0,
+    "ratio": 1.0000000000000002
+   }
+  },
+  {
+   "name": "T05a at low zoom markers are clustered (cluster bubbles drawn)",
+   "pass": true,
+   "detail": {
+    "markers": 5193,
+    "clusters": 157,
+    "mode": "clustered",
+    "drawMs": 3.699999988079071
+   }
+  },
+  {
+   "name": "T05b at close zoom markers are individual (images/icons), not clusters",
+   "pass": true,
+   "detail": {
+    "mode": "individual",
+    "hits": 175,
+    "single": true
+   }
+  },
+  {
+   "name": "T05c clicking a cluster zooms into it",
+   "pass": true,
+   "detail": {
+    "before": 13.08626198083067,
+    "after": 5.4526091586794445
+   }
+  },
+  {
+   "name": "T06a hierarchical filter tree: the 6 groups and the requested subcategories exist",
+   "pass": true,
+   "detail": {
+    "subs": [
+     "exploration.traces",
+     "exploration.chests",
+     "exploration.collectibles",
+     "hunting.boss",
+     "hunting.elite",
+     "hunting.normal",
+     "hunting.pet",
+     "hunting.mount",
+     "gathering.aether",
+     "gathering.ore",
+     "gathering.plants",
+     "gathering.food",
+     "logistics.teleports",
+     "logistics.merchants",
+     "logistics.quest_npc",
+     "events.rifts",
+     "events.fortress",
+     "events.dungeons"
+    ],
+    "groups": [
+     "exploration",
+     "hunting",
+     "gathering",
+     "logistics",
+     "events",
+     "unclassified"
+    ]
+   }
+  },
+  {
+   "name": "T06b panel counts are real: every shown subcategory count is a number from this map's data",
+   "pass": true,
+   "detail": {
+    "rows": 16,
+    "meta": true
+   }
+  },
+  {
+   "name": "T06c categories without client data (Pet, Mount) are disabled and say \"No data in client\" instead of showing results",
+   "pass": true,
+   "detail": {
+    "hunting.pet": {
+     "disabled": true,
+     "text": "Pet Spawns\nNo data in client"
+    },
+    "hunting.mount": {
+     "disabled": true,
+     "text": "Mount-related Spawns\nNo data in client"
+    }
+   }
+  },
+  {
+   "name": "T06d Unclassified is off by default",
+   "pass": true,
+   "detail": "unchecked"
+  },
+  {
+   "name": "T06e clicking the partly-checked parent \"Hunting\" turns every hunting subtype on (Normal Monsters appear)",
+   "pass": true,
+   "detail": {
+    "normal": 26,
+    "state": "checked"
+   }
+  },
+  {
+   "name": "T06f toggling the parent off removes every hunting marker while other groups stay",
+   "pass": true,
+   "detail": {
+    "total": 167,
+    "hunting": 0,
+    "state": "unchecked"
+   }
+  },
+  {
+   "name": "T06g a subcategory toggles independently (Ore/Gems off, Plants still on)",
+   "pass": true,
+   "detail": {
+    "ores": 0,
+    "plants": 21
+   }
+  },
+  {
+   "name": "T06h Clear all removes every marker and shows the \"no markers match\" state",
+   "pass": true,
+   "detail": {
+    "n": 0,
+    "empty": true
+   }
+  },
+  {
+   "name": "T06i Select all shows markers again",
+   "pass": true,
+   "detail": 20022
+  },
+  {
+   "name": "T06j Reset restores the package defaults (Unclassified off, Hunting partly on)",
+   "pass": true,
+   "detail": {
+    "unc": "unchecked",
+    "hunting": "indeterminate"
+   }
+  },
+  {
+   "name": "T07a search by name finds Diamond with per-map spawn counts",
+   "pass": true,
+   "detail": [
+    "Diamond | Gathering › Ore / Gems · Diamond | 200 on Altgard · also: Verteron 192, Morheim 142, Eltnen 97"
+   ]
+  },
+  {
+   "name": "T07b search by object ID (1500021) finds Diamond",
+   "pass": true,
+   "detail": [
+    "Diamond"
+   ]
+  },
+  {
+   "name": "T07c choosing a result navigates to a Diamond marker (centered) and opens its popup",
+   "pass": true,
+   "detail": {
+    "popup": "Diamond",
+    "hasHit": true,
+    "hitDist": 0,
+    "popupVisible": true
+   }
+  },
+  {
+   "name": "T07d the popup follows its marker while panning (moved with the map and still sits on a Diamond marker)",
+   "pass": true,
+   "detail": {
+    "before": {
+     "l": 499.5,
+     "t": 313
+    },
+    "after": {
+     "l": 579.5,
+     "t": 363
+    },
+    "distToMarker": 1.709087925789039e-12
+   }
+  },
+  {
+   "name": "T07e (precondition) an entity exists only on another map",
+   "pass": true,
+   "detail": {
+    "name": "Latesran Western Root",
+    "maps": [
+     "Abyss_Reshanta_A"
+    ]
+   }
+  },
+  {
+   "name": "T07f picking an entity from another map switches map without a reload and opens its popup",
+   "pass": true,
+   "detail": {
+    "rowtxt": "Latesran Western Root | Logistics › Kisk / Save Points / Teleports · Teleport Artifacts | not on Altgard · also: Chaotic Lower Reshanta 1",
+    "cm": {
+     "map": "Abyss_Reshanta_A",
+     "select": "Abyss_Reshanta_A",
+     "popup": true,
+     "name": "Latesran Western Root"
+    }
+   }
+  },
+  {
+   "name": "T08a region selector lists Elyos, Asmodian, Abyss and Special / Instanced",
+   "pass": true,
+   "detail": [
+    "elyos",
+    "asmodian",
+    "abyss",
+    "special"
+   ]
+  },
+  {
+   "name": "T08b switching maps without reloading works for Elyos, Asmodian, Abyss and Special maps (readable names, all tiles load, markers present)",
+   "pass": true,
+   "detail": [
+    {
+     "mapId": "World_L_A",
+     "name": "Verteron",
+     "tiles": {
+      "loaded": 64,
+      "failed": 0,
+      "total": 64
+     },
+     "markers": 16934,
+     "ok": true
+    },
+    {
+     "mapId": "World_L_B",
+     "name": "Eltnen",
+     "tiles": {
+      "loaded": 64,
+      "failed": 0,
+      "total": 64
+     },
+     "markers": 11901,
+     "ok": true
+    },
+    {
+     "mapId": "World_D_B",
+     "name": "Morheim",
+     "tiles": {
+      "loaded": 64,
+      "failed": 0,
+      "total": 64
+     },
+     "markers": 9470,
+     "ok": true
+    },
+    {
+     "mapId": "Abyss_Reshanta_A",
+     "name": "Chaotic Lower Reshanta",
+     "tiles": {
+      "loaded": 16,
+      "failed": 0,
+      "total": 16
+     },
+     "markers": 2316,
+     "ok": true
+    },
+    {
+     "mapId": "Dungeon_L_0019",
+     "name": "Lepharist Research Center",
+     "tiles": {
+      "loaded": 1,
+      "failed": 0,
+      "total": 1
+     },
+     "markers": 144,
+     "ok": true
+    },
+    {
+     "mapId": "World_D_A",
+     "name": "Altgard",
+     "tiles": {
+      "loaded": 64,
+      "failed": 0,
+      "total": 64
+     },
+     "markers": 20022,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "name": "T08c spawn data is fetched only for maps that were opened (7 loaded maps; unvisited maps such as Dungeon_D_0001 are never requested; revisits at most re-fetch)",
+   "pass": true,
+   "detail": [
+    "World_D_A.json",
+    "World_D_A.json",
+    "Abyss_Reshanta_A.json",
+    "World_L_B.json",
+    "World_L_A.json",
+    "World_D_A.json",
+    "World_D_B.json",
+    "Abyss_Reshanta_A.json",
+    "Fire_Temple_Arena.json",
+    "Dungeon_L_0019.json",
+    "World_D_A.json"
+   ]
+  },
+  {
+   "name": "T08d maps without world-bounds metadata are not offered at all (so no markers can be drawn with invalid coordinates)",
+   "pass": true,
+   "detail": {
+    "unavailable": [
+     "Dungeon_L_0027",
+     "Dungeon_D_0027",
+     "Abyss_Reshanta_B"
+    ],
+    "listedInCatalog": false
+   }
+  },
+  {
+   "name": "T09a a collectible popup shows completion status \"Not completed\" and a Mark-as-done button",
+   "pass": true,
+   "detail": {
+    "id": "World_D_A:-1036027369:0:e",
+    "name": "Empyrean Trace: Altgard",
+    "totalCollect": 1991,
+    "hasBtn": true,
+    "status": "Not completed"
+   }
+  },
+  {
+   "name": "T09b Mark as done persists in localStorage under aion2.map.done.v1.<map_id> (spawn id), popup says Completed, header counter updates",
+   "pass": true,
+   "detail": {
+    "ls": {
+     "ids": [
+      "World_D_A:-1036027369:0:e"
+     ]
+    },
+    "status": "Completed",
+    "title": "Altgard\n\n20,022 markers · Collectibles 1 / 1,991"
+   }
+  },
+  {
+   "name": "T09c ordinary monsters have no completion tracking (no button, no status)",
+   "pass": true,
+   "detail": {
+    "btn": false,
+    "status": false
+   }
+  },
+  {
+   "name": "T09d All / Not done / Done filters partition the markers (done = 1; not done + done = all)",
+   "pass": true,
+   "detail": {
+    "all": 5193,
+    "notdone": 5192,
+    "done": 1
+   }
+  },
+  {
+   "name": "T09e completion survives a page reload and is scoped to its map",
+   "pass": true,
+   "detail": {
+    "ls": [
+     "World_D_A:-1036027369:0:e"
+    ],
+    "title": "Altgard\n\n20,022 markers · Collectibles 1 / 1,991",
+    "others": [
+     "aion2.map.done.v1.World_D_A"
+    ]
+   }
+  },
+  {
+   "name": "T09f a different map starts with its own empty completion state",
+   "pass": true
+  },
+  {
+   "name": "T09g clicking again undoes it",
+   "pass": true,
+   "detail": 0
+  },
+  {
+   "name": "T10a entity images/icons load without failures, each file is fetched once, no per-marker DOM images",
+   "pass": true,
+   "detail": {
+    "sprites": 71,
+    "ready": 71,
+    "failed": [],
+    "fetched": 71,
+    "dup": 0,
+    "domImgs": 0
+   }
+  },
+  {
+   "name": "T10b a monster popup is compact: its mapped portrait (loaded), name, category, rank and level",
+   "pass": true,
+   "detail": {
+    "name": "Blades Sentinel",
+    "shown": "Blades Sentinel",
+    "img": "/map-data/v1/assets/monster-portraits/UT_256_MOB_AltKnife_01.webp",
+    "loaded": true,
+    "text": "Blades Sentinel\n\nHunting › Normal Monsters\n\nLevel 34 · Rank: Normal Monsters · Type: Intellect",
+    "w": 272,
+    "h": 104
+   }
+  },
+  {
+   "name": "T10c a resource popup uses its item icon (Diamond -> Icon_Item_Gather_Gemstone_A_c_003) and names the resource type",
+   "pass": true,
+   "detail": {
+    "src": "/map-data/v1/assets/entity-icons/Icon_Item_Gather_Gemstone_A_c_003.png",
+    "loaded": true,
+    "text": "Diamond\n\nGathering › Ore / Gems · Diamond\n\nResource: Gemstone\n\nOne of 70 candidate positions (not all are active at once)."
+   }
+  },
+  {
+   "name": "T10d a monster without a verified image gets the neutral dot (not a substitute picture) and a neutral popup placeholder",
+   "pass": true,
+   "detail": {
+    "r": 5,
+    "px": [
+     203,
+     213,
+     225
+    ],
+    "popupImg": false,
+    "placeholder": true
+   }
+  },
+  {
+   "name": "T10e resources that share one icon file stay separate classifications with their own names/filters (Calendula/Targena, Asvata/Yggdrasil, Coriolus/Morfa, Cypri/Pujery ...)",
+   "pass": true,
+   "detail": [
+    "Calendula+Targena",
+    "Asvata+Yggdrasil",
+    "Coriolus+Morfa",
+    "Cypri+Pujery"
+   ]
+  },
+  {
+   "name": "T11a mobile (390px): no horizontal overflow, the map uses the full width, filters are behind a button",
+   "pass": true,
+   "detail": {
+    "overflowX": false,
+    "stageW": 356,
+    "stageH": 570,
+    "filterBtn": true,
+    "sidebarVisible": false
+   }
+  },
+  {
+   "name": "T11b the filter drawer opens on mobile with the full filter tree",
+   "pass": true,
+   "detail": {
+    "visible": true,
+    "w": 351
+   }
+  },
+  {
+   "name": "T12 a real guest session (guest cookie) opens /map directly, stays on /map and sees Map first in the menu",
+   "pass": true,
+   "detail": {
+    "guestApi": {
+     "status": 200
+    },
+    "path": "/map",
+    "nav": [
+     "/map",
+     "/character-lookup"
+    ]
+   }
+  },
+  {
+   "name": "T12b with the same guest cookie other pages are still blocked (redirect), i.e. no permission was widened",
+   "pass": true,
+   "detail": "opaqueredirect"
+  },
+  {
+   "name": "T13 no console errors and no 4xx/5xx responses across the whole run (unauthenticated + guest)",
+   "pass": true,
+   "detail": {
+    "errs": [],
+    "net": []
+   }
+  }
+ ]
+}

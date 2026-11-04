@@ -6,12 +6,13 @@ import { PhotoBackdrop } from "@/components/aion/photo-backdrop";
 import { SiteLogo } from "@/components/aion/site-logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { GuestNav } from "@/components/layout/guest-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { logout } from "@/lib/auth/client";
 import { useT } from "@/lib/i18n";
 import mainBg from "../../../public/image/background-pic/main_bg.png";
 
-/** Minimal frame for guests: logo, language/theme and one way back to the login page. Nothing else. */
+/** Minimal frame for guests: logo, language/theme, the guest menu (Map first) and one way back to the login page. */
 export function GuestShell({ children }: { children: ReactNode }) {
   const t = useT();
   const [busy, setBusy] = useState(false);
@@ -49,6 +50,7 @@ export function GuestShell({ children }: { children: ReactNode }) {
             </button>
           </div>
         </div>
+        <GuestNav />
         <div aria-hidden className="h-px bg-gradient-to-r via-gold/70 from-transparent to-transparent" />
       </header>
       <main className="relative min-w-0 flex-1 px-4 pt-6 pb-8 sm:px-6 lg:px-8 lg:pt-8">{children}</main>

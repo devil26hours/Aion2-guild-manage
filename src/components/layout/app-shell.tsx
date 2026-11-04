@@ -29,11 +29,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="relative flex flex-1">
         <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px)] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-[var(--sidebar-bg)] px-3 py-5 lg:flex">
-          <p className="px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
+          <p className="shrink-0 px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
             Command
           </p>
-          <SidebarNav />
-          <div className="mt-auto">{guildCard}</div>
+          <div className="-mx-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-1" data-testid="sidebar-scroll">
+            <SidebarNav />
+          </div>
+          <div className="shrink-0">{guildCard}</div>
         </aside>
 
         <main className="min-w-0 flex-1 px-4 pt-6 pb-[calc(var(--footer-bar-h)+1.5rem)] sm:px-6 lg:px-8 lg:pt-8 lg:pb-[calc(var(--footer-bar-h)+2rem)]">

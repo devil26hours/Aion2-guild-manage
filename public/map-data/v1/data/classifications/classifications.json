@@ -1,0 +1,2969 @@
+{
+ "groups": [
+  {
+   "id": "exploration",
+   "label": "Exploration"
+  },
+  {
+   "id": "hunting",
+   "label": "Hunting"
+  },
+  {
+   "id": "gathering",
+   "label": "Gathering"
+  },
+  {
+   "id": "logistics",
+   "label": "Logistics"
+  },
+  {
+   "id": "events",
+   "label": "Events & PvP"
+  },
+  {
+   "id": "unclassified",
+   "label": "Unclassified"
+  }
+ ],
+ "categories": [
+  {
+   "id": "cat_ores",
+   "group": "gathering",
+   "label": "Ores & Minerals",
+   "order": 1
+  },
+  {
+   "id": "cat_plants",
+   "group": "gathering",
+   "label": "Plants & Herbs",
+   "order": 2
+  },
+  {
+   "id": "cat_trees",
+   "group": "gathering",
+   "label": "Trees & Wood",
+   "order": 3
+  },
+  {
+   "id": "cat_other_gather",
+   "group": "gathering",
+   "label": "Other Gathering Resources",
+   "order": 4
+  },
+  {
+   "id": "cat_traces",
+   "group": "exploration",
+   "label": "Empyrean Traces",
+   "order": 1
+  },
+  {
+   "id": "cat_chests",
+   "group": "exploration",
+   "label": "Chests",
+   "order": 2
+  },
+  {
+   "id": "cat_crafters",
+   "group": "logistics",
+   "label": "Crafters",
+   "order": 1
+  },
+  {
+   "id": "cat_storage",
+   "group": "logistics",
+   "label": "Storage",
+   "order": 2
+  },
+  {
+   "id": "cat_services",
+   "group": "logistics",
+   "label": "Other Service NPCs",
+   "order": 3
+  }
+ ],
+ "monster_ranks": [
+  "world_boss",
+  "named_monster",
+  "elite_monster",
+  "normal_monster"
+ ],
+ "classifications": [
+  {
+   "classification_id": "hidden_cube",
+   "kind": "other",
+   "group": "exploration",
+   "category": null,
+   "label": "Hidden Cubes",
+   "rule": "EnvObjData.EnvObjCategory in {HiddenCubeDark,HiddenCubeLight} OR localized name == \"Hidden Cube\"",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Spawn entries are candidate pools (10/20/30 positions per entry); not every position is active at once.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Exploration_Hideen",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 4272,
+   "unique_entity_count": 9,
+   "spawn_count_by_map": {
+    "World_D_A": 1371,
+    "World_D_B": 745,
+    "World_L_A": 1440,
+    "World_L_B": 716
+   }
+  },
+  {
+   "classification_id": "seal",
+   "kind": "other",
+   "group": "exploration",
+   "category": null,
+   "label": "Seal Dungeons",
+   "rule": "EnvObjData.Usage == EnterDungeon AND internal Name starts with \"E_Seal_\"",
+   "source": "EnvObjData",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Exploration.json defines Seal as an exploration type with these icons; entrance-name match is the link.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Exploration_Seal",
+    "done_icon_asset_id": "mapicon:UT_Marker_Exploration_Seal_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 160,
+   "unique_entity_count": 160,
+   "spawn_count_by_map": {
+    "World_D_A": 60,
+    "World_D_B": 20,
+    "World_L_A": 60,
+    "World_L_B": 20
+   }
+  },
+  {
+   "classification_id": "daeva_trace",
+   "kind": "other",
+   "group": "exploration",
+   "category": null,
+   "label": "Daeva Hunter's Traces",
+   "rule": "localized EnvObjData name == \"Daeva Hunter's Trace\"",
+   "source": "EnvObjData + L10N",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Exploration.json DaevaHunter type uses these icons; name match is the link.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Exploration_Daeva",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "flight_ring",
+   "kind": "other",
+   "group": "exploration",
+   "category": null,
+   "label": "Flight Rings",
+   "rule": "EnvObjData.Usage == FlightRing",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_FlightRing",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 83,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 49,
+    "Abyss_Reshanta_D": 32,
+    "Dungeon_0005": 2
+   }
+  },
+  {
+   "classification_id": "world_boss",
+   "kind": "monster_rank",
+   "group": "hunting",
+   "category": null,
+   "label": "World Bosses",
+   "rule": "NpcData monster with bUseBossBerserk OR NpcSubType==LegendMonster OR WorldMapFieldNamed.SpawnType==PeriodSpawn",
+   "source": "NpcData + WorldMapFieldNamed",
+   "confidence": "medium",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": "\"World boss\" is not an explicit client enum; this combines boss-berserk and periodic named-spawn evidence.",
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": null,
+   "spawn_count": 18,
+   "unique_entity_count": 13,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 13,
+    "Abyss_Reshanta_C": 5
+   }
+  },
+  {
+   "classification_id": "named_monster",
+   "kind": "monster_rank",
+   "group": "hunting",
+   "category": null,
+   "label": "Named Monsters",
+   "rule": "NpcData.NpcSubType == HeroMonster (all have bNamed=true) and not a World Boss",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": null,
+   "spawn_count": 123,
+   "unique_entity_count": 122,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 3,
+    "Abyss_Reshanta_C": 3,
+    "CoastalCave": 2,
+    "Dungeon_0004": 1,
+    "Dungeon_0006": 1,
+    "Dungeon_D_0001": 2,
+    "Dungeon_D_0002": 5,
+    "Dungeon_D_0006": 1,
+    "Dungeon_D_0007": 1,
+    "Dungeon_D_0008": 2,
+    "Dungeon_D_0009": 1,
+    "Dungeon_D_0010": 3,
+    "Dungeon_D_0011": 2,
+    "Dungeon_D_0014": 1,
+    "Dungeon_D_0019": 1,
+    "Dungeon_D_0020": 1,
+    "Dungeon_D_0021": 1,
+    "Dungeon_D_0022": 1,
+    "Dungeon_L_0004": 1,
+    "Dungeon_L_0008": 1,
+    "Dungeon_L_0009": 1,
+    "Dungeon_L_0010": 2,
+    "Dungeon_L_0011": 1,
+    "Dungeon_L_0014": 1,
+    "Dungeon_L_0017": 1,
+    "Dungeon_L_0018": 1,
+    "Dungeon_L_0019": 2,
+    "RootCellar": 3,
+    "StrigikAltar": 3,
+    "World_D_A": 24,
+    "World_D_B": 13,
+    "World_L_A": 24,
+    "World_L_B": 13
+   }
+  },
+  {
+   "classification_id": "elite_monster",
+   "kind": "monster_rank",
+   "group": "hunting",
+   "category": null,
+   "label": "Elite Monsters",
+   "rule": "NpcData.NpcSubType == EliteMonster",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": null,
+   "spawn_count": 792,
+   "unique_entity_count": 74,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 132,
+    "Abyss_Reshanta_C": 271,
+    "Abyss_Reshanta_D": 212,
+    "CoastalCave": 19,
+    "Dungeon_0004": 1,
+    "Dungeon_D_0002": 1,
+    "Dungeon_D_0006": 2,
+    "Dungeon_D_0010": 1,
+    "Dungeon_L_0009": 2,
+    "Dungeon_L_0019": 3,
+    "RootCellar": 1,
+    "World_D_A": 67,
+    "World_L_A": 80
+   }
+  },
+  {
+   "classification_id": "normal_monster",
+   "kind": "monster_rank",
+   "group": "hunting",
+   "category": null,
+   "label": "Normal Monsters",
+   "rule": "NpcData.NpcSubType == NormalMonster",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": "Very numerous; off by default. The client itself shows these only on the minimap.",
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": null,
+   "spawn_count": 35559,
+   "unique_entity_count": 1420,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 1579,
+    "Abyss_Reshanta_C": 2330,
+    "Abyss_Reshanta_D": 1104,
+    "Battlefield_A_1": 3,
+    "Battlefield_B_1": 6,
+    "Battlefield_C_1": 2,
+    "CoastalCave": 28,
+    "Dungeon_0004": 4,
+    "Dungeon_0005": 8,
+    "Dungeon_D_0001": 27,
+    "Dungeon_D_0002": 14,
+    "Dungeon_D_0006": 30,
+    "Dungeon_D_0007": 47,
+    "Dungeon_D_0008": 54,
+    "Dungeon_D_0009": 13,
+    "Dungeon_D_0010": 41,
+    "Dungeon_D_0011": 28,
+    "Dungeon_D_0014": 2,
+    "Dungeon_D_0019": 15,
+    "Dungeon_D_0020": 19,
+    "Dungeon_D_0021": 7,
+    "Dungeon_L_0004": 71,
+    "Dungeon_L_0010": 74,
+    "Dungeon_L_0011": 3,
+    "Dungeon_L_0014": 2,
+    "Dungeon_L_0017": 13,
+    "Dungeon_L_0018": 22,
+    "Dungeon_L_0019": 100,
+    "Growth_FafniteBasin": 480,
+    "Growth_SilentNecropolis": 480,
+    "IllicitTradeSpot": 3,
+    "RootCellar": 48,
+    "StrigikAltar": 38,
+    "World_D_A": 11612,
+    "World_D_B": 2964,
+    "World_D_Starter": 243,
+    "World_L_A": 9234,
+    "World_L_B": 4590,
+    "World_L_Starter": 221
+   }
+  },
+  {
+   "classification_id": "pet",
+   "kind": "other",
+   "group": "hunting",
+   "category": null,
+   "label": "Pet Spawns",
+   "rule": "Unsupported: no NPC/spawn type in NpcData/MapData identifies pets.",
+   "source": "NpcData (searched NpcType/NpcSubType/FunctionType/Name)",
+   "confidence": "n/a",
+   "supported": false,
+   "completable": false,
+   "default_on": false,
+   "note": "FunctionType \"Companion\" NPCs are story companions, not pets; VehicleList tables are not world spawns.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "mount",
+   "kind": "other",
+   "group": "hunting",
+   "category": null,
+   "label": "Mount-related Spawns",
+   "rule": "Unsupported: no world spawn data for mounts found.",
+   "source": "Vehicle* tables (not spawns)",
+   "confidence": "n/a",
+   "supported": false,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "kisk",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Kisks",
+   "rule": "EnvObjData.Usage == Kisk",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_HUD_Minimap_Kisk_Regist_Sprite",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "teleport_artifact",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Teleport Artifacts",
+   "rule": "EnvObjData.Usage == TeleportArtifact",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_TeleportArtifact_Light_Engraved",
+    "done_icon_asset_id": null,
+    "icon_by_race": {
+     "Light": "mapicon:UT_Marker_TeleportArtifact_Light_Engraved",
+     "Dark": "mapicon:UT_Marker_TeleportArtifact_Dark_Engraved"
+    },
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 175,
+   "unique_entity_count": 175,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 2,
+    "Abyss_Reshanta_C": 2,
+    "Abyss_Reshanta_D": 2,
+    "Growth_SilentNecropolis": 3,
+    "World_D_A": 61,
+    "World_D_B": 20,
+    "World_D_Starter": 3,
+    "World_L_A": 61,
+    "World_L_B": 20,
+    "World_L_Starter": 1
+   }
+  },
+  {
+   "classification_id": "dungeon_teleport",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Dungeon Teleport Artifacts",
+   "rule": "EnvObjData.Usage == DungeonTeleportArtifact",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_DungeonTeleportArtifact_Engraved",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "monolith",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Monoliths",
+   "rule": "EnvObjData.Usage == Monolith",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Monolith_Light",
+    "done_icon_asset_id": null,
+    "icon_by_race": {
+     "Light": "mapicon:UT_Marker_Monolith_Light",
+     "Dark": "mapicon:UT_Marker_Monolith_Dark"
+    },
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 10,
+   "unique_entity_count": 8,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 2,
+    "Abyss_Reshanta_C": 2,
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "map_portal",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Map Portals",
+   "rule": "EnvObjData.Usage in {MoveMap, MovemapCondition}",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MoveMap",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 5,
+   "unique_entity_count": 5,
+   "spawn_count_by_map": {
+    "World_D_A": 1,
+    "World_D_B": 2,
+    "World_L_A": 1,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "npc_teleport",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Teleporter NPCs",
+   "rule": "NpcData.FunctionType == NpcTeleport",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 6,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 2,
+    "Abyss_Reshanta_C": 2,
+    "World_D_A": 1,
+    "World_L_A": 1
+   }
+  },
+  {
+   "classification_id": "merchant",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Merchants",
+   "rule": "NpcData.FunctionType == BuySell",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Shop",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 152,
+   "unique_entity_count": 62,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 4,
+    "Abyss_Reshanta_C": 4,
+    "Abyss_Reshanta_D": 2,
+    "World_D_A": 52,
+    "World_D_B": 21,
+    "World_D_Starter": 1,
+    "World_L_A": 46,
+    "World_L_B": 21,
+    "World_L_Starter": 1
+   }
+  },
+  {
+   "classification_id": "quest_npc",
+   "kind": "other",
+   "group": "logistics",
+   "category": null,
+   "label": "Quest NPCs",
+   "rule": "NpcData.Name referenced by Quest.AcquireValue (AcquireType=Npc) or Quest.CompleteValue (CompleteType=Npc); only when the NPC has no more specific function",
+   "source": "NpcData + Quest",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 450,
+   "unique_entity_count": 443,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 2,
+    "DreamCrossroad": 1,
+    "DreamOfPain": 1,
+    "Dungeon_0004": 1,
+    "Dungeon_0005": 1,
+    "Dungeon_0006": 1,
+    "Dungeon_D_0014": 1,
+    "Dungeon_L_0014": 1,
+    "World_D_A": 145,
+    "World_D_B": 62,
+    "World_D_Starter": 8,
+    "World_L_A": 150,
+    "World_L_B": 69,
+    "World_L_Starter": 7
+   }
+  },
+  {
+   "classification_id": "rift",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Spacetime Rifts",
+   "rule": "EnvObjData.Usage == Rift (localized \"Spacetime Rift\")",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Rift",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 50,
+   "unique_entity_count": 10,
+   "spawn_count_by_map": {
+    "World_D_A": 15,
+    "World_D_B": 10,
+    "World_L_A": 15,
+    "World_L_B": 10
+   }
+  },
+  {
+   "classification_id": "dungeon_entrance",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Dungeon Entrances",
+   "rule": "EnvObjData.Usage in {EnterDungeon (non-seal), PartyDungeon}",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Dungeon",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 98,
+   "unique_entity_count": 94,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 6,
+    "Abyss_Reshanta_C": 6,
+    "World_D_A": 29,
+    "World_D_B": 12,
+    "World_D_Starter": 1,
+    "World_L_A": 29,
+    "World_L_B": 14,
+    "World_L_Starter": 1
+   }
+  },
+  {
+   "classification_id": "instance_door",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Instance / Layer Doors",
+   "rule": "EnvObjData.Usage == EnterInstanceLayer OR NpcData.FunctionType == EnterInstanceLayer",
+   "source": "EnvObjData + NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 152,
+   "unique_entity_count": 152,
+   "spawn_count_by_map": {
+    "World_D_A": 44,
+    "World_D_B": 24,
+    "World_D_Starter": 5,
+    "World_L_A": 54,
+    "World_L_B": 23,
+    "World_L_Starter": 2
+   }
+  },
+  {
+   "classification_id": "field_event",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Field Event Entrances",
+   "rule": "EnvObjData.Usage == EnterFieldEvent OR NpcData.FunctionType == EnterFieldEvent",
+   "source": "EnvObjData + NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_HUD_Minimap_FieldEventMarker_Sprite",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 95,
+   "unique_entity_count": 44,
+   "spawn_count_by_map": {
+    "World_D_A": 55,
+    "World_L_A": 40
+   }
+  },
+  {
+   "classification_id": "abyss_artifact",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Abyss Artifacts",
+   "rule": "EnvObjData.Usage == AbyssArtifact",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_AbyssArtifact_Neutral",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 6,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 3,
+    "Abyss_Reshanta_C": 3
+   }
+  },
+  {
+   "classification_id": "abyss_core",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Abyss Cores",
+   "rule": "EnvObjData.Usage == AbyssCore",
+   "source": "EnvObjData",
+   "confidence": "medium",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": "Fortress mapping is not asserted; the client has no explicit \"Fortress\" env usage. Shown as Abyss Cores.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 3,
+   "unique_entity_count": 3,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 3
+   }
+  },
+  {
+   "classification_id": "fortress",
+   "kind": "other",
+   "group": "events",
+   "category": null,
+   "label": "Fortresses",
+   "rule": "Unsupported: no verified fortress record type found in NpcData/EnvObjData/MapData.",
+   "source": "searched localized names + Usage values",
+   "confidence": "n/a",
+   "supported": false,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "quest_object",
+   "kind": "other",
+   "group": "unclassified",
+   "category": null,
+   "label": "Quest Objects",
+   "rule": "EnvObjData.Usage == Quest",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 1791,
+   "unique_entity_count": 392,
+   "spawn_count_by_map": {
+    "DreamCrossroad": 1,
+    "World_D_A": 691,
+    "World_D_B": 203,
+    "World_D_Starter": 13,
+    "World_L_A": 561,
+    "World_L_B": 317,
+    "World_L_Starter": 5
+   }
+  },
+  {
+   "classification_id": "npc_citizen",
+   "kind": "other",
+   "group": "unclassified",
+   "category": null,
+   "label": "Other Citizens",
+   "rule": "NpcType == Citizen with no function and no quest link",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 3886,
+   "unique_entity_count": 1364,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 74,
+    "Abyss_Reshanta_C": 72,
+    "Abyss_Reshanta_D": 72,
+    "Dungeon_D_0001": 2,
+    "Dungeon_D_0002": 1,
+    "Dungeon_D_0006": 5,
+    "Dungeon_D_0008": 3,
+    "Dungeon_D_0019": 1,
+    "Dungeon_L_0017": 14,
+    "Dungeon_L_0018": 1,
+    "RootCellar": 4,
+    "World_D_A": 1582,
+    "World_D_B": 389,
+    "World_D_Starter": 56,
+    "World_L_A": 1123,
+    "World_L_B": 444,
+    "World_L_Starter": 43
+   }
+  },
+  {
+   "classification_id": "npc_other",
+   "kind": "other",
+   "group": "unclassified",
+   "category": null,
+   "label": "Other NPCs / Objects",
+   "rule": "NpcType Summon/Bot/Etc, or Monster with non-combat subtype (Object/Vessel/AbyssPortal)",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 7,
+   "unique_entity_count": 6,
+   "spawn_count_by_map": {
+    "Battlefield_C_1": 3,
+    "DreamCrossroad": 1,
+    "Dungeon_D_0006": 1,
+    "World_D_A": 1,
+    "World_L_A": 1
+   }
+  },
+  {
+   "classification_id": "unresolved",
+   "kind": "unresolved",
+   "group": "unclassified",
+   "category": null,
+   "label": "Unresolved Spawn Points",
+   "rule": "SpawnInfo entry has empty NpcIdList and EnvObjIdList; internal spawn Name matches no NpcData/EnvObjData row",
+   "source": "MapData.SpawnInfoList",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": "Runtime-assigned spawns: position + internal name only. Not classified (no evidence).",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 6248,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {
+    "Dungeon_0003": 1,
+    "World_D_A": 195,
+    "World_D_B": 2634,
+    "World_L_A": 195,
+    "World_L_B": 3223
+   }
+  },
+  {
+   "classification_id": "env_other",
+   "kind": "other",
+   "group": "unclassified",
+   "category": null,
+   "label": "Other Environment Objects",
+   "rule": "Any env object not matched by a rule above",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 1754,
+   "unique_entity_count": 318,
+   "spawn_count_by_map": {
+    "Battlefield_A_1": 2,
+    "Battlefield_B_1": 50,
+    "Battlefield_C_1": 2,
+    "CoastalCave": 10,
+    "DreamOfPain": 1,
+    "Dungeon_0004": 4,
+    "Dungeon_0005": 5,
+    "Dungeon_0006": 1,
+    "Dungeon_D_0001": 23,
+    "Dungeon_D_0002": 9,
+    "Dungeon_D_0006": 38,
+    "Dungeon_D_0007": 6,
+    "Dungeon_D_0008": 20,
+    "Dungeon_D_0009": 12,
+    "Dungeon_D_0010": 15,
+    "Dungeon_D_0014": 2,
+    "Dungeon_D_0019": 6,
+    "Dungeon_D_0020": 55,
+    "Dungeon_D_0021": 1,
+    "Dungeon_D_0022": 2,
+    "Dungeon_L_0004": 12,
+    "Dungeon_L_0008": 1,
+    "Dungeon_L_0009": 4,
+    "Dungeon_L_0010": 14,
+    "Dungeon_L_0014": 3,
+    "Dungeon_L_0017": 3,
+    "Dungeon_L_0018": 8,
+    "Dungeon_L_0019": 27,
+    "Fire_Temple_Arena": 2,
+    "Growth_FafniteBasin": 9,
+    "IllicitTradeSpot": 1,
+    "Impetusium_Arena": 2,
+    "Legion_Agit_01": 2,
+    "RootCellar": 18,
+    "StrigikAltar": 5,
+    "World_D_A": 748,
+    "World_D_B": 62,
+    "World_L_A": 434,
+    "World_L_B": 131,
+    "World_L_Starter": 4
+   }
+  },
+  {
+   "classification_id": "gather_unresolved",
+   "kind": "other",
+   "group": "unclassified",
+   "category": null,
+   "label": "Unresolved Gather Sources",
+   "rule": "EnvObjData.Usage==GatherSource but UsageValue has no GatherSource/GatherSourceMaterial row",
+   "source": "EnvObjData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": false,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 0,
+   "unique_entity_count": 0,
+   "spawn_count_by_map": {}
+  },
+  {
+   "classification_id": "fn_Alchemy",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_crafters",
+   "label": "Alchemy Table",
+   "rule": "NpcData.FunctionType == Alchemy",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Alchemist",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "fn_Tailor",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_crafters",
+   "label": "Armorsmithing Table",
+   "rule": "NpcData.FunctionType == Tailor",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Tailor",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "fn_Blacksmith",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_crafters",
+   "label": "Blacksmithing Table",
+   "rule": "NpcData.FunctionType == Blacksmith",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_BlackSmith",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "fn_Cook",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_crafters",
+   "label": "Cooking Table",
+   "rule": "NpcData.FunctionType == Cook",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Cooking",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_altgard",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Altgard",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 560,
+   "unique_entity_count": 4,
+   "spawn_count_by_map": {
+    "World_D_A": 560
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_eltnen",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Eltnen",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 142,
+   "unique_entity_count": 3,
+   "spawn_count_by_map": {
+    "World_L_B": 142
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_lower_reshanta",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Lower Reshanta",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 200,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 200
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_middle_reshanta",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Middle Reshanta",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 100,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_C": 100
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_morheim",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Morheim",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 140,
+   "unique_entity_count": 3,
+   "spawn_count_by_map": {
+    "World_D_B": 140
+   }
+  },
+  {
+   "classification_id": "trace_empyrean_trace_verteron",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_traces",
+   "label": "Empyrean Trace: Verteron",
+   "rule": "localized EnvObjData name starts with \"Empyrean Trace\"; one leaf per localized name (region)",
+   "source": "EnvObjData + L10N",
+   "confidence": "high",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Reference-project cross-check: 560/560 monolithMaterial markers match within 40px.",
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_MonolithFragment",
+    "done_icon_asset_id": "mapicon:UT_Marker_MonolithFragment_Complete",
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 560,
+   "unique_entity_count": 4,
+   "spawn_count_by_map": {
+    "World_L_A": 560
+   }
+  },
+  {
+   "classification_id": "fn_Jewelcraft",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_crafters",
+   "label": "Handicrafting Table",
+   "rule": "NpcData.FunctionType == Jewelcraft",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Jewelry",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 6,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 2,
+    "World_D_B": 1,
+    "World_L_A": 2,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "res_610620013",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_ores",
+   "label": "Orichalcum",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Metal",
+    "source_type_label": "Metal ore",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610620013,
+    "primary_yield_item_name": "Orichalcum Ore",
+    "primary_yield_icon": "Icon_Item_Gather_Ore_A_c_002",
+    "env_object_ids": [
+     1500004,
+     1550004
+    ],
+    "yields": [
+     {
+      "item_id": 610620013,
+      "name": "Orichalcum Ore",
+      "icon": "Icon_Item_Gather_Ore_A_c_002"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610620014,
+      "name": "Fine Orichalcum Ore",
+      "icon": "Icon_Item_Gather_Ore_A_r_002"
+     },
+     {
+      "item_id": 610620015,
+      "name": "Pure Orichalcum Ore",
+      "icon": "Icon_Item_Gather_Ore_A_l_002"
+     },
+     {
+      "item_id": 610620016,
+      "name": "Radiant Orichalcum Ore",
+      "icon": "Icon_Item_Gather_Ore_A_u_001"
+     }
+    ]
+   },
+   "spawn_count": 2132,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 530,
+    "World_D_B": 534,
+    "World_L_A": 546,
+    "World_L_B": 522
+   }
+  },
+  {
+   "classification_id": "res_610660026",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_ores",
+   "label": "Diamond",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Jewelry",
+    "source_type_label": "Gemstone",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610660026,
+    "primary_yield_item_name": "Diamond Gemstone",
+    "primary_yield_icon": "Icon_Item_Gather_Gemstone_A_c_003",
+    "env_object_ids": [
+     1500021,
+     1550021
+    ],
+    "yields": [
+     {
+      "item_id": 610660026,
+      "name": "Diamond Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_c_003"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610660029,
+      "name": "Fine Diamond Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_r_003"
+     },
+     {
+      "item_id": 610660032,
+      "name": "Pure Diamond Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_l_003"
+     },
+     {
+      "item_id": 610660035,
+      "name": "Radiant Diamond Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_u_002"
+     }
+    ]
+   },
+   "spawn_count": 631,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 200,
+    "World_D_B": 142,
+    "World_L_A": 192,
+    "World_L_B": 97
+   }
+  },
+  {
+   "classification_id": "res_610660027",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_ores",
+   "label": "Ruby",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Jewelry",
+    "source_type_label": "Gemstone",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610660027,
+    "primary_yield_item_name": "Ruby Gemstone",
+    "primary_yield_icon": "Icon_Item_Gather_Gemstone_A_c_004",
+    "env_object_ids": [
+     1500022,
+     1550022
+    ],
+    "yields": [
+     {
+      "item_id": 610660027,
+      "name": "Ruby Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_c_004"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610660030,
+      "name": "Fine Ruby Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_r_004"
+     },
+     {
+      "item_id": 610660033,
+      "name": "Pure Ruby Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_l_004"
+     },
+     {
+      "item_id": 610660036,
+      "name": "Radiant Ruby Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_u_003"
+     }
+    ]
+   },
+   "spawn_count": 696,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 190,
+    "World_D_B": 142,
+    "World_L_A": 196,
+    "World_L_B": 168
+   }
+  },
+  {
+   "classification_id": "res_610660025",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_ores",
+   "label": "Sapphire",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Jewelry",
+    "source_type_label": "Gemstone",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610660025,
+    "primary_yield_item_name": "Sapphire Gemstone",
+    "primary_yield_icon": "Icon_Item_Gather_Gemstone_A_c_002",
+    "env_object_ids": [
+     1500020,
+     1550020
+    ],
+    "yields": [
+     {
+      "item_id": 610660025,
+      "name": "Sapphire Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_c_002"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610660028,
+      "name": "Fine Sapphire Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_r_002"
+     },
+     {
+      "item_id": 610660031,
+      "name": "Pure Sapphire Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_l_002"
+     },
+     {
+      "item_id": 610660034,
+      "name": "Radiant Sapphire Gemstone",
+      "icon": "Icon_Item_Gather_Gemstone_A_u_001"
+     }
+    ]
+   },
+   "spawn_count": 683,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_D_A": 200,
+    "World_D_B": 142,
+    "World_L_A": 192,
+    "World_L_B": 149
+   }
+  },
+  {
+   "classification_id": "chest_aullaeu_chest",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_chests",
+   "label": "Aullaeu Chest",
+   "rule": "EnvObjData.Usage in {Normal, None} AND localized name contains the word \"Chest\"; one leaf per localized name",
+   "source": "EnvObjData + L10N",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Name-pattern rule; no dedicated chest category exists in the client tables.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 39,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 39
+   }
+  },
+  {
+   "classification_id": "chest_aullaeu_large_chest",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_chests",
+   "label": "Aullaeu Large Chest",
+   "rule": "EnvObjData.Usage in {Normal, None} AND localized name contains the word \"Chest\"; one leaf per localized name",
+   "source": "EnvObjData + L10N",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Name-pattern rule; no dedicated chest category exists in the client tables.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 37,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 37
+   }
+  },
+  {
+   "classification_id": "chest_bomb_chest",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_chests",
+   "label": "Bomb Chest",
+   "rule": "EnvObjData.Usage in {Normal, None} AND localized name contains the word \"Chest\"; one leaf per localized name",
+   "source": "EnvObjData + L10N",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Name-pattern rule; no dedicated chest category exists in the client tables.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 23,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_Starter": 23
+   }
+  },
+  {
+   "classification_id": "chest_chest",
+   "kind": "other",
+   "group": "exploration",
+   "category": "cat_chests",
+   "label": "Chest",
+   "rule": "EnvObjData.Usage in {Normal, None} AND localized name contains the word \"Chest\"; one leaf per localized name",
+   "source": "EnvObjData + L10N",
+   "confidence": "medium",
+   "supported": true,
+   "completable": true,
+   "default_on": true,
+   "note": "Name-pattern rule; no dedicated chest category exists in the client tables.",
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 11,
+   "unique_entity_count": 3,
+   "spawn_count_by_map": {
+    "CoastalCave": 2,
+    "Dungeon_D_0001": 2,
+    "Dungeon_D_0002": 1,
+    "Dungeon_D_0010": 3,
+    "Dungeon_L_0010": 1,
+    "RootCellar": 2
+   }
+  },
+  {
+   "classification_id": "fn_Storage",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_storage",
+   "label": "Storage Manager",
+   "rule": "NpcData.FunctionType == Storage",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_Storage",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 16,
+   "unique_entity_count": 12,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 2,
+    "Abyss_Reshanta_C": 2,
+    "Abyss_Reshanta_D": 2,
+    "World_D_A": 4,
+    "World_D_B": 1,
+    "World_L_A": 4,
+    "World_L_B": 1
+   }
+  },
+  {
+   "classification_id": "res_610670041",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_plants",
+   "label": "Aria",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Herb",
+    "source_type_label": "Herb",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610670041,
+    "primary_yield_item_name": "Aria",
+    "primary_yield_icon": "Icon_Item_Gather_Herb_L_c_001",
+    "env_object_ids": [
+     1500032
+    ],
+    "yields": [
+     {
+      "item_id": 610670041,
+      "name": "Aria",
+      "icon": "Icon_Item_Gather_Herb_L_c_001"
+     },
+     {
+      "item_id": 510116011,
+      "name": "Life Crystal",
+      "icon": "Icon_Item_Usable_Potion_hp_once_03_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610670045,
+      "name": "Fresh Aria",
+      "icon": "Icon_Item_Gather_Herb_L_r_001"
+     }
+    ]
+   },
+   "spawn_count": 279,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 156,
+    "World_L_B": 123
+   }
+  },
+  {
+   "classification_id": "res_610670043",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_plants",
+   "label": "Azpha",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Herb",
+    "source_type_label": "Herb",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610670043,
+    "primary_yield_item_name": "Azpha",
+    "primary_yield_icon": "Icon_Item_Gather_Herb_D_c_001",
+    "env_object_ids": [
+     1550032
+    ],
+    "yields": [
+     {
+      "item_id": 610670043,
+      "name": "Azpha",
+      "icon": "Icon_Item_Gather_Herb_D_c_001"
+     },
+     {
+      "item_id": 510116011,
+      "name": "Life Crystal",
+      "icon": "Icon_Item_Usable_Potion_hp_once_03_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610670047,
+      "name": "Fresh Azpha",
+      "icon": "Icon_Item_Gather_Herb_D_r_001"
+     }
+    ]
+   },
+   "spawn_count": 262,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 150,
+    "World_D_B": 112
+   }
+  },
+  {
+   "classification_id": "res_610670044",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_plants",
+   "label": "Calendula",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Herb",
+    "source_type_label": "Herb",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610670044,
+    "primary_yield_item_name": "Calendula",
+    "primary_yield_icon": "Icon_Item_Gather_Herb_D_c_002",
+    "env_object_ids": [
+     1550033
+    ],
+    "yields": [
+     {
+      "item_id": 610670044,
+      "name": "Calendula",
+      "icon": "Icon_Item_Gather_Herb_D_c_002"
+     },
+     {
+      "item_id": 510116011,
+      "name": "Life Crystal",
+      "icon": "Icon_Item_Usable_Potion_hp_once_03_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610670048,
+      "name": "Fresh Calendula",
+      "icon": "Icon_Item_Gather_Herb_D_r_002"
+     }
+    ]
+   },
+   "spawn_count": 196,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 108,
+    "World_D_B": 88
+   }
+  },
+  {
+   "classification_id": "res_610670042",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_plants",
+   "label": "Targena",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Herb",
+    "source_type_label": "Herb",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610670042,
+    "primary_yield_item_name": "Targena",
+    "primary_yield_icon": "Icon_Item_Gather_Herb_D_c_002",
+    "env_object_ids": [
+     1500033
+    ],
+    "yields": [
+     {
+      "item_id": 610670042,
+      "name": "Targena",
+      "icon": "Icon_Item_Gather_Herb_D_c_002"
+     },
+     {
+      "item_id": 510116011,
+      "name": "Life Crystal",
+      "icon": "Icon_Item_Usable_Potion_hp_once_03_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610670046,
+      "name": "Fresh Targena",
+      "icon": "Icon_Item_Gather_Herb_D_r_002"
+     }
+    ]
+   },
+   "spawn_count": 210,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 120,
+    "World_L_B": 90
+   }
+  },
+  {
+   "classification_id": "fn_ArenaCar",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_services",
+   "label": "Arena car",
+   "rule": "NpcData.FunctionType == ArenaCar",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "type_icon",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": "mapicon:UT_Marker_ArenaCar",
+    "done_icon_asset_id": null,
+    "icon_by_race": null,
+    "icon_by_function": null,
+    "note": "Original in-game map icon (client UIIcon / WorldMapFilterType evidence)."
+   },
+   "resource": null,
+   "spawn_count": 1,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "Battlefield_A_1": 1
+   }
+  },
+  {
+   "classification_id": "fn_Companion",
+   "kind": "other",
+   "group": "logistics",
+   "category": "cat_services",
+   "label": "Companion",
+   "rule": "NpcData.FunctionType == Companion",
+   "source": "NpcData",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "neutral_dot",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "No original map icon exists in the client for this type."
+   },
+   "resource": null,
+   "spawn_count": 86,
+   "unique_entity_count": 41,
+   "spawn_count_by_map": {
+    "CoastalCave": 3,
+    "Dungeon_D_0001": 6,
+    "Dungeon_D_0002": 5,
+    "Dungeon_D_0006": 3,
+    "Dungeon_D_0007": 4,
+    "Dungeon_D_0008": 3,
+    "Dungeon_D_0009": 6,
+    "Dungeon_D_0010": 5,
+    "Dungeon_D_0011": 1,
+    "Dungeon_D_0019": 2,
+    "Dungeon_D_0020": 3,
+    "Dungeon_D_0021": 4,
+    "Dungeon_D_0022": 2,
+    "Dungeon_L_0008": 4,
+    "Dungeon_L_0010": 5,
+    "Dungeon_L_0017": 7,
+    "Dungeon_L_0018": 3,
+    "Dungeon_L_0019": 12,
+    "IllicitTradeSpot": 5,
+    "StrigikAltar": 3
+   }
+  },
+  {
+   "classification_id": "res_610650012",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_trees",
+   "label": "Asvata",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Tree",
+    "source_type_label": "Tree",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610650012,
+    "primary_yield_item_name": "Asvata Log",
+    "primary_yield_icon": "Icon_Item_Gather_Wood_A_c_001",
+    "env_object_ids": [
+     1550012
+    ],
+    "yields": [
+     {
+      "item_id": 610650012,
+      "name": "Asvata Log",
+      "icon": "Icon_Item_Gather_Wood_A_c_001"
+     },
+     {
+      "item_id": 511490001,
+      "name": "Seed of Detection",
+      "icon": "Icon_Item_Gather_Seed_A_c_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610650014,
+      "name": "Fine Asvata Log",
+      "icon": "Icon_Item_Gather_Wood_A_r_001"
+     },
+     {
+      "item_id": 610650016,
+      "name": "Pure Asvata Log",
+      "icon": "Icon_Item_Gather_Wood_A_l_001"
+     },
+     {
+      "item_id": 610650018,
+      "name": "Radiant Asvata Log",
+      "icon": "Icon_Item_Gather_Wood_A_u_001"
+     }
+    ]
+   },
+   "spawn_count": 259,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 158,
+    "World_D_B": 101
+   }
+  },
+  {
+   "classification_id": "res_610650011",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_trees",
+   "label": "Yggdrasil",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Tree",
+    "source_type_label": "Tree",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610650011,
+    "primary_yield_item_name": "Yggdrasil Log",
+    "primary_yield_icon": "Icon_Item_Gather_Wood_A_c_001",
+    "env_object_ids": [
+     1500012
+    ],
+    "yields": [
+     {
+      "item_id": 610650011,
+      "name": "Yggdrasil Log",
+      "icon": "Icon_Item_Gather_Wood_A_c_001"
+     },
+     {
+      "item_id": 511490001,
+      "name": "Seed of Detection",
+      "icon": "Icon_Item_Gather_Seed_A_c_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610650013,
+      "name": "Fine Yggdrasil Log",
+      "icon": "Icon_Item_Gather_Wood_A_r_001"
+     },
+     {
+      "item_id": 610650015,
+      "name": "Pure Yggdrasil Log",
+      "icon": "Icon_Item_Gather_Wood_A_l_001"
+     },
+     {
+      "item_id": 610650017,
+      "name": "Radiant Yggdrasil Log",
+      "icon": "Icon_Item_Gather_Wood_A_u_001"
+     }
+    ]
+   },
+   "spawn_count": 229,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 125,
+    "World_L_B": 104
+   }
+  },
+  {
+   "classification_id": "res_610610013",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Odyle",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Od",
+    "source_type_label": "Odyle",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610610013,
+    "primary_yield_item_name": "Odyle",
+    "primary_yield_icon": "Icon_Item_Gather_Od_L_lv2_02a",
+    "env_object_ids": [
+     1590001,
+     1500000,
+     1550000
+    ],
+    "yields": [
+     {
+      "item_id": 610610013,
+      "name": "Odyle",
+      "icon": "Icon_Item_Gather_Od_L_lv2_02a"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     },
+     {
+      "item_id": 610610014,
+      "name": "Fine Odyle",
+      "icon": "Icon_Item_Gather_Od_L_lv4_02a"
+     },
+     {
+      "item_id": 610610015,
+      "name": "Pure Odyle",
+      "icon": "Icon_Item_Gather_Od_L_lv4_04a"
+     },
+     {
+      "item_id": 610610016,
+      "name": "Radiant Odyle",
+      "icon": "Icon_Item_Gather_Od_A_u_001"
+     }
+    ]
+   },
+   "spawn_count": 2675,
+   "unique_entity_count": 3,
+   "spawn_count_by_map": {
+    "Abyss_Reshanta_A": 240,
+    "World_D_A": 650,
+    "World_D_B": 540,
+    "World_L_A": 706,
+    "World_L_B": 539
+   }
+  },
+  {
+   "classification_id": "res_610680045",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Mela",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Berry",
+    "source_type_label": "Berry",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680045,
+    "primary_yield_item_name": "Mela",
+    "primary_yield_icon": "Icon_Item_Gather_Food_D_c_003",
+    "env_object_ids": [
+     1500040
+    ],
+    "yields": [
+     {
+      "item_id": 610680045,
+      "name": "Mela",
+      "icon": "Icon_Item_Gather_Food_D_c_003"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 176,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 96,
+    "World_L_B": 80
+   }
+  },
+  {
+   "classification_id": "res_610680051",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Raydam",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Berry",
+    "source_type_label": "Berry",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680051,
+    "primary_yield_item_name": "Raydam",
+    "primary_yield_icon": "Icon_Item_Gather_Food_L_c_003",
+    "env_object_ids": [
+     1550040
+    ],
+    "yields": [
+     {
+      "item_id": 610680051,
+      "name": "Raydam",
+      "icon": "Icon_Item_Gather_Food_L_c_003"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 170,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 96,
+    "World_D_B": 74
+   }
+  },
+  {
+   "classification_id": "res_610680043",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Coriolus",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Vegetable",
+    "source_type_label": "Vegetable",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680043,
+    "primary_yield_item_name": "Coriolus",
+    "primary_yield_icon": "Icon_Item_Gather_Food_L_c_001",
+    "env_object_ids": [
+     1500041
+    ],
+    "yields": [
+     {
+      "item_id": 610680043,
+      "name": "Coriolus",
+      "icon": "Icon_Item_Gather_Food_L_c_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 172,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 101,
+    "World_L_B": 71
+   }
+  },
+  {
+   "classification_id": "res_610680044",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Kukuru",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Vegetable",
+    "source_type_label": "Vegetable",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680044,
+    "primary_yield_item_name": "Kukuru",
+    "primary_yield_icon": null,
+    "env_object_ids": [
+     1500045
+    ],
+    "yields": [
+     {
+      "item_id": 610680044,
+      "name": "Kukuru",
+      "icon": null
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 154,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 95,
+    "World_L_B": 59
+   }
+  },
+  {
+   "classification_id": "res_610680049",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Morfa",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Vegetable",
+    "source_type_label": "Vegetable",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680049,
+    "primary_yield_item_name": "Morfa",
+    "primary_yield_icon": "Icon_Item_Gather_Food_L_c_001",
+    "env_object_ids": [
+     1550041
+    ],
+    "yields": [
+     {
+      "item_id": 610680049,
+      "name": "Morfa",
+      "icon": "Icon_Item_Gather_Food_L_c_001"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 167,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 98,
+    "World_D_B": 69
+   }
+  },
+  {
+   "classification_id": "res_610680050",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Ohkra",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Vegetable",
+    "source_type_label": "Vegetable",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680050,
+    "primary_yield_item_name": "Ohkra",
+    "primary_yield_icon": null,
+    "env_object_ids": [
+     1550045
+    ],
+    "yields": [
+     {
+      "item_id": 610680050,
+      "name": "Ohkra",
+      "icon": null
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 179,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 114,
+    "World_D_B": 65
+   }
+  },
+  {
+   "classification_id": "res_610680053",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Conide",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Shellfish",
+    "source_type_label": "Shellfish",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680053,
+    "primary_yield_item_name": "Conide",
+    "primary_yield_icon": null,
+    "env_object_ids": [
+     1550042
+    ],
+    "yields": [
+     {
+      "item_id": 610680053,
+      "name": "Conide",
+      "icon": null
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 177,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 93,
+    "World_D_B": 84
+   }
+  },
+  {
+   "classification_id": "res_610680048",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Cypri",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Shellfish",
+    "source_type_label": "Shellfish",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680048,
+    "primary_yield_item_name": "Cypri",
+    "primary_yield_icon": "Icon_Item_Gather_Food_L_c_006",
+    "env_object_ids": [
+     1500043,
+     1500061
+    ],
+    "yields": [
+     {
+      "item_id": 610680048,
+      "name": "Cypri",
+      "icon": "Icon_Item_Gather_Food_L_c_006"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 158,
+   "unique_entity_count": 2,
+   "spawn_count_by_map": {
+    "World_L_A": 108,
+    "World_L_B": 50
+   }
+  },
+  {
+   "classification_id": "res_610680047",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Inina",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Shellfish",
+    "source_type_label": "Shellfish",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680047,
+    "primary_yield_item_name": "Inina",
+    "primary_yield_icon": null,
+    "env_object_ids": [
+     1500042
+    ],
+    "yields": [
+     {
+      "item_id": 610680047,
+      "name": "Inina",
+      "icon": null
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 188,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_L_A": 100,
+    "World_L_B": 88
+   }
+  },
+  {
+   "classification_id": "res_610680054",
+   "kind": "resource",
+   "group": "gathering",
+   "category": "cat_other_gather",
+   "label": "Pujery",
+   "rule": "EnvObjData.Usage==GatherSource; EnvObjData.UsageValue -> GatherSource (SourceType, MaterialGroup) -> first GatherSourceMaterial row MaterialName = primary yield item; one leaf per primary yield item id",
+   "source": "EnvObjData + GatherSource + GatherSourceMaterial + Item",
+   "confidence": "high",
+   "supported": true,
+   "completable": false,
+   "default_on": true,
+   "note": null,
+   "marker_display": {
+    "mode": "entity_image",
+    "fallback": "neutral_dot",
+    "type_icon_asset_id": null,
+    "note": "Uses the entity image when verified; otherwise a neutral dot (never a generic category icon)."
+   },
+   "resource": {
+    "source_type": "Shellfish",
+    "source_type_label": "Shellfish",
+    "source_grade": "Beginner",
+    "primary_yield_item_id": 610680054,
+    "primary_yield_item_name": "Pujery",
+    "primary_yield_icon": "Icon_Item_Gather_Food_L_c_006",
+    "env_object_ids": [
+     1550043
+    ],
+    "yields": [
+     {
+      "item_id": 610680054,
+      "name": "Pujery",
+      "icon": "Icon_Item_Gather_Food_L_c_006"
+     },
+     {
+      "item_id": 533700110,
+      "name": "Poko's Skin Bundle (Bound)",
+      "icon": "Icon_Item_Skin_Package_Craft_A_s_002"
+     }
+    ]
+   },
+   "spawn_count": 154,
+   "unique_entity_count": 1,
+   "spawn_count_by_map": {
+    "World_D_A": 105,
+    "World_D_B": 49
+   }
+  }
+ ],
+ "facets": [
+  {
+   "id": "ct",
+   "label": "Creature type",
+   "source_field": "NpcData.NpcCreatureType",
+   "confidence": "high",
+   "note": "Labels are the client UI strings (UI_MAINTARGET_CREATURETYPE_*); raw enum in brackets.",
+   "values": {
+    "Intellect": "Cogni (Intellect)",
+    "Feral": "Fera (Feral)",
+    "Trans": "Varian (Trans)",
+    "Nature": "Natura (Nature)",
+    "Special": "Special (Special)"
+   }
+  },
+  {
+   "id": "tb",
+   "label": "Tribe (client key)",
+   "source_field": "NpcData.Tribe",
+   "confidence": "high",
+   "note": "The client has no localized tribe names; the raw key is shown. Only a minority of monsters have a tribe; the rest are Unknown.",
+   "values": null
+  },
+  {
+   "id": "ag",
+   "label": "Aggro behaviour",
+   "source_field": "NpcData.AggroType",
+   "confidence": "medium",
+   "note": "Interpretation of AggroNormal vs Aggro_A is inferred from the enum names; raw value is shown in popups.",
+   "values": {
+    "AggroNormal": "Normal (AggroNormal)",
+    "Aggro_A": "Aggressive (Aggro_A)",
+    "Devotion_A": "Devotion_A",
+    "Revenge_A": "Revenge_A",
+    "Magnetic_A": "Magnetic_A"
+   }
+  },
+  {
+   "id": "re",
+   "label": "Relationship",
+   "source_field": "NpcData.RelationshipEntity",
+   "confidence": "medium",
+   "note": "Raw client relationship groups are never merged. \"Monster\" is the standard hostile group; Team/other groups are shown as-is.",
+   "values": {
+    "Monster": "Hostile - standard (Monster)"
+   }
+  },
+  {
+   "id": "tt",
+   "label": "Terrain",
+   "source_field": "NpcData.ObjectTerrainType",
+   "confidence": "high",
+   "note": null,
+   "values": {
+    "Ground": "Ground",
+    "Air": "Air",
+    "Water": "Water",
+    "All": "All terrain"
+   }
+  }
+ ],
+ "notes": [
+  "spawn_count counts spawn LOCATIONS (one record per map position); unique_entity_count counts distinct entity_id values (client NpcData/EnvObjData ids).",
+  "Display names are not identities: several entity_ids can share one name (e.g. many \"Guard\" NPC ids)."
+ ]
+}

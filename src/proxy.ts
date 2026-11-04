@@ -8,7 +8,7 @@ import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy"
  *
  * - Refreshes the Supabase Auth session cookies and verifies the JWT (getClaims).
  * - Public pages: /login, /register (signed-in users are sent on),
- *   /forgot-password, the email-link handler /auth/confirm /support and /cookie-policy (open to guests too).
+ *   /forgot-password, the email-link handler /auth/confirm /support, /cookie-policy and the Interactive Map /map (open to guests too).
  * - /reset-password needs a session (the recovery link signs the user in) but no guild.
  * - Public APIs: login, logout, register, forgot-password, the registration character search and feedback submission.
  * - Every other page/API needs a valid session.
@@ -23,7 +23,7 @@ import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy"
  */
 
 const PUBLIC_PAGES = new Set(["/login", "/register"]);
-const OPEN_PAGES = new Set(["/forgot-password", "/auth/confirm", "/suspended", "/support", "/cookie-policy"]);
+const OPEN_PAGES = new Set(["/forgot-password", "/auth/confirm", "/suspended", "/support", "/cookie-policy", "/map"]);
 const NO_GUILD_PAGES = new Set(["/reset-password"]);
 const PUBLIC_API = new Set([
   "/api/auth/login",

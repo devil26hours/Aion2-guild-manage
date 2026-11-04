@@ -57,6 +57,7 @@ export function verifyGuestToken(token: string | undefined | null, now = Date.no
 
 /** The API paths a guest may call: the allowlisted lookup endpoints, plus the public auth helpers. */
 export function isGuestApiPath(pathname: string): boolean {
+  if (pathname === "/api/aion2/icon") return true; // item-icon image proxy used by the equipment export
   const m = /^\/api\/aion2\/([a-z0-9-]+)$/.exec(pathname);
   return !!m && GUEST_ENDPOINTS.has(m[1]);
 }

@@ -9,7 +9,7 @@ import { useSyncExternalStore } from "react";
  * Bump COOKIE_POLICY_VERSION whenever the policy materially changes (e.g. a new cookie
  * category is added); everyone who acknowledged an older version sees the notice again.
  */
-export const COOKIE_POLICY_VERSION = "2026-11-04-r2";
+export const COOKIE_POLICY_VERSION = "2026-11-04-r3";
 export const COOKIE_NOTICE_KEY = "aion2-gc:cookie-notice";
 
 type Ack = { version: string; at: string };

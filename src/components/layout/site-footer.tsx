@@ -43,7 +43,7 @@ function CookiePolicyLink({ className }: { className?: string }) {
 export function SiteFooter({ className, support = false }: { className?: string; support?: boolean }) {
   const t = useT();
   return (
-    <footer className={cn("space-y-1.5 text-center text-2xs leading-relaxed text-subtle", className)}>
+    <footer className={cn("space-y-1.5 text-left text-2xs leading-relaxed text-subtle", className)}>
       <p>{t("An independent community project, built with passion for AION2 players.")}</p>
       <p>{t("Not affiliated with NCSOFT.")}</p>
       <p>
@@ -66,10 +66,10 @@ export function SiteFooter({ className, support = false }: { className?: string;
 export function FooterBar() {
   const t = useT();
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-20 flex h-[var(--footer-bar-h)] flex-col items-center justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:justify-between sm:gap-6 sm:px-6 lg:left-60 lg:px-8">
-      <div className="order-2 flex min-w-0 flex-col items-center gap-0.5 text-center sm:order-1 sm:items-start sm:text-left">
+    <footer className="fixed inset-x-0 bottom-0 z-20 flex h-[var(--footer-bar-h)] flex-col items-start justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:left-60 lg:px-8">
+      <div className="order-2 flex min-w-0 flex-col items-start gap-0.5 text-left sm:order-1">
         <p className="hidden xl:block">{t("An independent community project, built with passion for AION2 players.")}</p>
-        <p className="flex flex-wrap items-center justify-center gap-x-2 sm:justify-start">
+        <p className="flex flex-wrap items-center justify-start gap-x-2">
           <span>{t("Not affiliated with NCSOFT.")}</span>
           <span aria-hidden>·</span>
           <span>Built by JustKiddingLab © 2026</span>

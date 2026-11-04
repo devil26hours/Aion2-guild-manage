@@ -41,9 +41,11 @@ export function MobileNav({ footer }: { footer?: ReactNode }) {
               {t("AION2 Player Community")}</SheetDescription>
           </div>
         </div>
-        <SidebarNav onNavigate={() => setOpen(false)} />
-        <LanguageSwitcher className="self-start sm:hidden" />
-        {footer && <div className="mt-auto">{footer}</div>}
+        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto overscroll-contain" data-testid="mobile-nav-scroll">
+          <SidebarNav onNavigate={() => setOpen(false)} />
+          <LanguageSwitcher className="self-start sm:hidden" />
+        </div>
+        {footer && <div className="shrink-0">{footer}</div>}
       </SheetContent>
     </Sheet>
   );

@@ -110,6 +110,24 @@ const STORAGE: Item[] = [
     created: "When you press “Understood”.",
     removed: "Not removed by signing out. Delete it in your browser (the notice then appears again).",
   },
+  {
+    name: "aion2.map.filters.v1 / aion2.map.names.v1",
+    purpose: "Interactive Map: remembers which marker types you switched on or off and the language of entity names.",
+    category: PREFERENCE,
+    contains: "Marker type IDs with true/false, and a language code such as “en-US”. No personal data.",
+    retention: "No expiry. It stays until you delete it.",
+    created: "When you change a marker filter or the entity name language on the Map page.",
+    removed: "Not removed by signing out. Delete it in your browser.",
+  },
+  {
+    name: "aion2.map.done.v1.<map>",
+    purpose: "Interactive Map: remembers which collectibles you marked as done on each map (one entry per map).",
+    category: PREFERENCE,
+    contains: "A list of spawn location IDs from the game data. No personal data.",
+    retention: "No expiry. It stays until you delete it.",
+    created: "When you press “Mark as done” on a collectible.",
+    removed: "Not removed by signing out. Delete it in your browser.",
+  },
 ];
 
 function Card({ item }: { item: Item }) {
@@ -156,7 +174,7 @@ export function CookiePolicyView() {
         <h2 className={h2}>{t("What this website uses")}</h2>
         <ul className="list-disc space-y-1.5 pl-5 text-xs leading-relaxed text-subtle">
           <li>{t("Strictly necessary cookies, needed to sign you in or to run a guest session you asked for.")}</li>
-          <li>{t("Functional cookies and browser storage, which remember choices you make (language, theme, “Remember me”, your open party preset, and that you dismissed the cookie notice). They are created only when you use the related feature, and the website still works if you delete them.")}</li>
+          <li>{t("Functional cookies and browser storage, which remember choices you make (language, theme, “Remember me”, your open party preset, Interactive Map marker filters, name language and items marked as done, and that you dismissed the cookie notice). They are created only when you use the related feature, and the website still works if you delete them.")}</li>
           <li>{t("We do not use analytics, advertising, marketing or tracking cookies, and we load no third-party analytics or tracking scripts.")}</li>
         </ul>
         <p className={p}>

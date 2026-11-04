@@ -33,7 +33,7 @@ export function CookieNotice() {
         {t("Cookies on this website")}
       </p>
       <p className="mt-2 text-xs leading-relaxed text-subtle">
-        {t("We only use cookies and browser storage that are necessary for signing in or that remember choices you make, such as language and theme. We do not use analytics, advertising or tracking cookies.")}
+        {t("We only use cookies and browser storage that are necessary for signing in or that remember choices you make, such as language, theme and Interactive Map settings. We do not use analytics, advertising or tracking cookies.")}
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <Button type="button" data-testid="cookie-notice-ok" onClick={acknowledgeCookieNotice} className={cn(aionButtonPrimary, "h-9")}>
