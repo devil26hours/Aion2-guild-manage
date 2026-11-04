@@ -200,7 +200,6 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
   useEffect(() => {
     if (autoRan.current) return;
     autoRan.current = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- starts the shared-link fetch once; its only synchronous setState is the loading flag
     if (initial) void autoLoad(initial.name, initial.region, initial.server, initial.id);
     // one-shot on mount; autoLoad only uses setters and fetch
     // eslint-disable-next-line react-hooks/exhaustive-deps
