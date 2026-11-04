@@ -35,13 +35,13 @@ export function ClassBadge({
       ) : (
         <span
           aria-hidden
-          className="size-2 shrink-0 rotate-45 ring-1 ring-black/40"
+          className="size-2 shrink-0 rotate-45 ring-1 ring-foreground/20"
           style={{ backgroundColor: meta.color, boxShadow: `0 0 8px ${meta.color}80` }}
         />
       )}
       <span className="text-foreground/90">{meta.name}</span>
       {showRole && (
-        <span className="text-2xs text-steel/60">{meta.role}</span>
+        <span className="text-2xs text-subtle">{meta.role}</span>
       )}
     </span>
   );

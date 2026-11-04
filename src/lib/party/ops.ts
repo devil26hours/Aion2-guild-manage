@@ -8,9 +8,12 @@
 import {
   clampPartySize,
   DEFAULT_PARTY_SIZE,
+  DUNGEON_NAME_MAX,
   MAX_PARTY_SIZE,
   MIN_PARTY_SIZE,
+  PARTY_CONTENT_TYPES,
   PARTY_ROLES,
+  type PartyContentType,
   type PartyPreset,
   type PartyRole,
   type PartySlot,
@@ -49,6 +52,8 @@ const isRole = (v: unknown): v is PartyRole => PARTY_ROLES.includes(v as PartyRo
 const isMemberId = (v: unknown): v is string => typeof v === "string" && MEMBER_ID_RE.test(v);
 const isName = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0 && v.trim().length <= PRESET_NAME_MAX;
 const isSize = (v: unknown): v is number => typeof v === "number" && Number.isInteger(v) && v >= MIN_PARTY_SIZE && v <= MAX_PARTY_SIZE;
+const isContentType = (v: unknown): v is PartyContentType => PARTY_CONTENT_TYPES.includes(v as PartyContentType);
+const isDungeonName = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0 && v.trim().length <= DUNGEON_NAME_MAX;
 
 export function isPartySlot(v: unknown): v is PartySlot {
   return isObj(v) && (v.member_id === null || isMemberId(v.member_id)) && (v.role === null || isRole(v.role));
@@ -63,6 +68,8 @@ export function isPartyPreset(v: unknown): v is PartyPreset {
     Array.isArray(v.slots) &&
     isSize(v.slots.length) &&
     v.slots.every(isPartySlot) &&
+    (v.content_type == null || isContentType(v.content_type)) &&
+    (v.dungeon_name == null || isDungeonName(v.dungeon_name)) &&
     typeof v.created_at === "string" &&
     typeof v.updated_at === "string"
   );
@@ -91,6 +98,8 @@ export type PartyOp =
   | { op: "clear"; presetId: string; index: number }
   | { op: "reset"; presetId: string }
   | { op: "setSize"; presetId: string; size: number }
+  | { op: "setContentType"; presetId: string; contentType: PartyContentType | null }
+  | { op: "setDungeon"; presetId: string; dungeonName: string | null }
   | { op: "clearMissing"; presetId: string }
   | { op: "apply"; presetId: string; items: { index: number; memberId: string; role: PartyRole }[] }
   | { op: "resetAll" }
@@ -136,6 +145,10 @@ export function parsePartyOp(v: unknown): PartyOp | null {
       return pid && idx ? { op: "clear", presetId: v.presetId as string, index: v.index as number } : null;
     case "setSize":
       return pid && isSize(v.size) ? { op: "setSize", presetId: v.presetId as string, size: v.size } : null;
+    case "setContentType":
+      return pid && (v.contentType === null || isContentType(v.contentType)) ? { op: "setContentType", presetId: v.presetId as string, contentType: v.contentType } : null;
+    case "setDungeon":
+      return pid && (v.dungeonName === null || isDungeonName(v.dungeonName)) ? { op: "setDungeon", presetId: v.presetId as string, dungeonName: v.dungeonName } : null;
     case "apply": {
       if (!pid || !Array.isArray(v.items) || v.items.length > MAX_PARTY_SIZE) return null;
       const items = v.items;
@@ -184,7 +197,7 @@ export function applyPartyOp(presets: PartyPreset[], op: PartyOp, now: string, r
       if (!src) return { ok: false, error: "That party preset no longer exists." };
       if (presets.length >= MAX_PRESETS) return { ok: false, error: `At most ${MAX_PRESETS} presets.` };
       if (find(op.id)) return { ok: false, error: "Duplicate preset id." };
-      const copy: PartyPreset = { id: op.id, name: uniqueName(presets, `${src.name} (copy)`), slots: src.slots.map((s) => ({ ...s })), created_at: now, updated_at: now };
+      const copy: PartyPreset = { id: op.id, name: uniqueName(presets, `${src.name} (copy)`), slots: src.slots.map((s) => ({ ...s })), content_type: src.content_type, dungeon_name: src.dungeon_name, created_at: now, updated_at: now };
       return { ok: true, presets: [...presets, copy] };
     }
     case "delete":
@@ -209,6 +222,10 @@ export function applyPartyOp(presets: PartyPreset[], op: PartyOp, now: string, r
         const n = clampPartySize(op.size);
         return { ...p, slots: p.slots.length >= n ? p.slots.slice(0, n) : [...p.slots, ...emptySlots(n - p.slots.length)] };
       });
+    case "setContentType":
+      return update(op.presetId, (p) => ({ ...p, content_type: op.contentType }));
+    case "setDungeon":
+      return update(op.presetId, (p) => ({ ...p, dungeon_name: op.dungeonName?.trim().slice(0, DUNGEON_NAME_MAX) || null }));
     case "clearMissing":
       if (!rosterIds) return { ok: false, error: "Roster unavailable." };
       return update(op.presetId, (p) => ({ ...p, slots: p.slots.map((s) => (s.member_id && !rosterIds.has(s.member_id) ? slot() : s)) }));

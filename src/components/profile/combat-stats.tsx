@@ -27,9 +27,9 @@ function Group({
   stats: CharacterStats;
 }) {
   return (
-    <div className="border border-steel/10 bg-ink/40">
-      <h3 className="flex items-center gap-2 border-b border-steel/10 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
-        <Icon className="size-3.5 text-gold/80" />
+    <div className="border border-steel/10 bg-surface/40">
+      <h3 className="flex items-center gap-2 border-b border-steel/10 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">
+        <Icon className="size-3.5 text-brand" />
         {title}
       </h3>
       <dl className="divide-y divide-steel/[0.06]">
@@ -39,7 +39,7 @@ function Group({
             <dd
               className={
                 k === emphasis
-                  ? "font-heading text-lg font-bold text-gold-bright tabular-nums"
+                  ? "font-heading text-lg font-bold text-brand-strong tabular-nums"
                   : "text-sm font-semibold text-foreground tabular-nums"
               }
             >
@@ -59,7 +59,7 @@ function Vital({ label, value, color }: { label: string; value: number; color: s
         <span className="text-3xs font-semibold tracking-[0.18em] text-steel uppercase">{label}</span>
         <span className="font-heading text-lg font-bold text-foreground tabular-nums">{formatNumber(value)}</span>
       </div>
-      <div className="mt-1 h-2 border border-steel/15 bg-ink p-px">
+      <div className="mt-1 h-2 border border-steel/15 bg-surface p-px">
         <div className="h-full" style={{ background: `linear-gradient(90deg, ${color}99, ${color})` }} />
       </div>
     </div>

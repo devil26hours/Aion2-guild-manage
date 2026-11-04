@@ -19,7 +19,7 @@ import { PARTY_ROLES, type PartyMember, type PartyRole, type PartySlot } from "@
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "./role-badge";
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
 
 type RangeKey = "minCp" | "maxCp" | "minIl" | "maxIl";
 const EMPTY_RANGE: Record<RangeKey, string> = { minCp: "", maxCp: "", minIl: "", maxIl: "" };
@@ -155,8 +155,8 @@ function Picker({
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-gold-bright uppercase">
-          <UserPlus className="size-4 text-gold" />
+        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-brand-strong uppercase">
+          <UserPlus className="size-4 text-brand" />
           {target.current.member_id ? t("Replace") : t("Assign")} {" "}{t("— Slot")}{" "}{target.index + 1}
         </DialogTitle>
         <DialogDescription className="text-xs text-steel">
@@ -167,14 +167,14 @@ function Picker({
         <div className="space-y-1.5">
           <Label htmlFor="pk-q" className={labelClass}>{t("Search")}</Label>
           <div className="relative">
-            <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+            <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
             <Input id="pk-q" autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("Character name…")} className={cn(aionField, "pl-8")} />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="pk-comment" className={labelClass}>{t("Comment")}</Label>
           <div className="relative">
-            <MessageSquareText aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+            <MessageSquareText aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
             <Input id="pk-comment" value={commentQuery} onChange={(e) => setCommentQuery(e.target.value)} placeholder={t("Search comments…")} className={cn(aionField, "pl-8")} />
           </div>
         </div>
@@ -214,7 +214,7 @@ function Picker({
         })}
       </div>
       {rangeInvalid && (
-        <p id="pk-range-error" role="alert" className="-mt-1 text-xs text-[#ef9b89]">
+        <p id="pk-range-error" role="alert" className="-mt-1 text-xs text-danger-text">
           {[cpInvalid && t("Min CP is greater than Max CP"), ilInvalid && t("Min Item Level is greater than Max Item Level")]
             .filter(Boolean)
             .join(" · ")}
@@ -241,7 +241,7 @@ function Picker({
           </NativeSelect>
         </div>
       </div>
-      <p className="-mt-2 text-3xs text-steel/55">{t("Role filter uses each member's guild role (set on the Members page); you can assign any role per party.")}</p>
+      <p className="-mt-2 text-3xs text-subtle">{t("Role filter uses each member's guild role (set on the Members page); you can assign any role per party.")}</p>
 
       <div className="grid min-h-0 gap-3 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <ul className="max-h-80 divide-y divide-steel/[0.07] overflow-y-auto border border-steel/10" role="listbox" aria-label={t("Characters")}>
@@ -260,21 +260,21 @@ function Picker({
                   type="button"
                   onClick={() => setSelectedId(m.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 px-3 py-2 text-left transition-colors outline-none hover:bg-white/[0.04] focus-visible:bg-arcane/[0.08]",
-                    m.id === selectedId && "bg-gold/[0.08] shadow-[inset_2px_0_0_var(--color-gold)]",
+                    "flex w-full items-center gap-3 px-3 py-2 text-left transition-colors outline-none hover:bg-surface-hover focus-visible:bg-arcane/[0.08]",
+                    m.id === selectedId && "bg-brand/[0.08] shadow-[inset_2px_0_0_var(--brand)]",
                   )}
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-foreground">
                       {m.character_name}
-                      {m.comment && <span className="ml-1.5 text-xs font-normal text-steel/80 italic">· {m.comment}</span>}
+                      {m.comment && <span className="ml-1.5 text-xs font-normal text-subtle italic">· {m.comment}</span>}
                     </span>
                     <RosterClassBadge className={m.class_name} wrapperClassName="text-2xs" />
                     {other.length > 0 && (
                       <span
                         data-testid="picker-elsewhere-badge"
                         title={t("Also in: {list}", { list: describePlacements(other) })}
-                        className="mt-0.5 flex max-w-full items-center gap-1 truncate text-3xs text-[#f0cf86]"
+                        className="mt-0.5 flex max-w-full items-center gap-1 truncate text-3xs text-warning-text"
                       >
                         <CircleAlert aria-hidden className="size-3 shrink-0" />
                         {t("In")}{" "}{other[0].presetName}
@@ -283,11 +283,11 @@ function Picker({
                     )}
                   </span>
                   <span className="text-right text-xs tabular-nums">
-                    <span className="block font-semibold text-gold-bright">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</span>
-                    <span className="block text-steel/60">iLv {m.item_level ?? "—"}</span>
+                    <span className="block font-semibold text-brand-strong">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</span>
+                    <span className="block text-subtle">iLv {m.item_level ?? "—"}</span>
                   </span>
                   {inSlot !== undefined && (
-                    <span className={cn("shrink-0 border px-1 text-5xs font-semibold tracking-wider uppercase", here ? "border-gold/50 text-gold" : "border-steel/30 text-steel")}>
+                    <span className={cn("shrink-0 border px-1 text-5xs font-semibold tracking-wider uppercase", here ? "border-brand/50 text-brand" : "border-steel/30 text-steel")}>
                       {here ? t("This slot") : `Slot ${inSlot + 1}`}
                     </span>
                   )}
@@ -298,13 +298,13 @@ function Picker({
         </ul>
 
         {/* Overview */}
-        <div className="border border-steel/10 bg-ink/50 p-3">
+        <div className="border border-steel/10 bg-surface/50 p-3">
           {!selected ? (
             <p className="py-10 text-center text-sm text-steel">{t("Select a character to see an overview.")}</p>
           ) : (
             <div className="space-y-3">
               <div>
-                <p className="font-heading text-lg tracking-wide text-gold-bright">{selected.character_name}</p>
+                <p className="font-heading text-lg tracking-wide text-brand-strong">{selected.character_name}</p>
                 <p className="text-xs text-steel">{selected.server_name ?? "—"} {" "}{t("· Lv.")}{" "}{selected.level ?? "—"}</p>
                 {selected.comment && <p className="mt-0.5 text-xs text-foreground/80 italic">“{selected.comment}”</p>}
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
@@ -320,7 +320,7 @@ function Picker({
                   ["Guild Role", selected.role ?? t("Not set")],
                 ].map(([k, v]) => (
                   <div key={k} className="border border-steel/10 px-2 py-1.5">
-                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">{t(k)}</dt>
+                    <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">{t(k)}</dt>
                     <dd className="font-semibold text-foreground">{v}</dd>
                   </div>
                 ))}
@@ -329,7 +329,7 @@ function Picker({
                 <p
                   role="status"
                   data-testid="picker-elsewhere"
-                  className="flex items-start gap-2 border border-[#e0b04a]/35 border-l-2 border-l-[#e0b04a] bg-[#e0b04a]/[0.07] px-2.5 py-2 text-xs text-[#f0dca8]"
+                  className="flex items-start gap-2 border border-warning/35 border-l-2 border-l-warning bg-warning/[0.07] px-2.5 py-2 text-xs text-warning-text"
                 >
                   <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
                   <span>
@@ -337,7 +337,7 @@ function Picker({
                 </p>
               )}
               {blocked && (
-                <p className="text-xs text-[#f0a596]">{t("Already assigned to slot")}{" "}{selectedSlot! + 1}{t(". Remove it there first.")}</p>
+                <p className="text-xs text-danger-text">{t("Already assigned to slot")}{" "}{selectedSlot! + 1}{t(". Remove it there first.")}</p>
               )}
             </div>
           )}

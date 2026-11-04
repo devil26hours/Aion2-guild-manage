@@ -31,39 +31,39 @@ export function MemberRowActions({
         disabled={refreshing}
         aria-label={`Refresh ${member.character_name}`}
         title="Refresh character data"
-        className="flex size-8 items-center justify-center border border-transparent text-steel/70 transition-colors outline-none hover:border-steel/20 hover:text-arcane focus-visible:border-arcane/50 disabled:text-arcane"
+        className="flex size-8 items-center justify-center border border-transparent text-subtle transition-colors outline-none hover:border-steel/20 hover:text-arcane focus-visible:border-arcane/50 disabled:text-arcane"
       >
         <RefreshCw className={refreshing ? "size-3.5 animate-spin" : "size-3.5"} />
       </button>
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Actions for ${member.character_name}`}
-          className="flex size-8 items-center justify-center border border-transparent text-steel/70 transition-colors outline-none hover:border-steel/20 hover:text-gold-bright focus-visible:border-arcane/50 data-[state=open]:border-gold-dim/50 data-[state=open]:text-gold-bright"
+          className="flex size-8 items-center justify-center border border-transparent text-subtle transition-colors outline-none hover:border-steel/20 hover:text-brand-strong focus-visible:border-arcane/50 data-[state=open]:border-brand-muted/50 data-[state=open]:text-brand-strong"
         >
           <Ellipsis className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-52 rounded-none border-gold-dim/30 bg-ink-raised"
+          className="w-52 rounded-md border-brand-muted/30 bg-surface-raised"
         >
           <DropdownMenuLabel className="truncate text-xs text-steel">
             {member.character_name} · {member.server}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild className="rounded-none">
+          <DropdownMenuItem asChild className="rounded-md">
             <Link href={`/members/${member.id}`}>
               <UserRound />
               View Character Profile
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="rounded-none">
+          <DropdownMenuItem asChild className="rounded-md">
             <Link href={`/character-history/${member.id}`}>
               <History />
               View Character History
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="rounded-none"
+            className="rounded-md"
             disabled={refreshing}
             onSelect={onRefresh}
           >
@@ -73,7 +73,7 @@ export function MemberRowActions({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
-            className="rounded-none"
+            className="rounded-md"
             onSelect={onRemove}
           >
             <UserMinus />

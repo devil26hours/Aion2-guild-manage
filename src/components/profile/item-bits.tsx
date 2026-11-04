@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 import { RARITY_META } from "@/lib/aion/rarity";
 import type { ItemStat, Rarity, SoulBindingLine, Verification } from "@/lib/aion/types";
 import { formatNumber } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { cn, dataText } from "@/lib/utils";
 
 export function Stars({ count, max = 5, className }: { count: number; max?: number; className?: string }) {
   return (
@@ -17,7 +17,7 @@ export function Stars({ count, max = 5, className }: { count: number; max?: numb
           aria-hidden
           className={cn(
             "size-2.5",
-            i < count ? "fill-gold-bright text-gold-bright" : "text-steel/30",
+            i < count ? "fill-gold text-gold" : "text-steel/30",
           )}
         />
       ))}
@@ -33,7 +33,7 @@ export function RarityLabel({ rarity, className }: { rarity: Rarity; className?:
         "inline-flex items-center border px-1.5 py-px text-4xs font-semibold tracking-[0.14em] uppercase",
         className,
       )}
-      style={{ color: meta.color, borderColor: `${meta.color}55`, backgroundColor: `${meta.color}14` }}
+      style={{ color: dataText(meta.color), borderColor: `${meta.color}55`, backgroundColor: `${meta.color}14` }}
     >
       {meta.label}
     </span>
@@ -61,7 +61,7 @@ export function VerificationBadge({ verification, className }: { verification: V
           : "Sources conflict"
       }
       className={cn(
-        "inline-flex items-center border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-5xs font-semibold tracking-[0.12em] text-[#f0cf86] uppercase",
+        "inline-flex items-center border border-warning/40 bg-warning/10 px-1 text-5xs font-semibold tracking-[0.12em] text-warning-text uppercase",
         className,
       )}
     >
@@ -76,7 +76,7 @@ export function MockTag({ className }: { className?: string }) {
     <span
       title="Mock value — not real character data"
       className={cn(
-        "inline-flex items-center border border-steel/25 px-1 text-5xs font-semibold tracking-[0.14em] text-steel/70 uppercase",
+        "inline-flex items-center border border-mystic/40 bg-mystic/10 px-1 text-5xs font-semibold tracking-[0.14em] text-mystic-text uppercase",
         className,
       )}
     >
@@ -90,7 +90,7 @@ export function rarityFrameStyle(rarity: Rarity): React.CSSProperties {
   const c = RARITY_META[rarity].color;
   return {
     borderColor: `${c}8c`,
-    background: `radial-gradient(circle at 50% 35%, ${c}2e, ${c}0d 60%, transparent 85%), #0a0e18`,
+    background: `radial-gradient(circle at 50% 35%, ${c}2e, ${c}0d 60%, transparent 85%), var(--icon-well)`,
     boxShadow: `inset 0 0 12px ${c}22`,
   };
 }

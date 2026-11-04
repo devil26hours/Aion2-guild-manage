@@ -17,24 +17,24 @@ export function SidebarGuildCard() {
   const known = roster.status === "ready";
 
   return (
-    <div className="border border-steel/10 bg-ink/60 p-3" data-testid="sidebar-guild-card">
+    <div className="border border-gold/40 bg-[image:var(--card-gradient)] p-3 shadow-panel" data-testid="sidebar-guild-card">
       <div className="flex items-center gap-2.5">
         <GuildEmblem className="size-9" />
         <div className="min-w-0">
-          <p className="truncate font-heading text-xs leading-snug font-semibold tracking-wider text-gold-bright">{ready ? name : " "}</p>
-          <p className="truncate text-2xs text-steel/70">{ready ? server || t("Server not set") : " "}</p>
+          <p className="truncate font-heading text-xs leading-snug font-semibold tracking-wider text-brand-strong">{ready ? name : " "}</p>
+          <p className="truncate text-2xs text-subtle">{ready ? server || t("Server not set") : " "}</p>
         </div>
       </div>
       <div className="mt-3">
-        <div className="flex justify-between text-3xs tracking-wider text-steel/70 uppercase">
+        <div className="flex justify-between text-3xs tracking-wider text-subtle uppercase">
           <span>{t("Roster")}</span>
           <span className="text-foreground tabular-nums" data-testid="sidebar-roster-count">
             {known ? memberCount : "—"} / {ready ? memberCap : "—"}
           </span>
         </div>
-        <div className="mt-1.5 h-1 bg-steel/10">
+        <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-sunken">
           <div
-            className="h-full bg-gradient-to-r from-gold-dim to-gold transition-[width] duration-500"
+            className="h-full bg-[image:var(--bar-gradient)] transition-[width] duration-500"
             style={{ width: `${known && ready ? Math.min(100, (memberCount / memberCap) * 100) : 0}%` }}
           />
         </div>

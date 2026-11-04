@@ -49,20 +49,20 @@ function Body({ member }: { member: RosterMember }) {
     <>
       <DialogHeader className="flex-row items-center justify-between gap-3 space-y-0 pr-8">
         <div className="min-w-0 text-left">
-          <DialogTitle className="font-heading text-sm tracking-[0.18em] text-gold-bright uppercase">{t("Character Profile")}</DialogTitle>
+          <DialogTitle className="font-heading text-sm tracking-[0.18em] text-brand-strong uppercase">{t("Character Profile")}</DialogTitle>
           <DialogDescription className="text-xs text-steel">
             {t("Added")}{" "}<RelativeTime iso={member.added_at} /> {" "}{t("· data from the AION2 API")}</DialogDescription>
         </div>
         <Link
           href={`/character-history/${encodeURIComponent(member.id)}`}
-          className="flex shrink-0 items-center gap-1 text-xs text-gold/90 hover:text-gold-bright"
+          className="flex shrink-0 items-center gap-1 text-xs text-brand hover:text-brand-strong"
         >
           {t("View history")}{" "}<ChevronRight className="size-3.5" />
         </Link>
       </DialogHeader>
 
       {member.last_refresh_error && (
-        <p className="flex items-start gap-2 border border-[#e0b04a]/35 bg-[#e0b04a]/[0.07] px-3 py-2 text-xs text-[#f0dca8]">
+        <p className="flex items-start gap-2 border border-warning/35 bg-warning/[0.07] px-3 py-2 text-xs text-warning-text">
           <CircleAlert className="mt-0.5 size-3.5 shrink-0" />
           {t("Last refresh failed")}{" "}<RelativeTime iso={member.last_refresh_error.at} />: {member.last_refresh_error.message}
         </p>
@@ -72,7 +72,7 @@ function Body({ member }: { member: RosterMember }) {
       {detail.status === "loading" && (
         <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {" "}{t("Loading character profile…")}</p>
       )}
-      {detail.status === "error" && <p className="text-sm text-[#f6c2b6]">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
+      {detail.status === "error" && <p className="text-sm text-danger-text">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
       {detail.status === "ready" && <CharacterProfileView member={member} raw={detail.raw} itemDetails />}
     </>
   );

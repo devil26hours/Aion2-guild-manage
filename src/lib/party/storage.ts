@@ -1,11 +1,11 @@
 /**
  * SERVER-ONLY persistence for one guild's party presets in Supabase:
- *   party_presets (legacy_id = the app's preset id "p-…", name, slot_count)
+ *   party_presets (legacy_id = the app's preset id "p-…", name, slot_count, content_type, dungeon_name)
  *   party_preset_slots (position, roster_member_id → guild_roster_members, role)
  *
  * The browser keeps sending small ops (lib/party/ops.ts). The server loads the
  * presets, applies the op with the same pure function as before, then writes
- * only the presets that changed: each through `save_party_preset` (0006, one
+ * only the presets that changed: each through `save_party_preset` (0007, one
  * transaction per preset, SECURITY INVOKER → RLS: Guild Leader only), and
  * deletes removed presets. Slots reference roster rows by uuid; the API keeps
  * using roster identity ids. A slot whose member was removed becomes empty
@@ -18,7 +18,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { rosterIdMap } from "@/lib/roster/storage";
 import { DbError, must, toDbError } from "@/lib/supabase/errors";
 import { applyPartyOp, defaultPartyFile, type PartyFile, type PartyOp } from "./ops";
-import type { PartyPreset, PartyRole } from "./types";
+import type { PartyContentType, PartyPreset, PartyRole } from "./types";
 
 if (typeof window !== "undefined") {
   throw new Error("party/storage is server-only.");
@@ -29,6 +29,8 @@ interface PresetRow {
   legacy_id: string | null;
   name: string;
   slot_count: number;
+  content_type: PartyContentType | null;
+  dungeon_name: string | null;
   created_at: string;
   updated_at: string;
   slots: { position: number; roster_member_id: string | null; role: PartyRole | null }[];
@@ -38,7 +40,7 @@ async function load(sb: SupabaseClient, guildId: string) {
   const [rows, ids] = await Promise.all([
     sb
       .from("party_presets")
-      .select("id, legacy_id, name, slot_count, created_at, updated_at, slots:party_preset_slots(position, roster_member_id, role)")
+      .select("id, legacy_id, name, slot_count, content_type, dungeon_name, created_at, updated_at, slots:party_preset_slots(position, roster_member_id, role)")
       .eq("guild_id", guildId)
       .order("created_at", { ascending: true })
       .order("id", { ascending: true }),
@@ -50,7 +52,7 @@ async function load(sb: SupabaseClient, guildId: string) {
       if (s.position < 0 || s.position >= slots.length) continue;
       slots[s.position] = { member_id: s.roster_member_id ? (ids.toIdentity.get(s.roster_member_id) ?? null) : null, role: s.role };
     }
-    return { id: p.legacy_id ?? `p-${p.id}`, name: p.name, slots, created_at: p.created_at, updated_at: p.updated_at };
+    return { id: p.legacy_id ?? `p-${p.id}`, name: p.name, slots, content_type: p.content_type, dungeon_name: p.dungeon_name, created_at: p.created_at, updated_at: p.updated_at };
   });
   return { presets, ids };
 }
@@ -63,14 +65,14 @@ export async function readPartyFile(sb: SupabaseClient, guildId: string): Promis
 }
 
 const sameContent = (a: PartyPreset, b: PartyPreset) =>
-  a.name === b.name && a.slots.length === b.slots.length && a.slots.every((s, i) => s.member_id === b.slots[i].member_id && s.role === b.slots[i].role);
+  a.name === b.name && (a.content_type ?? null) === (b.content_type ?? null) && (a.dungeon_name ?? null) === (b.dungeon_name ?? null) && a.slots.length === b.slots.length && a.slots.every((s, i) => s.member_id === b.slots[i].member_id && s.role === b.slots[i].role);
 
 async function savePreset(sb: SupabaseClient, p: PartyPreset, toDb: Map<string, string>) {
   const slots = p.slots.flatMap((s, position) => {
     const member = s.member_id ? (toDb.get(s.member_id) ?? null) : null;
     return member || s.role ? [{ position, roster_member_id: member, role: s.role }] : [];
   });
-  const { error } = await sb.rpc("save_party_preset", { p_legacy_id: p.id, p_name: p.name, p_slot_count: p.slots.length, p_slots: slots });
+  const { error } = await sb.rpc("save_party_preset", { p_legacy_id: p.id, p_name: p.name, p_slot_count: p.slots.length, p_slots: slots, p_content_type: p.content_type ?? null, p_dungeon_name: p.dungeon_name ?? null });
   if (error) {
     if (error.code === "23505") throw new DbError("Another party preset already has this name.", "PARTY_RULE", 409);
     throw toDbError(error);

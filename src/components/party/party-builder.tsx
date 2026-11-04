@@ -35,12 +35,14 @@ import {
   placementsElsewhere,
   renamePreset,
   resetPartySlots,
+  setPartyContentType,
+  setPartyDungeon,
   setPartySize,
   setSlotRole,
   slotsLostBySize,
   usePartyState,
 } from "@/lib/party/party-store";
-import { PARTY_SIZE_OPTIONS } from "@/lib/party/types";
+import { DUNGEON_NAME_MAX, PARTY_CONTENT_TYPES, PARTY_SIZE_OPTIONS, type PartyContentType } from "@/lib/party/types";
 import { NativeSelect } from "@/components/ui/native-select";
 import { suggestFill, type Suggestion } from "@/lib/party/suggest";
 import type { PartyView } from "@/lib/settings/settings-store";
@@ -75,6 +77,7 @@ export function PartyBuilder() {
   const [picker, setPicker] = useState<PickerTarget | null>(null);
   const [suggestions, setSuggestions] = useState<{ presetId: string; items: Suggestion[] } | null>(null);
   const [editingName, setEditingName] = useState<{ presetId: string; value: string } | null>(null);
+  const [editingDungeon, setEditingDungeon] = useState<{ presetId: string; value: string; initial: string } | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
   /** Pending shrink that would remove assigned characters (needs confirmation). */
   const [pendingSize, setPendingSize] = useState<{ presetId: string; size: number; lost: number[] } | null>(null);
@@ -106,6 +109,8 @@ export function PartyBuilder() {
 
   const exportData: Omit<ExportData, "generatedAt"> = {
     partyName: preset.name,
+    contentType: preset.content_type ?? null,
+    dungeonName: preset.dungeon_name ?? null,
     guildName: guild.name,
     server: guild.server,
     slots: preset.slots.map((s, index) => {
@@ -136,6 +141,14 @@ export function PartyBuilder() {
     setEditingName(null);
   }
 
+  function commitDungeon() {
+    if (!editingDungeon) return;
+    const v = editingDungeon.value.trim();
+    // Compare with the value at focus time: a reload may have brought in a newer one since.
+    if (!readOnly && v !== editingDungeon.initial) setPartyDungeon(editingDungeon.presetId, v || null);
+    setEditingDungeon(null);
+  }
+
   return (
     <div className="mx-auto max-w-7xl">
       <PageHeader
@@ -149,7 +162,7 @@ export function PartyBuilder() {
         }
       />
 
-      <div className="mb-4 border border-steel/12 bg-ink-raised/70 p-4 sm:mb-6">
+      <div className="mb-4 border border-steel/12 bg-surface-raised/70 p-4 sm:mb-6">
         <PresetToolbar
           presets={presets}
           active={preset}
@@ -163,7 +176,7 @@ export function PartyBuilder() {
           readOnly={readOnly}
         />
         {meReady && readOnly && (
-          <p data-testid="read-only-notice" className="mt-3 text-xs text-[#cfe3ff]">{t("Read-only view. Only the Guild Leader can change parties. You can still view presets and export PNGs.")}</p>
+          <p data-testid="read-only-notice" className="mt-3 text-xs text-info-text">{t("Read-only view. Only the Guild Leader can change parties. You can still view presets and export PNGs.")}</p>
         )}
       </div>
 
@@ -173,9 +186,9 @@ export function PartyBuilder() {
             key={notice.id}
             className={cn(
               "aion-enter mb-4 flex items-center gap-2.5 border border-l-2 px-3 py-2 text-sm",
-              notice.tone === "ok" && "border-[#7ee79e]/25 border-l-[#7ee79e] bg-[#7ee79e]/[0.07] text-[#c8f5d4]",
-              notice.tone === "warn" && "border-[#e0b04a]/35 border-l-[#e0b04a] bg-[#e0b04a]/[0.07] text-[#f0dca8]",
-              notice.tone === "error" && "border-destructive/40 border-l-destructive bg-destructive/10 text-[#f6c2b6]",
+              notice.tone === "ok" && "border-success/25 border-l-success bg-success/[0.07] text-success-text",
+              notice.tone === "warn" && "border-warning/35 border-l-warning bg-warning/[0.07] text-warning-text",
+              notice.tone === "error" && "border-destructive/40 border-l-destructive bg-destructive/10 text-danger-text",
             )}
             data-testid="party-notice"
             data-tone={notice.tone}
@@ -190,7 +203,7 @@ export function PartyBuilder() {
       </div>
 
       {partyError && partiesReady && (
-        <p role="alert" data-testid="party-sync-error" className="mb-4 flex items-center gap-2 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]">
+        <p role="alert" data-testid="party-sync-error" className="mb-4 flex items-center gap-2 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2 text-sm text-danger-text">
           <CircleAlert className="size-4 shrink-0" />
           <span className="flex-1">{partyError} {" "}{t("The latest saved presets were re-loaded from the server.")}</span>
           <button type="button" aria-label={t("Dismiss")} onClick={clearPartyError} className="opacity-70 hover:opacity-100">
@@ -202,10 +215,10 @@ export function PartyBuilder() {
       {/* Wait for the persisted roster AND the shared presets before analysing
           slots, so saved assignments are never flagged as "removed" while loading. */}
       {!rosterReady || !partiesReady ? (
-        <div className="border border-steel/12 bg-ink-raised/70 px-4 py-10 text-center" data-testid="roster-gate">
+        <div className="border border-steel/12 bg-surface-raised/70 px-4 py-10 text-center" data-testid="roster-gate">
           {rosterState.status === "error" || partyStatus === "error" ? (
             <div className="space-y-3">
-              <p className="text-sm text-[#f6c2b6]">
+              <p className="text-sm text-danger-text">
                 {rosterState.status === "error" ? t("Could not load the guild roster: {msg}", { msg: rosterState.error }) : t("Could not load party presets: {msg}", { msg: partyError })}
               </p>
               <Button
@@ -240,7 +253,7 @@ export function PartyBuilder() {
                   role="radio"
                   aria-checked={view === k}
                   onClick={() => setViewOverride(k)}
-                  className={cn("flex items-center gap-1.5 px-2.5 py-1 text-xs", view === k ? "bg-gold/15 text-gold-bright" : "text-steel hover:text-foreground")}
+                  className={cn("flex items-center gap-1.5 px-2.5 py-1 text-xs", view === k ? "bg-brand/15 text-brand-strong" : "text-steel hover:text-foreground")}
                 >
                   <Icon className="size-3.5" />
                   <span className="hidden sm:inline">{t(label)}</span>
@@ -252,7 +265,7 @@ export function PartyBuilder() {
           {/* Name editing + reset */}
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <div className="min-w-[12rem] flex-1">
-              <label htmlFor="party-name" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
+              <label htmlFor="party-name" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">
                 {t("Party name")}</label>
               <Input
                 id="party-name"
@@ -273,7 +286,7 @@ export function PartyBuilder() {
               />
             </div>
             <div className="w-36 shrink-0">
-              <label htmlFor="party-size" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
+              <label htmlFor="party-size" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">
                 {t("Party size")}</label>
               <NativeSelect
                 id="party-size"
@@ -305,6 +318,49 @@ export function PartyBuilder() {
             <Button type="button" variant="outline" className={aionButtonSecondary} onClick={() => setConfirmReset(true)}>
               <RotateCcw className="size-3.5" /> {" "}{t("Reset Party")}</Button>
             )}
+          </div>
+
+          {/* Content category + dungeon name (independent of each other) */}
+          <div className="mb-4 flex flex-wrap items-end gap-2">
+            <div className="min-w-[12rem] flex-1">
+              <label htmlFor="party-type" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">
+                {t("Type")}</label>
+              <NativeSelect
+                id="party-type"
+                value={preset.content_type ?? ""}
+                disabled={readOnly}
+                onChange={(e) => setPartyContentType(preset.id, (e.target.value || null) as PartyContentType | null)}
+                className={aionField}
+              >
+                <option value="">{t("Not set")}</option>
+                {PARTY_CONTENT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {t(type)}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+            <div className="min-w-[12rem] flex-1">
+              <label htmlFor="party-dungeon" className="mb-1.5 block text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">
+                {t("Dungeon")}</label>
+              <Input
+                id="party-dungeon"
+                maxLength={DUNGEON_NAME_MAX}
+                readOnly={readOnly}
+                value={editingDungeon?.presetId === preset.id ? editingDungeon.value : (preset.dungeon_name ?? "")}
+                onFocus={() => !editingDungeon && setEditingDungeon({ presetId: preset.id, value: preset.dungeon_name ?? "", initial: preset.dungeon_name ?? "" })}
+                onChange={(e) => setEditingDungeon({ presetId: preset.id, value: e.target.value, initial: editingDungeon?.presetId === preset.id ? editingDungeon.initial : (preset.dungeon_name ?? "") })}
+                onBlur={commitDungeon}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitDungeon();
+                  }
+                  if (e.key === "Escape") setEditingDungeon(null);
+                }}
+                className={aionField}
+              />
+            </div>
           </div>
 
           <ol
@@ -414,7 +470,7 @@ export function PartyBuilder() {
                 {pendingSize.lost.map((i) => {
                   const id = preset.slots[i]?.member_id;
                   return (
-                    <li key={i} className="flex items-center gap-2 border border-steel/12 bg-ink/50 px-2.5 py-1.5">
+                    <li key={i} className="flex items-center gap-2 border border-steel/12 bg-surface/50 px-2.5 py-1.5">
                       <span className="text-xs text-steel tabular-nums">{t("Slot")}{" "}{i + 1}</span>
                       <span className="font-medium text-foreground">
                         {(id && byId.get(id)?.character_name) ?? t("Removed character")}

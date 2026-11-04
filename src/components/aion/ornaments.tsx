@@ -7,7 +7,7 @@ export function OrnamentDivider({ className }: { className?: string }) {
       aria-hidden
       className={cn("flex items-center justify-center gap-3", className)}
     >
-      <span className="h-px w-16 bg-gradient-to-r from-transparent via-gold-dim/70 to-gold/80 sm:w-24" />
+      <span className="h-px w-16 bg-gradient-to-r from-transparent via-gold/50 to-gold/80 sm:w-24" />
       <svg viewBox="0 0 24 12" className="h-3 w-6 text-gold">
         <path d="M0 6h6" stroke="currentColor" strokeWidth="0.75" />
         <path d="M18 6h6" stroke="currentColor" strokeWidth="0.75" />
@@ -19,7 +19,7 @@ export function OrnamentDivider({ className }: { className?: string }) {
         />
         <path d="M12 4 14 6 12 8 10 6Z" fill="currentColor" />
       </svg>
-      <span className="h-px w-16 bg-gradient-to-l from-transparent via-gold-dim/70 to-gold/80 sm:w-24" />
+      <span className="h-px w-16 bg-gradient-to-l from-transparent via-gold/50 to-gold/80 sm:w-24" />
     </div>
   );
 }
@@ -34,20 +34,33 @@ const cornerTransform: Record<Corner, string> = {
 };
 
 const cornerPosition: Record<Corner, string> = {
-  tl: "-top-px -left-px",
-  tr: "-top-px -right-px",
-  bl: "-bottom-px -left-px",
-  br: "-bottom-px -right-px",
+  tl: "top-1.5 left-1.5",
+  tr: "top-1.5 right-1.5",
+  bl: "bottom-1.5 left-1.5",
+  br: "right-1.5 bottom-1.5",
 };
 
+/** All four filigree corners. `small` fits inside the 16px padding of content cards, clear of their text and buttons. */
+export function OrnamentCorners({ small = false }: { small?: boolean }) {
+  return (
+    <>
+      <OrnamentCorner corner="tl" small={small} />
+      <OrnamentCorner corner="tr" small={small} />
+      <OrnamentCorner corner="bl" small={small} />
+      <OrnamentCorner corner="br" small={small} />
+    </>
+  );
+}
+
 /** Filigree corner bracket for framed panels. */
-export function OrnamentCorner({ corner }: { corner: Corner }) {
+function OrnamentCorner({ corner, small }: { corner: Corner; small: boolean }) {
   return (
     <svg
       aria-hidden
       viewBox="0 0 40 40"
       className={cn(
-        "pointer-events-none absolute size-9 text-gold sm:size-10",
+        "pointer-events-none absolute text-gold",
+        small ? "size-5" : "size-7 sm:size-8",
         cornerPosition[corner],
         cornerTransform[corner],
       )}
@@ -111,7 +124,7 @@ export function AionCrest({ className }: { className?: string }) {
         d="M60 12 70 34 60 58 50 34Z"
         stroke="url(#crest-gold)"
         strokeWidth="1.4"
-        fill="#0b101b"
+        fill="var(--surface-raised)"
       />
       <path
         d="M60 20 65.5 34 60 49 54.5 34Z"

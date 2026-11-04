@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const labelClass =
-  "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
+  "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
 
 const SORT_OPTIONS: { value: `${SortKey}:${SortDir}`; label: string }[] = (
   ["combat_power", "item_level", "level"] as SortKey[]
@@ -76,7 +76,7 @@ export function MembersFilters({
           <div className="relative">
             <Search
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50"
+              className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle"
             />
             <Input
               id="f-query"
@@ -91,7 +91,7 @@ export function MembersFilters({
                 type="button"
                 aria-label="Clear search"
                 onClick={() => onChange({ query: "" })}
-                className="absolute top-1/2 right-2 -translate-y-1/2 p-0.5 text-steel/60 hover:text-gold-bright"
+                className="absolute top-1/2 right-2 -translate-y-1/2 p-0.5 text-subtle hover:text-brand-strong"
               >
                 <X className="size-3.5" />
               </button>
@@ -168,7 +168,7 @@ export function MembersFilters({
           <span className="font-semibold text-foreground tabular-nums">{resultCount}</span> of{" "}
           <span className="tabular-nums">{totalCount}</span> members
           {rangeInvalid && (
-            <span className="ml-2 text-[#ef9b89]">· Min CP is greater than Max CP</span>
+            <span className="ml-2 text-danger-text">· Min CP is greater than Max CP</span>
           )}
         </p>
         <Button

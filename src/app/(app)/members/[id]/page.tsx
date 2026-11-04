@@ -6,7 +6,7 @@ import { RealMemberProfile } from "@/components/roster/real-member-profile";
 import { ROSTER_ID_RE } from "@/lib/roster/types";
 
 export const metadata: Metadata = {
-  title: "Character Profile — AION II Guild Command",
+  title: "Character Profile — ChumChon AION2",
 };
 
 /** Route segments may arrive URL-encoded (real roster ids contain ":" and "="). */

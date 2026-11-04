@@ -52,9 +52,10 @@ import {
   type Settings,
   type SortPref,
 } from "@/lib/settings/settings-store";
+import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function Field({ id, label, hint, error, children }: { id: string; label: string; hint?: string; error?: string; children: ReactNode }) {
@@ -63,9 +64,9 @@ function Field({ id, label, hint, error, children }: { id: string; label: string
       <Label htmlFor={id} className={labelClass}>{label}</Label>
       {children}
       {error ? (
-        <p id={`${id}-err`} className="text-xs text-[#ef9b89]">{error}</p>
+        <p id={`${id}-err`} className="text-xs text-danger-text">{error}</p>
       ) : (
-        hint && <p className="text-2xs text-steel/60">{hint}</p>
+        hint && <p className="text-2xs text-subtle">{hint}</p>
       )}
     </div>
   );
@@ -77,13 +78,13 @@ function SaveBar({ dirty, saved, saving, error, onCancel }: { dirty: boolean; sa
     <div className="flex flex-wrap items-center justify-end gap-2 border-t border-steel/10 pt-4">
       <span aria-live="polite" className="mr-auto text-xs">
         {error ? (
-          <span role="alert" className="inline-flex items-center gap-1.5 text-[#f6c2b6]"><CircleAlert className="size-3.5" /> {" "}{t("Not saved:")}{" "}{error}</span>
+          <span role="alert" className="inline-flex items-center gap-1.5 text-danger-text"><CircleAlert className="size-3.5" /> {" "}{t("Not saved:")}{" "}{error}</span>
         ) : saving ? (
           <span className="inline-flex items-center gap-1.5 text-steel"><Loader2 className="size-3.5 animate-spin" /> {" "}{t("Saving…")}</span>
         ) : saved && !dirty ? (
-          <span className="inline-flex items-center gap-1.5 text-[#9af0b3]"><Check className="size-3.5" /> {" "}{t("Saved")}</span>
+          <span className="inline-flex items-center gap-1.5 text-success-text"><Check className="size-3.5" /> {" "}{t("Saved")}</span>
         ) : (
-          dirty && <span className="text-[#f0cf86]">{t("Unsaved changes")}</span>
+          dirty && <span className="text-warning-text">{t("Unsaved changes")}</span>
         )}
       </span>
       <Button type="button" variant="outline" disabled={!dirty || saving} onClick={onCancel} className={aionButtonSecondary}>{t("Discard")}</Button>
@@ -211,12 +212,12 @@ function GuildImageSettings({ settings }: { settings: Settings }) {
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center" data-testid="guild-image-settings">
-      <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden border border-gold-dim/40 bg-ink/60">
+      <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden border border-brand-muted/40 bg-surface/60">
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element -- auth-protected API image, not a static asset
           <img src={url} alt={t("Current guild image")} data-testid="guild-image-preview" className="size-full object-cover" />
         ) : (
-          <Shield className="size-10 text-gold/50" aria-label={t("No guild image")} />
+          <Shield className="size-10 text-brand" aria-label={t("No guild image")} />
         )}
       </div>
       <div className="min-w-0 space-y-2">
@@ -236,12 +237,12 @@ function GuildImageSettings({ settings }: { settings: Settings }) {
             {busy === "upload" ? t("Uploading…") : img ? t("Replace image") : t("Upload image")}
           </Button>
           {img && (
-            <Button type="button" variant="outline" disabled={!!busy} onClick={() => void remove()} className={cn(aionButtonSecondary, "hover:border-destructive/60 hover:text-[#f0a596]")}>
+            <Button type="button" variant="outline" disabled={!!busy} onClick={() => void remove()} className={cn(aionButtonSecondary, "hover:border-destructive/60 hover:text-danger-text")}>
               <Trash className="size-3.5" /> {" "}{t("Remove")}</Button>
           )}
         </div>
         <p aria-live="polite" className="text-sm empty:hidden" data-testid="guild-image-msg">
-          {msg && <span className={msg.ok ? "text-[#9af0b3]" : "text-[#f6c2b6]"}>{msg.text}</span>}
+          {msg && <span className={msg.ok ? "text-success-text" : "text-danger-text"}>{msg.text}</span>}
         </p>
       </div>
     </div>
@@ -335,7 +336,7 @@ function PreferencesForm({ prefs }: { prefs: AppPrefs }) {
       </div>
 
       <fieldset className="border border-steel/10 p-4">
-        <legend className="flex items-center gap-2 px-1 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <legend className="flex items-center gap-2 px-1 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">
           <LayoutDashboard className="size-3.5" /> {" "}{t("Dashboard display")}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
           {DASH_TOGGLES.map(({ key, label }) => (
@@ -344,7 +345,7 @@ function PreferencesForm({ prefs }: { prefs: AppPrefs }) {
                 id={`d-${key}`}
                 checked={prefs.dashboard[key]}
                 onCheckedChange={(v) => void save(updateDashboardPrefs({ [key]: v === true }))}
-                className="rounded-none border-gold-dim/60 bg-ink/60 data-checked:border-gold data-checked:bg-gold data-checked:text-ink"
+                className="rounded-md border-brand-muted/60 bg-surface/60 data-checked:border-brand data-checked:bg-brand data-checked:text-primary-foreground"
               />
               <Label htmlFor={`d-${key}`} className="cursor-pointer text-sm font-normal text-foreground/90">{t("Show {label}", { label: t(label) })}</Label>
             </div>
@@ -363,8 +364,8 @@ function PreferencesForm({ prefs }: { prefs: AppPrefs }) {
           </Field>
         </div>
       </fieldset>
-      <p className="text-2xs text-steel/60" aria-live="polite">
-        {error ? <span className="text-[#f6c2b6]">{t("Not saved:")}{" "}{error}</span> : t("Preferences are saved automatically on the server and shared by every browser.")}
+      <p className="text-2xs text-subtle" aria-live="polite">
+        {error ? <span className="text-danger-text">{t("Not saved:")}{" "}{error}</span> : t("Preferences are saved automatically on the server and shared by every browser.")}
       </p>
     </div>
   );
@@ -385,7 +386,7 @@ function AccountPanel() {
       </div>
       <div>
         <dt className={labelClass}>{t("Your character")}</dt>
-        <dd className="mt-1 text-foreground">{c ? `${c.name} · ${c.region.toUpperCase()} · ${c.server_id}` : t("No character linked")}</dd>
+        <dd className="mt-1 text-foreground">{c ? `${c.name} · ${regionLabel(c.region)} · ${c.server_id}` : t("No character linked")}</dd>
       </div>
       <div>
         <dt className={labelClass}>{t("Role")}</dt>
@@ -466,7 +467,7 @@ function JoinCodeSettings() {
         )}
       </form>
       <p aria-live="polite" className="text-sm empty:hidden" data-testid="join-code-msg">
-        {msg && <span className={msg.ok ? "text-[#9af0b3]" : "text-[#f6c2b6]"}>{msg.text}</span>}
+        {msg && <span className={msg.ok ? "text-success-text" : "text-danger-text"}>{msg.text}</span>}
       </p>
     </div>
   );
@@ -480,12 +481,12 @@ function MemberSettings({ s }: { s: Settings }) {
   return (
     <SectionPanel title={t("Guild Information")} icon={Shield}>
       <div className="flex flex-col gap-4 sm:flex-row" data-testid="member-guild-info">
-        <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden border border-gold-dim/40 bg-ink/60">
+        <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden border border-brand-muted/40 bg-surface/60">
           {url ? (
             // eslint-disable-next-line @next/next/no-img-element -- auth-protected API image, not a static asset
             <img src={url} alt="" className="size-full object-cover" />
           ) : (
-            <Shield className="size-9 text-gold/50" />
+            <Shield className="size-9 text-brand" />
           )}
         </div>
         <dl className="grid flex-1 gap-3 text-sm sm:grid-cols-2">
@@ -496,7 +497,7 @@ function MemberSettings({ s }: { s: Settings }) {
           <div className="sm:col-span-2"><dt className={labelClass}>{t("Description")}</dt><dd className="mt-1 whitespace-pre-line text-foreground">{g.description || "—"}</dd></div>
         </dl>
       </div>
-      <p className="mt-4 text-xs text-[#cfe3ff]" data-testid="read-only-notice">{t("Read-only view. Only the Guild Leader can change guild settings.")}</p>
+      <p className="mt-4 text-xs text-info-text" data-testid="read-only-notice">{t("Read-only view. Only the Guild Leader can change guild settings.")}</p>
     </SectionPanel>
   );
 }
@@ -520,11 +521,11 @@ export function SettingsView() {
     };
     return (
       <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
-        <PageHeader eyebrow={t("Guild Command")} title={t("Settings")} description={t("Guild details, admin profile, preferences and data management.")} />
-        <div className="border border-steel/12 bg-ink-raised/70 px-4 py-12 text-center" data-testid="settings-status">
+        <PageHeader eyebrow="ChumChon AION2" title={t("Settings")} description={t("Guild details, admin profile, preferences and data management.")} />
+        <div className="border border-steel/12 bg-surface-raised/70 px-4 py-12 text-center" data-testid="settings-status">
           {status === "error" || meState.status === "error" ? (
             <div className="space-y-3">
-              <p className="flex items-center justify-center gap-2 text-sm text-[#f6c2b6]"><CircleAlert className="size-4" /> {" "}{t("Could not load settings:")}{" "}{loadError}</p>
+              <p className="flex items-center justify-center gap-2 text-sm text-danger-text"><CircleAlert className="size-4" /> {" "}{t("Could not load settings:")}{" "}{loadError}</p>
               <Button type="button" variant="outline" className={aionButtonSecondary} onClick={retry}>
                 <RotateCcw className="size-3.5" /> {" "}{t("Retry")}</Button>
             </div>
@@ -538,7 +539,7 @@ export function SettingsView() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
-      <PageHeader eyebrow={t("Guild Command")} title={t("Settings")} description={t("Shared guild details, admin profile, preferences and data management.")} />
+      <PageHeader eyebrow="ChumChon AION2" title={t("Settings")} description={t("Shared guild details, admin profile, preferences and data management.")} />
       <SectionPanel title={t("Account")} icon={UserRound}>
         <AccountPanel />
       </SectionPanel>

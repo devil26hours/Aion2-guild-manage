@@ -10,6 +10,23 @@
 export const REGIONS = ["nae", "naw", "eu", "la", "as"] as const;
 export type Region = (typeof REGIONS)[number];
 
+/**
+ * Display names for the region codes. The API and database only carry the
+ * codes; these names are the app's own labels (never sent upstream or stored).
+ */
+export const REGION_LABELS: Record<Region, string> = {
+  nae: "North America East",
+  naw: "North America West",
+  eu: "Europe",
+  la: "Latin America",
+  as: "Asia",
+};
+
+/** Full region name for display; unknown codes fall back to the upper-cased code. */
+export function regionLabel(code: string): string {
+  return (REGION_LABELS as Record<string, string>)[code] ?? code.toUpperCase();
+}
+
 export const ENDPOINT_IDS = [
   "character-search",
   "character-profile",

@@ -24,40 +24,40 @@ export function UserMenu() {
   const roleLabel = me?.guild?.role === "leader" ? t("Guild Leader") : t("Guild Member");
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="group flex items-center gap-2.5 border border-transparent py-1 pr-1.5 pl-1 transition-colors outline-none hover:border-steel/15 hover:bg-white/[0.03] focus-visible:border-arcane/50 data-[state=open]:border-gold-dim/40">
-        <span className="flex size-8 items-center justify-center border border-gold-dim/60 bg-gradient-to-b from-gold/25 to-gold/5 font-heading text-sm font-bold text-gold-bright">
+      <DropdownMenuTrigger className="group flex items-center gap-2.5 border border-transparent py-1 pr-1.5 pl-1 transition-colors outline-none hover:border-steel/15 hover:bg-surface-hover focus-visible:border-arcane/50 data-[state=open]:border-brand-muted/40">
+        <span className="flex size-8 items-center justify-center border border-gold/60 bg-gradient-to-b from-brand/30 to-brand/10 font-heading text-sm font-bold text-brand-strong">
           {ready ? display.charAt(0).toUpperCase() : ""}
         </span>
         <span className="hidden text-left leading-tight md:block">
           <span className="block min-w-16 text-sm text-foreground">{ready ? display : "\u00a0"}</span>
-          <span className="block text-3xs tracking-wider text-gold/80 uppercase">
+          <span className="block text-3xs tracking-wider text-gold-text uppercase">
             {ready ? roleLabel : "\u00a0"}
           </span>
         </span>
-        <ChevronDown className="size-3.5 text-steel/70 transition-transform group-data-[state=open]:rotate-180" />
+        <ChevronDown className="size-3.5 text-subtle transition-transform group-data-[state=open]:rotate-180" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 rounded-none border-gold-dim/30 bg-ink-raised"
+        className="w-56 rounded-md border-gold/35 bg-surface-raised shadow-float"
       >
         <DropdownMenuLabel className="font-normal">
           <p className="text-sm text-foreground" data-testid="user-menu-name">{display}</p>
-          <p className="truncate text-xs text-steel/70">{me?.user.email}</p>
-          <p className="mt-0.5 text-3xs tracking-wider text-gold/80 uppercase" data-testid="user-menu-role">{roleLabel}</p>
+          <p className="truncate text-xs text-subtle">{me?.user.email}</p>
+          <p className="mt-0.5 text-3xs tracking-wider text-gold-text uppercase" data-testid="user-menu-role">{roleLabel}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="rounded-none">
+        <DropdownMenuItem asChild className="rounded-md">
           <Link href="/settings">
             <UserRound />
             {t("Profile")}</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild className="rounded-none">
+        <DropdownMenuItem asChild className="rounded-md">
           <Link href="/settings">
             <Settings />
             {t("Settings")}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" className="rounded-none" onSelect={() => void logout()}>
+        <DropdownMenuItem variant="destructive" className="rounded-md" onSelect={() => void logout()}>
           <LogOut />
           {t("Log out")}</DropdownMenuItem>
       </DropdownMenuContent>

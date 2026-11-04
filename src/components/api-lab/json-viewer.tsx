@@ -23,15 +23,15 @@ function highlight(text: string) {
     const [whole, str, colon, bool, nul, num, punct] = m;
     if (str !== undefined) {
       out.push(
-        <span key={i++} className={colon ? "text-[#cfe3ff]" : "text-[#9af0b3]"}>
+        <span key={i++} className={colon ? "text-info-text" : "text-success-text"}>
           {str}
         </span>,
       );
-      if (colon) out.push(<span key={i++} className="text-steel/60">{colon}</span>);
-    } else if (bool !== undefined) out.push(<span key={i++} className="text-[#d9a2ff]">{bool}</span>);
-    else if (nul !== undefined) out.push(<span key={i++} className="text-steel/60 italic">{nul}</span>);
-    else if (num !== undefined) out.push(<span key={i++} className="text-gold-bright">{num}</span>);
-    else if (punct !== undefined) out.push(<span key={i++} className="text-steel/50">{punct}</span>);
+      if (colon) out.push(<span key={i++} className="text-subtle">{colon}</span>);
+    } else if (bool !== undefined) out.push(<span key={i++} className="text-mystic-text">{bool}</span>);
+    else if (nul !== undefined) out.push(<span key={i++} className="text-subtle italic">{nul}</span>);
+    else if (num !== undefined) out.push(<span key={i++} className="text-brand-strong">{num}</span>);
+    else if (punct !== undefined) out.push(<span key={i++} className="text-subtle">{punct}</span>);
     else out.push(whole);
     last = idx + whole.length;
   }
@@ -42,12 +42,12 @@ function highlight(text: string) {
 export function JsonViewer({ text, className }: { text: string; className?: string }) {
   const nodes = useMemo(() => (text.length <= HIGHLIGHT_LIMIT ? highlight(text) : null), [text]);
   return (
-    <div className={cn("relative overflow-auto border border-steel/12 bg-[#060910]", className)}>
+    <div className={cn("relative overflow-auto border border-steel/12 bg-surface-sunken", className)}>
       <pre data-testid="json-viewer" className="min-w-max p-3 font-mono text-xs leading-relaxed text-foreground/90">
         {nodes ? nodes.map((n, i) => <Fragment key={i}>{n}</Fragment>) : text}
       </pre>
       {!nodes && (
-        <p className="sticky bottom-0 left-0 border-t border-steel/12 bg-ink px-3 py-1 text-3xs text-steel/60">
+        <p className="sticky bottom-0 left-0 border-t border-steel/12 bg-surface px-3 py-1 text-3xs text-subtle">
           Large response — syntax highlighting disabled.
         </p>
       )}

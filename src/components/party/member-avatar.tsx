@@ -23,7 +23,7 @@ export function MemberAvatar({ src, name, className, size }: Props) {
   return (
     <span
       data-testid="slot-avatar"
-      className="relative flex shrink-0 items-center justify-center overflow-hidden border border-gold-dim/40 bg-[#0a0e18]"
+      className="relative flex shrink-0 items-center justify-center overflow-hidden border border-brand-muted/40 bg-icon-well"
       style={{ width: size, height: size }}
     >
       {showPortrait ? (
@@ -39,7 +39,7 @@ export function MemberAvatar({ src, name, className, size }: Props) {
       ) : classImageSrc(className) ? (
         <ClassImage name={className} className="size-3/4 opacity-80" />
       ) : (
-        <span aria-hidden className="text-xs font-bold text-steel/60">{name.charAt(0)}</span>
+        <span aria-hidden className="text-xs font-bold text-subtle">{name.charAt(0)}</span>
       )}
     </span>
   );

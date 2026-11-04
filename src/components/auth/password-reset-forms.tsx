@@ -20,11 +20,11 @@ import { cn } from "@/lib/utils";
  */
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 
 function ErrorLine({ text }: { text: string }) {
   return (
-    <p role="alert" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-[#f6c2b6]">
+    <p role="alert" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-danger-text">
       <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {text}
     </p>
   );
@@ -62,11 +62,11 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <div className="space-y-4 text-center" data-testid="forgot-sent">
-        <span className="mx-auto flex size-12 items-center justify-center border border-gold-dim/50 bg-gold/10 text-gold">
+        <span className="mx-auto flex size-12 items-center justify-center border border-brand-muted/50 bg-brand/10 text-brand">
           <MailCheck className="size-6" />
         </span>
         <p className="text-sm text-steel">{t("If an account exists for {email}, a password-reset link is on its way. Open it in this browser to choose a new password.", { email: email.trim() })}</p>
-        <Link href="/login" className="text-sm text-gold underline-offset-4 hover:underline">{t("Back to sign in")}</Link>
+        <Link href="/login" className="text-sm text-brand underline-offset-4 hover:underline">{t("Back to sign in")}</Link>
       </div>
     );
   }
@@ -84,7 +84,7 @@ export function ForgotPasswordForm() {
         {busy ? t("Sending…") : t("Send reset link")}
       </Button>
       <p className="text-center text-xs text-steel">
-        <Link href="/login" className="text-gold underline-offset-4 hover:underline">{t("Back to sign in")}</Link>
+        <Link href="/login" className="text-brand underline-offset-4 hover:underline">{t("Back to sign in")}</Link>
       </p>
     </form>
   );
@@ -123,11 +123,11 @@ export function ResetPasswordForm() {
         <Label htmlFor={`${id}-pw`} className={labelClass}>{t("New password")}</Label>
         <div className="relative">
           <Input id={`${id}-pw`} type={show ? "text" : "password"} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className={cn(aionField, "pr-9")} />
-          <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? t("Hide password") : t("Show password")} className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-steel/70 hover:text-gold-bright">
+          <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? t("Hide password") : t("Show password")} className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-subtle hover:text-brand-strong">
             {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
         </div>
-        <p className="text-2xs text-steel/60">{t("At least 8 characters.")}</p>
+        <p className="text-2xs text-subtle">{t("At least 8 characters.")}</p>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor={`${id}-pw2`} className={labelClass}>{t("Confirm password")}</Label>

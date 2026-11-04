@@ -35,11 +35,11 @@ function BackLink() {
 
 const CHARTS: { title: string; value: (s: CharacterSnapshot) => number; decimals: number; color?: string }[] = [
   { title: "Combat Power", value: (s) => s.combat_power, decimals: 0 },
-  { title: "Item Level", value: (s) => s.item_level, decimals: 0, color: "#5fa8ff" },
-  { title: "Combat Speed", value: (s) => s.stats.combat_speed, decimals: 1, color: "#5fa8ff" },
-  { title: "Attack", value: (s) => s.stats.attack, decimals: 0, color: "#5fa8ff" },
-  { title: "Critical Hit", value: (s) => s.stats.critical_hit, decimals: 0, color: "#5fa8ff" },
-  { title: "Accuracy", value: (s) => s.stats.accuracy, decimals: 0, color: "#5fa8ff" },
+  { title: "Item Level", value: (s) => s.item_level, decimals: 0, color: "var(--chart-2)" },
+  { title: "Combat Speed", value: (s) => s.stats.combat_speed, decimals: 1, color: "var(--chart-4)" },
+  { title: "Attack", value: (s) => s.stats.attack, decimals: 0, color: "var(--chart-3)" },
+  { title: "Critical Hit", value: (s) => s.stats.critical_hit, decimals: 0, color: "var(--chart-2)" },
+  { title: "Accuracy", value: (s) => s.stats.accuracy, decimals: 0, color: "var(--chart-4)" },
 ];
 
 export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focusSnapshotId: string | null }) {
@@ -51,10 +51,10 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
   if (!member || history.length === 0) {
     return (
       <FramedPanel className="mx-auto max-w-lg px-6 py-10 text-center">
-        <UserX className="mx-auto size-8 text-steel/50" />
+        <UserX className="mx-auto size-8 text-subtle" />
         <h1 className="mt-3 font-heading text-lg tracking-[0.12em] text-foreground">Character Not Found</h1>
         <p className="mt-2 text-sm text-steel">
-          No guild member with id <code className="text-gold">{id}</code>.
+          No guild member with id <code className="text-brand">{id}</code>.
         </p>
         <div className="mt-6 flex justify-center">
           <BackLink />
@@ -79,7 +79,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
   return (
     <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
       {/* Overview */}
-      <section className="relative overflow-hidden border border-gold-dim/35 bg-gradient-to-br from-ink-raised via-ink to-ink">
+      <section className="relative overflow-hidden border border-gold/40 bg-gradient-to-br from-surface-raised via-surface to-surface">
         <div aria-hidden className="pointer-events-none absolute -top-24 -left-16 size-72 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: meta.color }} />
         <div className="relative flex flex-wrap items-start justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-5">
           <BackLink />
@@ -103,15 +103,15 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             <ClassImage name={member.class} className="relative size-9" />
           </div>
           <div className="min-w-0">
-            <p className="flex flex-wrap items-center gap-2 text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase">
+            <p className="flex flex-wrap items-center gap-2 text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
               Character History · {member.server}
               <MockTag />
             </p>
-            <h1 className="mt-1 font-heading text-3xl font-bold tracking-[0.06em] text-gold-bright">{member.character_name}</h1>
+            <h1 className="mt-1 font-heading text-3xl font-bold tracking-[0.06em] text-brand-strong">{member.character_name}</h1>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <ClassBadge cls={member.class} withIcon />
               <span className="text-steel">Level <span className="font-semibold text-foreground">{member.level}</span></span>
-              <span className="text-xs text-steel/70">Pattern: {PATTERN_LABELS[patternFor(member.id)]} (simulated)</span>
+              <span className="text-xs text-subtle">Pattern: {PATTERN_LABELS[patternFor(member.id)]} (simulated)</span>
             </div>
           </div>
         </div>
@@ -122,16 +122,16 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             ["Combat Speed", latest.stats.combat_speed.toFixed(1), Math.round((latest.stats.combat_speed - first.stats.combat_speed) * 10) / 10],
             ["Snapshots", String(history.length), null],
           ].map(([label, value, delta]) => (
-            <div key={label as string} className="bg-[#090d16] px-4 py-3 sm:px-6">
-              <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</dt>
+            <div key={label as string} className="bg-surface-sunken px-4 py-3 sm:px-6">
+              <dt className="text-4xs font-semibold tracking-[0.2em] text-subtle uppercase">{label}</dt>
               <dd className="mt-1 flex flex-wrap items-center gap-2">
                 <span className="font-heading text-xl font-bold text-foreground tabular-nums">{value}</span>
                 {delta !== null && <DeltaChip delta={delta as number} className="px-1 py-0 text-3xs" />}
               </dd>
             </div>
           ))}
-          <div className="col-span-2 bg-[#090d16] px-4 py-3 sm:px-6 lg:col-span-1">
-            <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">Latest Snapshot</dt>
+          <div className="col-span-2 bg-surface-sunken px-4 py-3 sm:px-6 lg:col-span-1">
+            <dt className="text-4xs font-semibold tracking-[0.2em] text-subtle uppercase">Latest Snapshot</dt>
             <dd className="mt-1 text-sm text-foreground">
               {refreshing ? (
                 <span className="inline-flex items-center gap-1.5 text-arcane"><Loader2 className="size-3.5 animate-spin" /> Capturing…</span>
@@ -141,7 +141,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
             </dd>
           </div>
         </dl>
-        <p className="relative border-t border-steel/10 px-4 py-2 text-3xs text-steel/60 sm:px-6">
+        <p className="relative border-t border-steel/10 px-4 py-2 text-3xs text-subtle sm:px-6">
           Changes in the stat strip are measured from the first recorded snapshot. All history is simulated demo data.
         </p>
       </section>
@@ -158,7 +158,7 @@ export function CharacterHistoryView({ id, focusSnapshotId }: { id: string; focu
           />
         ))}
       </div>
-      <p className="-mt-2 text-2xs text-steel/60">Filled markers show the snapshots selected for comparison (A and B).</p>
+      <p className="-mt-2 text-2xs text-subtle">Filled markers show the snapshots selected for comparison (A and B).</p>
 
       <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)]">
         <SnapshotTimeline

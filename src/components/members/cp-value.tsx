@@ -29,8 +29,8 @@ export function CpValue({
           <span
             className={cn(
               "aion-enter border px-1 text-3xs font-semibold tabular-nums",
-              delta > 0 && "border-[#7ee79e]/30 bg-[#7ee79e]/10 text-[#9af0b3]",
-              delta < 0 && "border-destructive/40 bg-destructive/10 text-[#f0a596]",
+              delta > 0 && "border-success/30 bg-success/10 text-success-text",
+              delta < 0 && "border-destructive/40 bg-destructive/10 text-danger-text",
               delta === 0 && "border-steel/20 text-steel",
             )}
           >
@@ -44,8 +44,8 @@ export function CpValue({
           className={cn(
             "font-semibold tabular-nums",
             tier === "elite" &&
-              "text-gold-bright drop-shadow-[0_0_8px_rgba(232,209,160,0.45)]",
-            tier === "high" && "text-gold",
+              "text-gold-text drop-shadow-[0_0_8px_var(--elite-glow)]",
+            tier === "high" && "text-brand",
             tier === "base" && "text-foreground/85",
           )}
         >
@@ -56,7 +56,7 @@ export function CpValue({
         <span
           className={cn(
             "block h-full",
-            tier === "elite" ? "bg-gold-bright" : tier === "high" ? "bg-gold" : "bg-steel/50",
+            tier === "elite" ? "bg-gold" : tier === "high" ? "bg-brand" : "bg-steel/50",
           )}
           style={{ width: `${Math.min(100, (value / Math.max(1, max)) * 100)}%` }}
         />

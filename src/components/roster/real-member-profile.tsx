@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { formatNumber, formatSigned } from "@/lib/format";
 import { getRosterMemberDetail, refreshRosterMember, useRoster } from "@/lib/roster/roster-store";
 import { cn } from "@/lib/utils";
+import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { CharacterProfileView } from "./character-profile-view";
 
 type Detail = { status: "loading" } | { status: "ready"; raw: unknown; key: string } | { status: "error"; message: string };
@@ -56,7 +57,7 @@ export function RealMemberProfile({ id }: { id: string }) {
   }
 
   const back = (
-    <Link href="/members" className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-gold-bright">
+    <Link href="/members" className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-brand-strong">
       <ArrowLeft className="size-3.5" /> {" "}{t("Back to Members")}</Link>
   );
 
@@ -64,14 +65,14 @@ export function RealMemberProfile({ id }: { id: string }) {
     return <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {" "}{t("Loading roster…")}</p>;
   }
   if (roster.status === "error") {
-    return <p className="text-sm text-[#f6c2b6]">{t("Could not load the guild roster:")}{" "}{roster.error}</p>;
+    return <p className="text-sm text-danger-text">{t("Could not load the guild roster:")}{" "}{roster.error}</p>;
   }
   if (!member) {
     return (
       <div className="mx-auto max-w-3xl space-y-4" data-testid="profile-not-found">
         {back}
-        <div className="border border-steel/12 bg-ink-raised/70 px-4 py-12 text-center">
-          <UserX className="mx-auto size-7 text-steel/40" />
+        <div className="border border-steel/12 bg-surface-raised/70 px-4 py-12 text-center">
+          <UserX className="mx-auto size-7 text-subtle" />
           <p className="mt-3 text-sm text-foreground">{t("This character is not in the guild roster.")}</p>
           <p className="mt-1 text-xs text-steel">{t("It may have been removed. Party slots that referenced it show as “removed from roster”.")}</p>
         </div>
@@ -83,7 +84,7 @@ export function RealMemberProfile({ id }: { id: string }) {
     <div className="mx-auto max-w-6xl space-y-4" data-testid="real-member-profile">
       {back}
       <PageHeader
-        eyebrow={`${member.server_name ?? member.server_id} · ${member.region.toUpperCase()}`}
+        eyebrow={`${member.server_name ?? member.server_id} · ${regionLabel(member.region)}`}
         title={member.character_name}
         description={member.notes ? `“${member.notes}”` : t("Added {date} · guild role: {role}", { date: new Date(member.added_at).toLocaleDateString(), role: member.role ?? t("not set") })}
         actions={
@@ -106,18 +107,18 @@ export function RealMemberProfile({ id }: { id: string }) {
         {t("API data updated")}{" "}<RelativeTime iso={member.api_updated_at} />
       </p>
       {notice && (
-        <p role="status" data-testid="profile-notice" className={cn("border px-3 py-2 text-sm", notice.ok ? "border-[#7ee79e]/25 bg-[#7ee79e]/[0.07] text-[#c8f5d4]" : "border-destructive/40 bg-destructive/10 text-[#f6c2b6]")}>
+        <p role="status" data-testid="profile-notice" className={cn("border px-3 py-2 text-sm", notice.ok ? "border-success/25 bg-success/[0.07] text-success-text" : "border-destructive/40 bg-destructive/10 text-danger-text")}>
           {notice.text}
         </p>
       )}
       {member.last_refresh_error && (
-        <p className="flex items-start gap-2 border border-[#e0b04a]/35 bg-[#e0b04a]/[0.07] px-3 py-2 text-xs text-[#f0dca8]">
+        <p className="flex items-start gap-2 border border-warning/35 bg-warning/[0.07] px-3 py-2 text-xs text-warning-text">
           <CircleAlert className="mt-0.5 size-3.5 shrink-0" />
           {t("Last refresh failed")}{" "}<RelativeTime iso={member.last_refresh_error.at} />: {member.last_refresh_error.message}
         </p>
       )}
       {detail.status === "loading" && <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {" "}{t("Loading character profile…")}</p>}
-      {detail.status === "error" && <p className="text-sm text-[#f6c2b6]">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
+      {detail.status === "error" && <p className="text-sm text-danger-text">{t("Could not load the stored profile:")}{" "}{detail.message}</p>}
       {detail.status === "ready" && <CharacterProfileView key={detail.key} member={member} raw={detail.raw} itemDetails />}
     </div>
   );

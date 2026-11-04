@@ -20,27 +20,27 @@ function Row({
   emphasis?: boolean;
 }) {
   return (
-    <div className="border border-steel/10 bg-ink/50 px-3 py-3">
+    <div className="border border-steel/10 bg-surface/50 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-3xs font-semibold tracking-[0.18em] text-steel uppercase">{label}</p>
         {previous !== null && <DeltaChip delta={delta} />}
       </div>
       <div className="mt-1.5 flex items-baseline gap-2 tabular-nums">
-        <span className="text-sm text-steel/70">
+        <span className="text-sm text-subtle">
           {previous !== null ? formatNumber(previous) : "—"}
         </span>
-        <ArrowRight aria-label="to" className="size-3.5 self-center text-steel/40" />
+        <ArrowRight aria-label="to" className="size-3.5 self-center text-subtle" />
         <span
           className={
             emphasis
-              ? "font-heading text-2xl font-bold text-gold-bright"
+              ? "font-heading text-2xl font-bold text-brand-strong"
               : "font-heading text-xl font-bold text-foreground"
           }
         >
           {formatNumber(current)}
         </span>
       </div>
-      <div className="mt-1 flex justify-between text-4xs tracking-wider text-steel/50 uppercase">
+      <div className="mt-1 flex justify-between text-4xs tracking-wider text-subtle uppercase">
         <span>Previous</span>
         <span>Current</span>
       </div>
@@ -64,7 +64,7 @@ export function ProgressionPreview({
       action={
         <Link
           href={`/character-history/${characterId}`}
-          className="flex shrink-0 items-center gap-1 text-xs text-gold/90 transition-colors hover:text-gold-bright"
+          className="flex shrink-0 items-center gap-1 text-xs text-brand transition-colors hover:text-brand-strong"
         >
           Full history <ChevronRight className="size-3.5" />
         </Link>
@@ -91,7 +91,7 @@ export function ProgressionPreview({
             current={current.gear_score}
             delta={progression.gearScoreDelta}
           />
-          <p className="pt-1 text-2xs text-steel/60">
+          <p className="pt-1 text-2xs text-subtle">
             {previous ? (
               <>
                 Previous snapshot <RelativeTime iso={previous.captured_at} /> · current{" "}

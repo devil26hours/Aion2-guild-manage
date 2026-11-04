@@ -67,7 +67,9 @@ export function toDbError(e: PgLikeError | null | undefined, fallback = "Databas
       return new DbError("You do not have permission to do this.", "FORBIDDEN", 403);
     case "P0001":
       return new DbError(message, "DB_RULE", 409);
+    case "42703":
     case "PGRST202":
+    case "PGRST204":
     case "PGRST205":
       return new DbError("The database schema is missing a required function or table. Run all SQL migrations.", "SCHEMA_MISSING", 500);
     default:

@@ -23,7 +23,7 @@ export function LineChart({
   title,
   points,
   format = (v) => String(v),
-  color = "#c9a45c",
+  color = "var(--chart-1)",
   height = 160,
   className,
 }: {
@@ -96,9 +96,9 @@ export function LineChart({
   const latest = points.at(-1);
 
   return (
-    <figure className={cn("border border-steel/10 bg-ink/40 p-3", className)}>
+    <figure className={cn("border border-steel/10 bg-surface/40 p-3", className)}>
       <figcaption className="mb-1 flex items-baseline justify-between gap-2">
-        <span id={titleId} className="text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <span id={titleId} className="text-3xs font-semibold tracking-[0.18em] text-brand uppercase">
           {title}
         </span>
         {latest && (
@@ -127,19 +127,19 @@ export function LineChart({
           <svg width={width} height={height} aria-hidden className="block overflow-visible">
             {ticks.map((tv, i) => (
               <g key={i}>
-                <line x1={pad.l} x2={pad.l + w} y1={y(tv)} y2={y(tv)} stroke="rgba(147,162,187,0.12)" strokeDasharray={i === 0 ? undefined : "2 4"} />
-                <text x={pad.l - 8} y={y(tv)} dy="0.32em" textAnchor="end" fontSize="11" fill="rgba(147,162,187,0.7)">
+                <line x1={pad.l} x2={pad.l + w} y1={y(tv)} y2={y(tv)} stroke="var(--chart-grid)" strokeDasharray={i === 0 ? undefined : "2 4"} />
+                <text x={pad.l - 8} y={y(tv)} dy="0.32em" textAnchor="end" fontSize="11" fill="var(--chart-axis)">
                   {format(tv)}
                 </text>
               </g>
             ))}
-            <text x={pad.l} y={height - 6} fontSize="11" fill="rgba(147,162,187,0.7)">
+            <text x={pad.l} y={height - 6} fontSize="11" fill="var(--chart-axis)">
               {fmtDate.format(new Date(t0))}
             </text>
-            <text x={pad.l + w} y={height - 6} fontSize="11" textAnchor="end" fill="rgba(147,162,187,0.7)">
+            <text x={pad.l + w} y={height - 6} fontSize="11" textAnchor="end" fill="var(--chart-axis)">
               {fmtDate.format(new Date(t1))}
             </text>
-            {a && <line x1={a.x} x2={a.x} y1={pad.t} y2={pad.t + h} stroke="rgba(207,227,255,0.35)" />}
+            {a && <line x1={a.x} x2={a.x} y1={pad.t} y2={pad.t + h} stroke="var(--chart-cross)" />}
             <path d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             {coords.map((c, i) => (
               <circle
@@ -147,8 +147,8 @@ export function LineChart({
                 cx={c.x}
                 cy={c.y}
                 r={i === active || points[i].highlight ? 5 : 4}
-                fill={points[i].highlight ? color : "#0b101b"}
-                stroke={i === active ? "#e8f3ff" : color}
+                fill={points[i].highlight ? color : "var(--surface-raised)"}
+                stroke={i === active ? "var(--foreground)" : color}
                 strokeWidth={2}
               />
             ))}
@@ -156,7 +156,7 @@ export function LineChart({
         )}
         {a && active !== null && (
           <div
-            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full border border-gold-dim/40 bg-ink-raised px-2 py-1 text-2xs whitespace-nowrap shadow-lg"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full border border-brand-muted/40 bg-surface-raised px-2 py-1 text-2xs whitespace-nowrap shadow-float"
             style={{ left: Math.min(Math.max(a.x, 60), width - 60), top: a.y - 8 }}
           >
             <span className="text-steel">{fmtDate.format(new Date(points[active].t))}</span>{" "}

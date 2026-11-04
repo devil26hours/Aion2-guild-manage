@@ -74,15 +74,15 @@ function ExportBody({ data: base }: { data: Omit<ExportData, "generatedAt"> }) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-gold-bright uppercase">
-          <ImageDown className="size-4 text-gold" />
+        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-brand-strong uppercase">
+          <ImageDown className="size-4 text-brand" />
           {t("Export Party PNG")}</DialogTitle>
         <DialogDescription className="text-xs text-steel">
           {t("A dedicated")}{" "}{data.slots.length}{t("-member party card (")}{px.width}×{px.height}{t("px) sized for Discord. Only this card is exported.")}</DialogDescription>
       </DialogHeader>
 
       <div
-        className="flex w-full items-center justify-center border border-steel/15 bg-ink/60"
+        className="flex w-full items-center justify-center border border-steel/15 bg-surface/60"
         style={{ aspectRatio: `${px.width} / ${px.height}` }}
         aria-live="polite"
       >
@@ -92,7 +92,7 @@ function ExportBody({ data: base }: { data: Omit<ExportData, "generatedAt"> }) {
         )}
         {state.status === "error" && (
           <div className="space-y-3 p-6 text-center">
-            <p className="flex items-center justify-center gap-2 text-sm text-[#f0a596]">
+            <p className="flex items-center justify-center gap-2 text-sm text-danger-text">
               <CircleAlert className="size-4" /> {" "}{t("Could not create the image:")}{" "}{state.message}
             </p>
             <Button type="button" variant="outline" className={aionButtonSecondary} onClick={() => { setState({ status: "rendering" }); setAttempt((a) => a + 1); }}>
@@ -106,8 +106,8 @@ function ExportBody({ data: base }: { data: Omit<ExportData, "generatedAt"> }) {
       </div>
 
       <div className="flex flex-col-reverse items-stretch gap-2 border-t border-steel/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="truncate text-xs text-steel/70">
-          {saved ? <span className="text-[#9af0b3]">{t("Saved")}{" "}{saved}</span> : <>{t("File:")}{" "}<span className="text-foreground">{filename}</span></>}
+        <p className="truncate text-xs text-subtle">
+          {saved ? <span className="text-success-text">{t("Saved")}{" "}{saved}</span> : <>{t("File:")}{" "}<span className="text-foreground">{filename}</span></>}
         </p>
         <div className="flex gap-2">
           <DialogClose asChild>

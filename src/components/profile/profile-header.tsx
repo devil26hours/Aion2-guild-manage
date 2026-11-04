@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Crown, Loader2, RefreshCw } from "lucide-react";
 import { ClassBadge } from "@/components/aion/class-badge";
 import { DeltaChip } from "@/components/aion/delta-chip";
+import { OrnamentCorners } from "@/components/aion/ornaments";
 import { RelativeTime } from "@/components/aion/relative-time";
 import { aionButtonPrimary, aionButtonSecondary } from "@/components/aion/styles";
 import { Button } from "@/components/ui/button";
@@ -27,8 +28,8 @@ export function BackToMembers({ className }: { className?: string }) {
 
 function HeaderStat({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#090d16] px-4 py-3 sm:px-6">
-      <p className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{label}</p>
+    <div className="bg-surface-sunken px-4 py-3 sm:px-6">
+      <p className="text-4xs font-semibold tracking-[0.2em] text-subtle uppercase">{label}</p>
       <div className="mt-1">{children}</div>
     </div>
   );
@@ -49,14 +50,15 @@ export function ProfileHeader({
   const elite = cpTier(member.combat_power) === "elite";
 
   return (
-    <section className="relative overflow-hidden border border-gold-dim/35 bg-gradient-to-br from-ink-raised via-ink to-ink shadow-[0_30px_70px_-35px_rgba(0,0,0,0.95)]">
+    <section className="relative overflow-hidden border border-gold/40 bg-[image:var(--panel-gradient)] shadow-frame">
+      <OrnamentCorners small />
       {/* class-colored aura */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-24 -left-16 size-72 rounded-full opacity-25 blur-3xl"
         style={{ backgroundColor: meta.color }}
       />
-      <div aria-hidden className="absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-gold-bright/60 to-transparent" />
+      <div aria-hidden className="absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-brand-strong/60 to-transparent" />
 
       <div className="relative flex flex-wrap items-start justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-5">
         <BackToMembers className="h-8" />
@@ -82,15 +84,15 @@ export function ProfileHeader({
             className="absolute inset-2 rotate-45 border-2"
             style={{ borderColor: meta.color, boxShadow: `0 0 26px ${meta.color}55, inset 0 0 18px ${meta.color}33` }}
           />
-          <span aria-hidden className="absolute inset-0 rotate-45 border border-gold-dim/40" />
+          <span aria-hidden className="absolute inset-0 rotate-45 border border-brand-muted/40" />
           <ClassImage name={member.class} className="relative size-11" />
         </div>
 
         <div className="min-w-0">
-          <p className="text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase">
+          <p className="text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
             {member.server} · {member.rank}
           </p>
-          <h1 className="mt-1 font-heading text-3xl font-bold tracking-[0.06em] text-gold-bright sm:text-4xl">
+          <h1 className="mt-1 font-heading text-3xl font-bold tracking-[0.06em] text-brand-strong sm:text-4xl">
             {member.character_name}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
@@ -100,7 +102,7 @@ export function ProfileHeader({
             </span>
           </div>
           {member.notes && (
-            <p className="mt-2 max-w-xl border-l-2 border-steel/20 pl-2.5 text-xs text-steel/80 italic">
+            <p className="mt-2 max-w-xl border-l-2 border-steel/20 pl-2.5 text-xs text-subtle italic">
               {member.notes}
             </p>
           )}
@@ -112,7 +114,7 @@ export function ProfileHeader({
           <p
             className={cn(
               "flex items-center gap-1.5 font-heading text-2xl font-bold tabular-nums",
-              elite ? "text-gold-bright drop-shadow-[0_0_10px_rgba(232,209,160,0.4)]" : "text-gold",
+              elite ? "text-gold-text drop-shadow-[0_0_10px_var(--elite-glow)]" : "text-brand",
             )}
           >
             {elite && <Crown aria-label="Elite tier" className="size-4" />}

@@ -12,15 +12,15 @@ import { cn } from "@/lib/utils";
 import { ROLE_ICONS } from "./role-badge";
 
 const LEVEL_STYLE: Record<WarningLevel, { icon: typeof Info; cls: string }> = {
-  error: { icon: CircleAlert, cls: "border-destructive/40 border-l-destructive bg-destructive/10 text-[#f6c2b6]" },
-  warning: { icon: TriangleAlert, cls: "border-[#e0b04a]/30 border-l-[#e0b04a] bg-[#e0b04a]/[0.07] text-[#f0dca8]" },
-  info: { icon: Info, cls: "border-arcane/25 border-l-arcane bg-arcane/[0.06] text-[#cfe3ff]" },
+  error: { icon: CircleAlert, cls: "border-destructive/40 border-l-destructive bg-destructive/10 text-danger-text" },
+  warning: { icon: TriangleAlert, cls: "border-warning/30 border-l-warning bg-warning/[0.07] text-warning-text" },
+  info: { icon: Info, cls: "border-arcane/25 border-l-arcane bg-arcane/[0.06] text-info-text" },
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-steel/10 bg-ink/50 px-3 py-2">
-      <p className="text-4xs tracking-[0.16em] text-steel/70 uppercase">{label}</p>
+    <div className="border border-steel/10 bg-surface/50 px-3 py-2">
+      <p className="text-4xs tracking-[0.16em] text-subtle uppercase">{label}</p>
       <p className="font-heading text-lg font-bold text-foreground tabular-nums">{value}</p>
     </div>
   );
@@ -41,12 +41,12 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         <Stat label={t("Classes")} value={String(classes.length)} />
       </div>
 
-      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Role Distribution")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">{t("Role Distribution")}</h3>
       <ul className="space-y-1.5">
         {[...PARTY_ROLES, "Unassigned" as const].map((r) => {
           const n = analysis.roleCounts[r];
           const Icon = r === "Unassigned" ? null : ROLE_ICONS[r];
-          const color = r === "Unassigned" ? "#93a2bb" : ROLE_COLORS[r];
+          const color = r === "Unassigned" ? "var(--steel)" : ROLE_COLORS[r];
           return (
             <li key={r} className="grid grid-cols-[6.5rem_1fr_1.5rem] items-center gap-2 text-xs">
               <span className="flex items-center gap-1.5 text-steel">
@@ -62,14 +62,14 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         })}
       </ul>
 
-      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Class Distribution")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">{t("Class Distribution")}</h3>
       {classes.length === 0 ? (
-        <p className="text-xs text-steel/60">{t("No characters assigned.")}</p>
+        <p className="text-xs text-subtle">{t("No characters assigned.")}</p>
       ) : (
         <ul className="flex flex-wrap gap-1.5">
           {classes.map((c) => (
             <li key={c} className="flex items-center gap-1.5 border border-steel/15 px-2 py-1 text-xs text-foreground/90">
-              <span aria-hidden className="size-2 rotate-45" style={{ backgroundColor: knownClass(c) ? CLASS_META[knownClass(c)!].color : "#93a2bb" }} />
+              <span aria-hidden className="size-2 rotate-45" style={{ backgroundColor: knownClass(c) ? CLASS_META[knownClass(c)!].color : "var(--steel)" }} />
               {c}
               <span className="font-semibold tabular-nums">×{analysis.classCounts[c]}</span>
             </li>
@@ -77,9 +77,9 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
         </ul>
       )}
 
-      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">{t("Warnings")}</h3>
+      <h3 className="mt-4 mb-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">{t("Warnings")}</h3>
       {analysis.warnings.length === 0 ? (
-        <p className="border border-[#7ee79e]/25 bg-[#7ee79e]/[0.06] px-3 py-2 text-xs text-[#c8f5d4]">{t("No issues found.")}</p>
+        <p className="border border-success/25 bg-success/[0.06] px-3 py-2 text-xs text-success-text">{t("No issues found.")}</p>
       ) : (
         <ul className="space-y-1.5" aria-live="polite" data-testid="party-warnings">
           {analysis.warnings.map((w, i) => {
@@ -93,7 +93,7 @@ export function PartyAnalysisPanel({ analysis }: { analysis: PartyAnalysis }) {
           })}
         </ul>
       )}
-      <p className="mt-3 text-3xs text-steel/55">
+      <p className="mt-3 text-3xs text-subtle">
         {t("Balance warnings are planning guidelines for this")}{" "}{size}{t("-member party (≥")}{limits.classStack} {" "}{t("of one class")}{Number.isFinite(limits.roleHeavy) && <>, ≥{limits.roleHeavy} {" "}{t("of one role")}</>}{t(", a member ≥")}{BALANCE_GUIDE.cpGapPct}{t("% below average CP) — not game rules. No class or role is restricted.")}</p>
     </SectionPanel>
   );

@@ -7,12 +7,14 @@ import { GuildEmblem, GuildName, GuildServerBadge, LogoutButton } from "./guild-
 import { MobileNav } from "./mobile-nav";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { ReactNode } from "react";
 
 export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) {
   const t = useT();
+  // Deep blue in both themes: a nested dark scope, so its tokens follow the dark values.
   return (
-    <header className="sticky top-0 z-30 bg-ink/85 backdrop-blur-md">
+    <header data-theme="dark" className="sticky top-0 z-30 bg-[var(--header-bg)] text-foreground backdrop-blur-md">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <MobileNav footer={mobileNavFooter} />
 
@@ -22,11 +24,11 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
         >
           <SiteLogo preload className="h-10 shrink-0" />
           <span className="hidden leading-none sm:block">
-            <span className="block font-heading text-base font-bold tracking-[0.2em] text-gold-bright">
-              AION II
+            <span className="block font-display text-base font-bold tracking-[0.2em] text-brand-strong">
+              ChumChon AION2
             </span>
-            <span className="mt-1 block text-4xs font-semibold tracking-[0.38em] text-steel">
-              GUILD COMMAND
+            <span className="mt-1 block text-4xs font-semibold tracking-[0.12em] text-steel">
+              {t("AION2 Player Community")}
             </span>
           </span>
         </Link>
@@ -41,6 +43,7 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
           </div>
           <GuildServerBadge className="hidden sm:inline-flex" />
           <LanguageSwitcher className="hidden sm:flex" />
+          <ThemeToggle />
           <UserMenu />
           <LogoutButton />
         </div>
@@ -55,10 +58,10 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
         </span>
         <GuildServerBadge className="shrink-0 border-0 bg-transparent px-0 py-0 sm:hidden" />
       </div>
-      {/* Gold hairline sheen */}
+      {/* Hairline sheen */}
       <div
         aria-hidden
-        className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+        className="h-px bg-gradient-to-r via-gold/70 from-transparent to-transparent"
       />
     </header>
   );

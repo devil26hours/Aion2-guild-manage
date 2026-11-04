@@ -13,7 +13,7 @@ import { CpValue } from "./cp-value";
 import { MemberRowActions } from "./member-row-actions";
 
 const thBase =
-  "py-3 text-3xs font-medium tracking-[0.16em] text-steel/70 uppercase whitespace-nowrap";
+  "py-3 text-3xs font-medium tracking-[0.16em] text-subtle uppercase whitespace-nowrap";
 
 function SortHeader({
   label,
@@ -38,8 +38,8 @@ function SortHeader({
         type="button"
         onClick={() => onSort(sortKey)}
         className={cn(
-          "inline-flex items-center gap-1 uppercase transition-colors outline-none hover:text-gold-bright focus-visible:text-gold-bright",
-          active && "text-gold",
+          "inline-flex items-center gap-1 uppercase transition-colors outline-none hover:text-brand-strong focus-visible:text-brand-strong",
+          active && "text-brand",
         )}
       >
         {label}
@@ -77,7 +77,7 @@ export function MembersTable({
           <tr className="border-b border-steel/10 text-left">
             <th
               scope="col"
-              className={cn(thBase, "sticky left-0 z-10 bg-ink-raised pr-3 pl-4 sm:pl-5")}
+              className={cn(thBase, "sticky left-0 z-10 bg-surface-raised pr-3 pl-4 sm:pl-5")}
             >
               Character
             </th>
@@ -102,12 +102,12 @@ export function MembersTable({
           {members.length === 0 && (
             <tr>
               <td colSpan={12} className="px-4 py-14 text-center">
-                <SearchX className="mx-auto size-7 text-steel/40" />
+                <SearchX className="mx-auto size-7 text-subtle" />
                 <p className="mt-3 text-sm text-foreground">No members match these filters.</p>
                 <button
                   type="button"
                   onClick={onResetFilters}
-                  className="mt-2 text-xs text-gold underline-offset-4 hover:text-gold-bright hover:underline"
+                  className="mt-2 text-xs text-brand underline-offset-4 hover:text-brand-strong hover:underline"
                 >
                   Reset filters
                 </button>
@@ -121,29 +121,29 @@ export function MembersTable({
               <tr
                 key={m.id}
                 className={cn(
-                  "group border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-[#0f1625]",
+                  "group border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-surface-hover",
                   refreshing && "bg-arcane/[0.04]",
                 )}
               >
-                <td className="sticky left-0 z-10 bg-ink-raised py-2.5 pr-3 pl-4 transition-colors group-hover:bg-[#0f1625] sm:pl-5">
+                <td className="sticky left-0 z-10 bg-surface-raised py-2.5 pr-3 pl-4 transition-colors group-hover:bg-surface-hover sm:pl-5">
                   <div className="flex items-center gap-1.5">
                     <Link
                       href={`/members/${m.id}`}
-                      className="font-medium text-foreground underline-offset-4 outline-none hover:text-gold-bright hover:underline focus-visible:text-gold-bright focus-visible:underline"
+                      className="font-medium text-foreground underline-offset-4 outline-none hover:text-brand-strong hover:underline focus-visible:text-brand-strong focus-visible:underline"
                     >
                       {m.character_name}
                     </Link>
                     {m.notes && (
-                      <span title={m.notes} className="flex shrink-0 text-steel/50">
+                      <span title={m.notes} className="flex shrink-0 text-subtle">
                         <NotebookPen aria-hidden className="size-3" />
                         <span className="sr-only">Note: {m.notes}</span>
                       </span>
                     )}
                   </div>
-                  <p className="text-2xs text-steel/60">
+                  <p className="text-2xs text-subtle">
                     {m.server}
                     {m.rank !== "Member" && (
-                      <span className="text-gold/70"> · {m.rank}</span>
+                      <span className="text-brand"> · {m.rank}</span>
                     )}
                   </p>
                 </td>
@@ -170,10 +170,10 @@ export function MembersTable({
                   {formatNumber(metrics.stats.accuracy)}
                 </td>
                 <td className="px-3 py-2.5 text-right tabular-nums">
-                  <span className="text-[#9af0b3]/90">{metrics.soulBindingLines}</span>
-                  <span className="text-3xs text-steel/50"> lines</span>
+                  <span className="text-success-text">{metrics.soulBindingLines}</span>
+                  <span className="text-3xs text-subtle"> lines</span>
                 </td>
-                <td className="px-3 py-2.5 text-xs whitespace-nowrap text-steel/75">
+                <td className="px-3 py-2.5 text-xs whitespace-nowrap text-subtle">
                   {refreshing ? (
                     <span className="inline-flex items-center gap-1.5 text-arcane">
                       <Loader2 className="size-3 animate-spin" />

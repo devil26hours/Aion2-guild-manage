@@ -117,11 +117,11 @@ export function LoginForm() {
   const rememberId = `${ids}-remember`;
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-5">
+    <form noValidate onSubmit={handleSubmit} className="space-y-5 pc:space-y-3">
       {authError && (
         <div
           role="alert"
-          className="aion-enter flex items-start gap-2.5 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2.5 text-sm text-[#f0b6aa]"
+          className="aion-enter flex items-start gap-2.5 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2.5 text-sm text-danger-text"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
           <span>{authError}</span>
@@ -131,7 +131,7 @@ export function LoginForm() {
       {notice && (
         <div
           role="status"
-          className="aion-enter flex items-start gap-2.5 border border-arcane/30 border-l-2 border-l-arcane bg-arcane/10 px-3 py-2.5 text-sm text-[#cfe3ff]"
+          className="aion-enter flex items-start gap-2.5 border border-arcane/30 border-l-2 border-l-arcane bg-arcane/10 px-3 py-2.5 text-sm text-info-text"
         >
           <Info className="mt-0.5 size-4 shrink-0 text-arcane" />
           <span>{notice}</span>
@@ -176,7 +176,7 @@ export function LoginForm() {
             disabled={busy}
             aria-label={showPassword ? t("Hide password") : t("Show password")}
             aria-pressed={showPassword}
-            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-steel/70 transition-colors outline-none hover:text-gold-bright focus-visible:text-gold-bright disabled:opacity-50"
+            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-subtle transition-colors outline-none hover:text-brand-strong focus-visible:text-brand-strong disabled:opacity-50"
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
@@ -211,7 +211,7 @@ export function LoginForm() {
             checked={remember}
             disabled={busy}
             onCheckedChange={(v) => setRemember(v === true)}
-            className="rounded-none border-gold-dim/60 bg-ink/60 data-checked:border-gold data-checked:bg-gold data-checked:text-ink"
+            className="rounded-md border-brand-muted/60 bg-surface/60 data-checked:border-brand data-checked:bg-brand data-checked:text-primary-foreground"
           />
           <Label
             htmlFor={rememberId}
@@ -221,7 +221,7 @@ export function LoginForm() {
         </div>
         <Link
           href="/forgot-password"
-          className="text-[0.875rem] text-gold/90 underline-offset-4 transition-colors outline-none hover:text-gold-bright hover:underline focus-visible:text-gold-bright focus-visible:underline"
+          className="text-[0.875rem] text-brand underline-offset-4 transition-colors outline-none hover:text-brand-strong hover:underline focus-visible:text-brand-strong focus-visible:underline"
         >
           {t("Forgot password?")}</Link>
       </div>
@@ -231,11 +231,11 @@ export function LoginForm() {
         disabled={busy}
         aria-busy={busy}
         className={cn(
-          "group relative h-12 w-full overflow-hidden rounded-none border border-gold/70",
-          "bg-gradient-to-b from-[#d8b56c] via-[#b8924a] to-[#86692f] text-[#140f05]",
+          "group relative h-12 w-full overflow-hidden rounded-md border border-brand/70 pc:h-10",
+          "bg-[image:var(--cta-gradient)] text-primary-foreground",
           "font-heading text-sm font-bold tracking-[0.28em] uppercase",
-          "shadow-[inset_0_1px_0_rgba(255,240,205,0.6),0_8px_24px_-10px_rgba(201,164,92,0.7)]",
-          "transition-[filter,box-shadow] duration-300 hover:bg-gradient-to-b hover:brightness-110 hover:shadow-[inset_0_1px_0_rgba(255,240,205,0.7),0_10px_30px_-8px_rgba(201,164,92,0.9)]",
+          "shadow-cta",
+          "transition-[filter,box-shadow] duration-300 hover:brightness-110",
           "focus-visible:ring-arcane/60 disabled:opacity-90",
         )}
       >
@@ -262,19 +262,19 @@ export function LoginForm() {
       </Button>
       <p className="text-center text-xs text-steel">
         {t("New here?")}{" "}
-        <Link href="/register" className="text-gold underline-offset-4 hover:underline" data-testid="register-link">{t("Create an account")}</Link>
+        <Link href="/register" className="text-brand underline-offset-4 hover:underline" data-testid="register-link">{t("Create an account")}</Link>
       </p>
     </form>
   );
 }
 
 const fieldInputClass = cn(
-  "h-11 rounded-none border-steel/20 bg-ink/70 pl-10 text-[1rem] text-foreground",
-  "placeholder:text-steel/40 transition-[border-color,box-shadow,background-color] duration-200",
-  "hover:border-gold-dim/60",
-  "focus-visible:border-gold/70 focus-visible:bg-ink focus-visible:ring-2 focus-visible:ring-arcane/25 focus-visible:shadow-[0_0_18px_-6px_rgba(95,168,255,0.6)]",
+  "h-11 rounded-md border-steel/20 bg-surface/70 pl-10 text-[1rem] text-foreground pc:h-10",
+  "placeholder:text-subtle transition-[border-color,box-shadow,background-color] duration-200",
+  "hover:border-brand-muted/60",
+  "focus-visible:border-brand/70 focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-arcane/25 focus-visible:shadow-[0_0_18px_-6px_var(--arcane)]",
   "aria-invalid:border-destructive/70 aria-invalid:ring-destructive/20",
-  "dark:bg-ink/70",
+  "dark:bg-surface/70",
 );
 
 function FormField({
@@ -293,17 +293,17 @@ function FormField({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 pc:space-y-1.5">
       <Label
         htmlFor={id}
-        className="font-heading text-2xs font-semibold tracking-[0.22em] text-gold/90 uppercase"
+        className="font-heading text-2xs font-semibold tracking-[0.22em] text-brand uppercase"
       >
         {label}
       </Label>
       <div className="group/field relative">
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-10 items-center justify-center text-steel/60 transition-colors group-focus-within/field:text-gold-bright [&_svg]:size-4"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 flex w-10 items-center justify-center text-subtle transition-colors group-focus-within/field:text-brand-strong [&_svg]:size-4"
         >
           {icon}
         </span>
@@ -313,7 +313,7 @@ function FormField({
       {error && (
         <p
           id={`${id}-error`}
-          className="flex items-center gap-1.5 text-xs text-[#ef9b89]"
+          className="flex items-center gap-1.5 text-xs text-danger-text"
         >
           <AlertTriangle className="size-3" />
           {error}

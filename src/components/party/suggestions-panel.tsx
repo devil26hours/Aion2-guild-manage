@@ -51,7 +51,7 @@ export function SuggestionsPanel({
           <Button type="button" onClick={() => { setRejected(new Set()); onGenerate(); }} disabled={emptyCount === 0} className={cn(aionButtonPrimary, "w-full")}>
             <Lightbulb className="size-3.5" />
             {t("Suggest Characters")}</Button>
-          {emptyCount === 0 && <p className="text-center text-2xs text-steel/60">{t("All slots are filled.")}</p>}
+          {emptyCount === 0 && <p className="text-center text-2xs text-subtle">{t("All slots are filled.")}</p>}
         </div>
       ) : suggestions.length === 0 ? (
         <div className="space-y-3">
@@ -64,14 +64,14 @@ export function SuggestionsPanel({
             {suggestions.map((s) => {
               const off = rejected.has(s.index);
               return (
-                <li key={s.index} className={cn("flex items-center gap-2 border border-steel/12 bg-ink/50 px-2.5 py-2", off && "opacity-40")}>
+                <li key={s.index} className={cn("flex items-center gap-2 border border-steel/12 bg-surface/50 px-2.5 py-2", off && "opacity-40")}>
                   <span className="flex size-6 shrink-0 items-center justify-center border border-steel/25 text-3xs font-bold text-steel tabular-nums">{s.index + 1}</span>
                   <div className="min-w-0 flex-1">
                     <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground">
                       {s.member.character_name}
                       <RoleBadge role={s.role} />
                     </p>
-                    <p className="flex flex-wrap items-center gap-x-2 text-2xs text-steel/70">
+                    <p className="flex flex-wrap items-center gap-x-2 text-2xs text-subtle">
                       <RosterClassBadge className={s.member.class_name} /> {s.reasonParts.map((p) => t(p.key, p.vars)).join(" · ")}
                     </p>
                   </div>

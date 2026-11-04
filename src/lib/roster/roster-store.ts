@@ -51,6 +51,9 @@ function subscribe(l: () => void) {
   return () => listeners.delete(l);
 }
 
+/** Current roster snapshot for non-React callers (e.g. re-validating capacity before a bulk add). */
+export const getRosterState = () => state;
+
 export function useRoster(): RosterState {
   return useSyncExternalStore(subscribe, () => state, () => SERVER_STATE);
 }

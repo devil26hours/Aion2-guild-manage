@@ -57,6 +57,7 @@ import { useSettings, useSettingsState } from "@/lib/settings/settings-store";
 import { cn } from "@/lib/utils";
 import { AddRealMemberDialog } from "./add-real-member-dialog";
 import { MemberDetailDialog } from "./member-detail-dialog";
+import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { RosterClassBadge } from "./roster-class-badge";
 
 type SortKey = "combat_power" | "item_level" | "level" | "character_name" | "api_updated_at";
@@ -64,9 +65,9 @@ type Notice = { tone: "success" | "info" | "error"; text: string; id: number };
 type Busy = "refresh" | "role" | "remove" | "comment";
 let noticeSeq = 0;
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
 const actionBtn =
-  "flex size-8 items-center justify-center border border-transparent text-steel/70 transition-colors outline-none hover:border-steel/20 focus-visible:border-arcane/50 disabled:opacity-40";
+  "flex size-8 items-center justify-center border border-transparent text-subtle transition-colors outline-none hover:border-steel/20 focus-visible:border-arcane/50 disabled:opacity-40";
 const UNKNOWN = "Unknown";
 
 /** sort "" = the shared "Default character sorting" preference from Settings. */
@@ -222,10 +223,10 @@ export function RosterManager() {
       />
 
       {status !== "ready" ? (
-        <div className="border border-steel/12 bg-ink-raised/70 px-4 py-12 text-center" data-testid="roster-status">
+        <div className="border border-steel/12 bg-surface-raised/70 px-4 py-12 text-center" data-testid="roster-status">
           {status === "error" ? (
             <div className="space-y-3">
-              <p className="flex items-center justify-center gap-2 text-sm text-[#f6c2b6]">
+              <p className="flex items-center justify-center gap-2 text-sm text-danger-text">
                 <CircleAlert className="size-4" /> {" "}{t("Could not load the guild roster:")}{" "}{error}
               </p>
               <Button type="button" variant="outline" className={aionButtonSecondary} onClick={() => void loadRoster()}>
@@ -245,18 +246,19 @@ export function RosterManager() {
               icon={Users}
               detail={t("{open} open slots · {roles} with a guild role", { open: Math.max(0, cap - members.length), roles: members.filter((m) => m.role).length })}
             />
-            <StatCard label={t("Average CP")} value={avg(cps) !== null ? formatNumber(avg(cps)!) : "—"} icon={Swords} detail={avg(ils) !== null ? `Avg item level ${formatNumber(avg(ils)!)}` : t("No item level data")} />
+            <StatCard label={t("Average CP")} value={avg(cps) !== null ? formatNumber(avg(cps)!) : "—"} icon={Swords} tone="cyan" detail={avg(ils) !== null ? `Avg item level ${formatNumber(avg(ils)!)}` : t("No item level data")} />
             <StatCard
               label={t("Highest CP")}
               value={top?.combat_power != null ? formatNumber(top.combat_power) : "—"}
               icon={Crown}
-              detail={top ? <span className="text-gold-bright">{top.character_name}</span> : t("No members yet")}
+              tone="gold"
+              detail={top ? <span className="text-brand-strong">{top.character_name}</span> : t("No members yet")}
             />
-            <StatCard label={t("Class Count")} value={String(classOptions.filter((c) => c !== UNKNOWN).length)} icon={Layers} detail={`${serverOptions.length} server${serverOptions.length === 1 ? "" : "s"}`} />
+            <StatCard label={t("Class Count")} value={String(classOptions.filter((c) => c !== UNKNOWN).length)} icon={Layers} tone="purple" detail={`${serverOptions.length} server${serverOptions.length === 1 ? "" : "s"}`} />
           </div>
 
           {meReady && !isLeader && (
-            <p data-testid="read-only-notice" className="mt-4 flex items-center gap-2 border border-arcane/25 border-l-2 border-l-arcane bg-arcane/[0.06] px-3 py-2.5 text-sm text-[#cfe3ff]">
+            <p data-testid="read-only-notice" className="mt-4 flex items-center gap-2 border border-arcane/25 border-l-2 border-l-arcane bg-arcane/[0.06] px-3 py-2.5 text-sm text-info-text">
               <Eye className="size-4 shrink-0" />
               {t("Read-only view. Only the Guild Leader can add, edit or remove members.")}
             </p>
@@ -265,7 +267,7 @@ export function RosterManager() {
           {isLeader && full && (
             <p
               data-testid="roster-full"
-              className="mt-4 flex items-center gap-2 border border-[#e0b04a]/35 border-l-2 border-l-[#e0b04a] bg-[#e0b04a]/[0.07] px-3 py-2.5 text-sm text-[#f0dca8]"
+              className="mt-4 flex items-center gap-2 border border-warning/35 border-l-2 border-l-warning bg-warning/[0.07] px-3 py-2.5 text-sm text-warning-text"
             >
               <CircleAlert className="size-4 shrink-0" />
               {overCap
@@ -281,9 +283,9 @@ export function RosterManager() {
                 data-testid="roster-notice"
                 className={cn(
                   "aion-enter flex items-center gap-2.5 border border-l-2 px-3 py-2.5 text-sm",
-                  notice.tone === "success" && "border-[#7ee79e]/25 border-l-[#7ee79e] bg-[#7ee79e]/[0.07] text-[#c8f5d4]",
-                  notice.tone === "info" && "border-arcane/25 border-l-arcane bg-arcane/[0.07] text-[#cfe3ff]",
-                  notice.tone === "error" && "border-destructive/40 border-l-destructive bg-destructive/10 text-[#f6c2b6]",
+                  notice.tone === "success" && "border-success/25 border-l-success bg-success/[0.07] text-success-text",
+                  notice.tone === "info" && "border-arcane/25 border-l-arcane bg-arcane/[0.07] text-info-text",
+                  notice.tone === "error" && "border-destructive/40 border-l-destructive bg-destructive/10 text-danger-text",
                 )}
               >
                 {notice.tone === "error" ? <CircleAlert className="size-4 shrink-0" /> : <CheckCircle2 className="size-4 shrink-0" />}
@@ -299,7 +301,7 @@ export function RosterManager() {
             title={t("Roster")}
             description={t("Stored in the guild database · API fields refresh on demand; guild role and comment are yours")}
             icon={Database}
-            className="mt-4 sm:mt-6"
+            className="mt-4 bg-none! bg-surface-raised sm:mt-6"
             bodyClassName="p-0 sm:p-0"
           >
             <div className="space-y-3 border-b border-steel/10 p-4 sm:p-5">
@@ -307,7 +309,7 @@ export function RosterManager() {
                 <div className="col-span-2 space-y-1.5 md:col-span-4 xl:col-span-1">
                   <Label htmlFor="r-query" className={labelClass}>{t("Search")}</Label>
                   <div className="relative">
-                    <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+                    <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
                     <Input id="r-query" value={filters.query} placeholder={t("Name or comment…")} onChange={(e) => set({ query: e.target.value })} className={cn(aionField, "pl-8")} />
                   </div>
                 </div>
@@ -364,7 +366,7 @@ export function RosterManager() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs text-steel" aria-live="polite">
                   {t("Showing")}{" "}<span className="font-semibold text-foreground tabular-nums">{visible.length}</span> of <span className="tabular-nums">{members.length}</span> members
-                  {rangeInvalid && <span className="ml-2 text-[#ef9b89]">{t("· Min CP is greater than Max CP")}</span>}
+                  {rangeInvalid && <span className="ml-2 text-danger-text">{t("· Min CP is greater than Max CP")}</span>}
                 </p>
                 <Button type="button" variant="outline" onClick={() => setFilters(DEFAULTS)} disabled={!filtersActive} className={cn(aionButtonSecondary, "h-8")}>
                   <RotateCcw className="size-3.5" /> {" "}{t("Reset Filters")}</Button>
@@ -373,16 +375,16 @@ export function RosterManager() {
 
             {members.length === 0 ? (
               <div className="px-4 py-14 text-center" data-testid="roster-empty">
-                <Users className="mx-auto size-7 text-steel/40" />
+                <Users className="mx-auto size-7 text-subtle" />
                 <p className="mt-3 text-sm text-foreground">{t("The roster is empty.")}</p>
                 <p className="mt-1 text-xs text-steel">{t("Use “Add Member” to search the AION2 API and add real characters.")}</p>
               </div>
             ) : (
-              <div className="relative overflow-x-auto">
+              <div className="relative overflow-x-auto rounded-b-xl">
                 <table className="w-full min-w-[64rem] text-sm" data-testid="roster-table">
                   <thead>
-                    <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
-                      <th scope="col" className="sticky left-0 z-10 bg-ink-raised py-3 pr-3 pl-4 font-medium sm:pl-5">{t("Character")}</th>
+                    <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-subtle uppercase">
+                      <th scope="col" className="sticky left-0 z-10 bg-surface-raised py-3 pr-3 pl-4 font-medium sm:pl-5">{t("Character")}</th>
                       <th scope="col" className="px-3 py-3 font-medium">{t("Class")}</th>
                       <th scope="col" className="px-3 py-3 text-right font-medium">{t("Level")}</th>
                       <th scope="col" className="px-3 py-3 text-right font-medium">{t("Combat Power")}</th>
@@ -396,7 +398,7 @@ export function RosterManager() {
                     {visible.length === 0 && (
                       <tr>
                         <td colSpan={8} className="px-4 py-12 text-center">
-                          <SearchX className="mx-auto size-7 text-steel/40" />
+                          <SearchX className="mx-auto size-7 text-subtle" />
                           <p className="mt-3 text-sm text-foreground">{t("No members match these filters.")}</p>
                         </td>
                       </tr>
@@ -404,23 +406,23 @@ export function RosterManager() {
                     {visible.map((m) => {
                       const b = busy[m.id];
                       return (
-                        <tr key={m.id} data-member-id={m.id} className="group border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-[#0f1625]">
-                          <td className="sticky left-0 z-10 bg-ink-raised py-2.5 pr-3 pl-4 transition-colors group-hover:bg-[#0f1625] sm:pl-5">
-                            <button type="button" onClick={() => setViewing(m)} className="text-left font-medium text-foreground underline-offset-4 hover:text-gold-bright hover:underline">
+                        <tr key={m.id} data-member-id={m.id} className="group border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-surface-hover">
+                          <td className="sticky left-0 z-10 bg-surface-raised py-2.5 pr-3 pl-4 transition-colors group-hover:bg-surface-hover sm:pl-5">
+                            <button type="button" onClick={() => setViewing(m)} className="text-left font-medium text-foreground underline-offset-4 hover:text-brand-strong hover:underline">
                               {m.character_name}
                             </button>
-                            <p className="text-2xs text-steel/60">
-                              {m.server_name ?? "—"} <span className="font-mono">({m.server_id})</span> · <span className="uppercase">{m.region}</span>
+                            <p className="text-2xs text-subtle">
+                              {m.server_name ?? "—"} <span className="font-mono">({m.server_id})</span> · {regionLabel(m.region)}
                             </p>
                             {m.notes && (
-                              <p data-testid="member-comment" title={m.notes} className="mt-0.5 max-w-[15rem] truncate text-xs text-[#cfe3ff]/85 italic">
+                              <p data-testid="member-comment" title={m.notes} className="mt-0.5 max-w-[15rem] truncate text-xs text-info-text italic">
                                 “{m.notes}”
                               </p>
                             )}
                           </td>
                           <td className="px-3 py-2.5 text-xs"><RosterClassBadge className={m.class_name} withIcon /></td>
                           <td className="px-3 py-2.5 text-right text-steel tabular-nums">{m.level ?? "—"}</td>
-                          <td className="px-3 py-2.5 text-right font-semibold text-gold-bright tabular-nums">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</td>
+                          <td className="px-3 py-2.5 text-right font-semibold text-brand-strong tabular-nums">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</td>
                           <td className="px-3 py-2.5 text-right text-foreground/85 tabular-nums">{m.item_level !== null ? formatNumber(m.item_level) : "—"}</td>
                           <td className="px-3 py-2.5">
                             {!isLeader ? (
@@ -439,7 +441,7 @@ export function RosterManager() {
                             </NativeSelect>
                             )}
                           </td>
-                          <td className="px-3 py-2.5 text-xs whitespace-nowrap text-steel/75">
+                          <td className="px-3 py-2.5 text-xs whitespace-nowrap text-subtle">
                             {b === "refresh" ? (
                               <span className="inline-flex items-center gap-1.5 text-arcane"><Loader2 className="size-3 animate-spin" /> {" "}{t("Refreshing…")}</span>
                             ) : (
@@ -449,7 +451,7 @@ export function RosterManager() {
                                   <span
                                     title={t("Last refresh failed: {msg}", { msg: m.last_refresh_error.message })}
                                     data-testid="refresh-error-badge"
-                                    className="ml-1.5 border border-[#e0b04a]/40 bg-[#e0b04a]/10 px-1 text-4xs font-semibold tracking-wider text-[#f0cf86] uppercase"
+                                    className="ml-1.5 border border-warning/40 bg-warning/10 px-1 text-4xs font-semibold tracking-wider text-warning-text uppercase"
                                   >
                                     {t("Refresh failed")}</span>
                                 )}
@@ -458,17 +460,17 @@ export function RosterManager() {
                           </td>
                           <td className="py-2.5 pr-3 pl-3 sm:pr-4">
                             <div className="flex items-center justify-end gap-1">
-                              <button type="button" aria-label={t("View {name}", { name: m.character_name })} title={t("View")} data-action="view" disabled={!!b} onClick={() => setViewing(m)} className={cn(actionBtn, "hover:text-gold-bright")}>
+                              <button type="button" aria-label={t("View {name}", { name: m.character_name })} title={t("View")} data-action="view" disabled={!!b} onClick={() => setViewing(m)} className={cn(actionBtn, "hover:text-brand-strong")}>
                                 <Eye className="size-3.5" />
                               </button>
                               {isLeader && (<>
-                              <button type="button" aria-label={t("Edit comment for {name}", { name: m.character_name })} title={m.notes ? t("Edit comment") : t("Add comment")} data-action="comment" disabled={!!b} onClick={() => setCommenting(m)} className={cn(actionBtn, "hover:text-gold-bright", m.notes && "text-[#cfe3ff]/80")}>
+                              <button type="button" aria-label={t("Edit comment for {name}", { name: m.character_name })} title={m.notes ? t("Edit comment") : t("Add comment")} data-action="comment" disabled={!!b} onClick={() => setCommenting(m)} className={cn(actionBtn, "hover:text-brand-strong", m.notes && "text-info-text")}>
                                 <MessageSquareText className="size-3.5" />
                               </button>
-                              <button type="button" aria-label={t("Refresh {name}", { name: m.character_name })} title={t("Refresh from API")} data-action="refresh" disabled={!!b} onClick={() => void refresh(m)} className={cn(actionBtn, "hover:text-gold-bright")}>
+                              <button type="button" aria-label={t("Refresh {name}", { name: m.character_name })} title={t("Refresh from API")} data-action="refresh" disabled={!!b} onClick={() => void refresh(m)} className={cn(actionBtn, "hover:text-brand-strong")}>
                                 <RefreshCw className={cn("size-3.5", b === "refresh" && "animate-spin")} />
                               </button>
-                              <button type="button" aria-label={t("Remove {name}", { name: m.character_name })} title={t("Remove")} data-action="remove" disabled={!!b} onClick={() => setRemoving(m)} className={cn(actionBtn, "hover:text-[#f0a596]")}>
+                              <button type="button" aria-label={t("Remove {name}", { name: m.character_name })} title={t("Remove")} data-action="remove" disabled={!!b} onClick={() => setRemoving(m)} className={cn(actionBtn, "hover:text-danger-text")}>
                                 <UserMinus className="size-3.5" />
                               </button>
                               </>)}
@@ -489,7 +491,13 @@ export function RosterManager() {
         open={addOpen}
         onOpenChange={setAddOpen}
         existingIds={ids}
-        onAdded={(m) => announce("success", t("{name} ({server}) added to the roster.", { name: m.character_name, server: m.server_name ?? m.server_id }))}
+        onAdded={(added) =>
+          announce(
+            "success",
+            added.length === 1
+              ? t("{name} ({server}) added to the roster.", { name: added[0].character_name, server: added[0].server_name ?? added[0].server_id })
+              : t("{n} members added to the roster.", { n: added.length }),
+          )}
       />
       <MemberDetailDialog member={viewing ? (members.find((x) => x.id === viewing.id) ?? viewing) : null} onClose={() => setViewing(null)} />
 
@@ -551,8 +559,8 @@ function CommentForm({ member, onSave }: { member: RosterMember; onSave: (text: 
   return (
     <form onSubmit={submit} noValidate className="space-y-4" data-testid="comment-form">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-gold-bright uppercase">
-          <MessageSquareText className="size-4 text-gold" />
+        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-brand-strong uppercase">
+          <MessageSquareText className="size-4 text-brand" />
           {t("Comment")}</DialogTitle>
         <DialogDescription className="text-xs text-steel">
           {t("A note to recognise who plays")}{" "}<span className="font-semibold text-foreground">{member.character_name}</span> {" "}{t("— e.g. nickname, Discord name, main/alt. Only stored in the local roster file; never sent to the AION2 API.")}</DialogDescription>
@@ -569,10 +577,10 @@ function CommentForm({ member, onSave }: { member: RosterMember; onSave: (text: 
           onChange={(e) => { setText(e.target.value); setError(null); }}
           className={aionField}
         />
-        <p className="text-right text-3xs text-steel/60 tabular-nums">{text.length}/{NOTES_MAX}</p>
+        <p className="text-right text-3xs text-subtle tabular-nums">{text.length}/{NOTES_MAX}</p>
       </div>
       {error && (
-        <p role="alert" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]">
+        <p role="alert" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-danger-text">
           <CircleAlert className="mt-0.5 size-4 shrink-0" /> {error}
         </p>
       )}

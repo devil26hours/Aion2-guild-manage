@@ -16,9 +16,9 @@ export function PlaceholderPage({
 }) {
   return (
     <>
-      <PageHeader eyebrow="Guild Command" title={title} description={description} />
+      <PageHeader eyebrow="ChumChon AION2" title={title} description={description} />
       <FramedPanel className="mx-auto max-w-lg px-6 py-10 text-center">
-        <span className="mx-auto flex size-12 items-center justify-center border border-gold-dim/50 bg-gold/10 text-gold">
+        <span className="mx-auto flex size-12 items-center justify-center border border-brand-muted/50 bg-brand/10 text-brand">
           <Icon className="size-5" />
         </span>
         <h2 className="mt-4 font-heading text-lg tracking-[0.12em] text-foreground">
@@ -30,7 +30,7 @@ export function PlaceholderPage({
         </p>
         <Link
           href="/dashboard"
-          className="mt-6 inline-flex items-center gap-2 text-xs tracking-[0.2em] text-gold uppercase underline-offset-4 hover:text-gold-bright hover:underline"
+          className="mt-6 inline-flex items-center gap-2 text-xs tracking-[0.2em] text-brand uppercase underline-offset-4 hover:text-brand-strong hover:underline"
         >
           <ArrowLeft className="size-3.5" />
           Back to dashboard

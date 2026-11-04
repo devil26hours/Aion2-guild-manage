@@ -9,8 +9,8 @@ export function DeltaChip({ delta, className }: { delta: number; className?: str
     <span
       className={cn(
         "inline-flex items-center gap-1 border px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-        delta > 0 && "border-[#7ee79e]/30 bg-[#7ee79e]/10 text-[#9af0b3]",
-        delta < 0 && "border-destructive/40 bg-destructive/10 text-[#f0a596]",
+        delta > 0 && "border-success/30 bg-success/10 text-success-text",
+        delta < 0 && "border-destructive/40 bg-destructive/10 text-danger-text",
         delta === 0 && "border-steel/20 text-steel",
         className,
       )}

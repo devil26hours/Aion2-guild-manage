@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { formatNumber } from "@/lib/format";
 import { loadRoster, useRoster } from "@/lib/roster/roster-store";
 import { cn } from "@/lib/utils";
+import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { RosterClassBadge } from "./roster-class-badge";
 
 type Tab = "roster" | "demo";
@@ -44,7 +45,7 @@ export function HistoryHub() {
             onClick={() => setTab(k)}
             className={cn(
               "-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-xs tracking-wider uppercase transition-colors outline-none focus-visible:bg-arcane/10",
-              tab === k ? "border-gold text-gold-bright" : "border-transparent text-steel hover:text-foreground",
+              tab === k ? "border-brand text-brand-strong" : "border-transparent text-steel hover:text-foreground",
             )}
           >
             <Icon className="size-3.5" />
@@ -70,7 +71,7 @@ function RosterHistoryList() {
           <div className="px-4 py-10 text-center text-sm">
             {status === "error" ? (
               <div className="space-y-3">
-                <p className="text-[#f6c2b6]">{t("Could not load the guild roster:")}{" "}{error}</p>
+                <p className="text-danger-text">{t("Could not load the guild roster:")}{" "}{error}</p>
                 <Button type="button" variant="outline" className={aionButtonSecondary} onClick={() => void loadRoster()}>
                   <RotateCcw className="size-3.5" /> {" "}{t("Retry")}</Button>
               </div>
@@ -80,12 +81,12 @@ function RosterHistoryList() {
           </div>
         ) : rows.length === 0 ? (
           <p className="px-4 py-10 text-center text-sm text-steel">
-            {t("The roster is empty.")}{" "}<Link href="/members" className="text-gold underline-offset-4 hover:underline">{t("Add members")}</Link> {" "}{t("to start tracking history.")}</p>
+            {t("The roster is empty.")}{" "}<Link href="/members" className="text-brand underline-offset-4 hover:underline">{t("Add members")}</Link> {" "}{t("to start tracking history.")}</p>
         ) : (
           <div className="relative overflow-x-auto">
             <table className="w-full min-w-[52rem] text-sm" data-testid="roster-history-list">
               <thead>
-                <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
+                <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-subtle uppercase">
                   <th className="py-3 pr-3 pl-4 font-medium sm:pl-5">{t("Character")}</th>
                   <th className="px-3 py-3 font-medium">{t("Class")}</th>
                   <th className="px-3 py-3 text-right font-medium">{t("Level")}</th>
@@ -100,19 +101,19 @@ function RosterHistoryList() {
                 {rows.map((m) => {
                   const href = `/character-history/${encodeURIComponent(m.id)}`;
                   return (
-                    <tr key={m.id} className="border-b border-steel/[0.07] last:border-0 hover:bg-white/[0.025]">
+                    <tr key={m.id} className="border-b border-steel/[0.07] last:border-0 hover:bg-surface-hover">
                       <td className="py-2.5 pr-3 pl-4 sm:pl-5">
-                        <Link href={href} className="font-medium text-foreground underline-offset-4 hover:text-gold-bright hover:underline">{m.character_name}</Link>
-                        <p className="text-2xs text-steel/60">{m.server_name ?? "—"} · <span className="uppercase">{m.region}</span></p>
+                        <Link href={href} className="font-medium text-foreground underline-offset-4 hover:text-brand-strong hover:underline">{m.character_name}</Link>
+                        <p className="text-2xs text-subtle">{m.server_name ?? "—"} · {regionLabel(m.region)}</p>
                       </td>
                       <td className="px-3 py-2.5 text-xs"><RosterClassBadge className={m.class_name} withIcon /></td>
                       <td className="px-3 py-2.5 text-right text-steel tabular-nums">{m.level ?? "—"}</td>
-                      <td className="px-3 py-2.5 text-right font-semibold text-gold-bright tabular-nums">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</td>
+                      <td className="px-3 py-2.5 text-right font-semibold text-brand-strong tabular-nums">{m.combat_power !== null ? formatNumber(m.combat_power) : "—"}</td>
                       <td className="px-3 py-2.5 text-right text-foreground/85 tabular-nums">{m.item_level !== null ? formatNumber(m.item_level) : "—"}</td>
                       <td className="px-3 py-2.5"><RoleBadge role={m.role} /></td>
-                      <td className="px-3 py-2.5 text-xs whitespace-nowrap text-steel/75"><RelativeTime iso={m.api_updated_at} /></td>
+                      <td className="px-3 py-2.5 text-xs whitespace-nowrap text-subtle"><RelativeTime iso={m.api_updated_at} /></td>
                       <td className="py-2.5 pr-4 pl-3 text-right sm:pr-5">
-                        <Link href={href} aria-label={`View history for ${m.character_name}`} className="inline-flex items-center gap-1 text-xs text-gold/90 hover:text-gold-bright">
+                        <Link href={href} aria-label={`View history for ${m.character_name}`} className="inline-flex items-center gap-1 text-xs text-brand hover:text-brand-strong">
                           {t("History")}{" "}<ChevronRight className="size-3.5" />
                         </Link>
                       </td>

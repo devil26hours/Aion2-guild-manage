@@ -15,7 +15,7 @@ function decodeId(id: string): string {
 }
 
 export const metadata: Metadata = {
-  title: "Character Progression — AION II Guild Command",
+  title: "Character Progression — ChumChon AION2",
 };
 
 /**

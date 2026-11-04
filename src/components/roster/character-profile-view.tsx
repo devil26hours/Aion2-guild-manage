@@ -14,9 +14,10 @@ import { itemDetailKey, itemDetailTarget, profileIdentity, type ItemDetailTarget
 import { requestItemDetail, useItemDetail } from "@/lib/roster/item-details-store";
 import { buildProfileView, gradeColor, type GearItem, type ProfileView, type StatRow } from "@/lib/roster/profile-view";
 import type { RosterMember } from "@/lib/roster/types";
-import { cn } from "@/lib/utils";
+import { cn, dataText } from "@/lib/utils";
 import { ApiIcon, GradeLabel } from "./api-icon";
 import { ItemDetailSection } from "./item-detail-body";
+import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { RosterClassBadge } from "./roster-class-badge";
 
 /* ------------------------------------------------------------------ */
@@ -110,10 +111,10 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
       {...(pin ? { [GEAR_PIN_ATTR]: "" } : {})}
       data-testid={pin ? "gear-tooltip-pinned" : "gear-tooltip"}
       className={cn(
-        "fixed border bg-gradient-to-b from-[#121a2c] to-[#080b13] p-3 text-left shadow-[0_18px_50px_-12px_rgba(0,0,0,0.95)]",
+        "fixed border bg-gradient-to-b from-surface-raised to-surface p-3 text-left",
         pin ? "pointer-events-auto select-text" : "pointer-events-none",
       )}
-      style={{ left, top, width: W, zIndex: pin ? pin.z : 1000, borderColor: `${c}99`, boxShadow: `0 18px 50px -12px rgba(0,0,0,0.95), inset 0 0 24px ${c}14` }}
+      style={{ left, top, width: W, zIndex: pin ? pin.z : 1000, borderColor: `${c}99`, boxShadow: `var(--float-shadow), inset 0 0 24px ${c}14` }}
       onPointerDown={pin?.onFront}
     >
       {pin && (
@@ -121,7 +122,7 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
           type="button"
           aria-label={t("Close pinned tooltip")}
           title={t("Close")}
-          className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center text-steel/70 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:ring-2 focus-visible:ring-arcane/50 focus-visible:outline-none"
+          className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center text-subtle transition-colors hover:bg-surface-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-arcane/50 focus-visible:outline-none"
           // Keep focus where it is, so a host dialog's focus trap is not disturbed.
           onMouseDown={(e) => e.preventDefault()}
           onClick={pin.onClose}
@@ -132,7 +133,7 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
       )}
       <p
         className={cn("font-heading text-[1rem] leading-snug font-bold", pin && "cursor-move touch-none pr-6 select-none")}
-        style={{ color: c }}
+        style={{ color: dataText(c) }}
         data-testid="gear-tooltip-title"
         {...titleDrag}
       >
@@ -140,50 +141,50 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
         {item.name}
       </p>
       <p className="text-xs text-steel">
-        {item.grade ? <span style={{ color: c }}>{item.grade}</span> : null} {item.slotLabel}
+        {item.grade ? <span style={{ color: dataText(c) }}>{item.grade}</span> : null} {item.slotLabel}
       </p>
       <div className="mt-2.5 flex items-start gap-3">
         <ApiIcon src={item.icon} alt={item.name} size={52} color={c} />
         <dl className="grid flex-1 grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
           {item.enchant !== null && (
             <>
-              <dt className="text-steel/70">{t("Enchant")}</dt>
-              <dd className="text-right font-semibold text-gold-bright tabular-nums">+{item.enchant}</dd>
+              <dt className="text-subtle">{t("Enchant")}</dt>
+              <dd className="text-right font-semibold text-brand-strong tabular-nums">+{item.enchant}</dd>
             </>
           )}
           {item.exceed !== null && (
             <>
-              <dt className="text-steel/70">{t("Exceed")}</dt>
+              <dt className="text-subtle">{t("Exceed")}</dt>
               <dd className="text-right font-semibold text-foreground tabular-nums">{item.exceed}</dd>
             </>
           )}
           {item.grade && (
             <>
-              <dt className="text-steel/70">{t("Grade")}</dt>
-              <dd className="text-right font-semibold" style={{ color: c }}>{item.grade}</dd>
+              <dt className="text-subtle">{t("Grade")}</dt>
+              <dd className="text-right font-semibold" style={{ color: dataText(c) }}>{item.grade}</dd>
             </>
           )}
-          <dt className="text-steel/70">{t("Slot")}</dt>
+          <dt className="text-subtle">{t("Slot")}</dt>
           <dd className="text-right text-foreground/90">{item.slotLabel}</dd>
         </dl>
       </div>
       {target && <ItemDetailSection entry={entry} />}
       {item.skin && (
         <div className="mt-3 border-t border-steel/15 pt-2" data-testid="gear-tooltip-skin">
-          <p className="text-4xs font-semibold tracking-[0.18em] text-gold/80 uppercase">{t("Skin Info")}</p>
+          <p className="text-4xs font-semibold tracking-[0.18em] text-brand uppercase">{t("Skin Info")}</p>
           <div className="mt-1.5 flex items-center gap-2">
             <ApiIcon src={item.skin.icon} alt={item.skin.name} size={30} color={gradeColor(item.skin.grade)} />
             <span className="min-w-0 text-xs">
-              <span className="block truncate" style={{ color: gradeColor(item.skin.grade) }}>{item.skin.name}</span>
-              {item.skin.grade && <span className="text-steel/70">{item.skin.grade}</span>}
+              <span className="block truncate" style={{ color: dataText(gradeColor(item.skin.grade)) }}>{item.skin.name}</span>
+              {item.skin.grade && <span className="text-subtle">{item.skin.grade}</span>}
             </span>
           </div>
         </div>
       )}
       {("note" in details || item.itemId !== null) && (
-        <p className="mt-3 border-t border-steel/15 pt-2 text-4xs leading-snug text-steel/55">
+        <p className="mt-3 border-t border-steel/15 pt-2 text-4xs leading-snug text-subtle">
           {"note" in details && details.note}
-          {item.itemId !== null && <span className={cn("block font-mono text-steel/45", "note" in details && "mt-0.5")}>{t("Item ID")}{" "}{item.itemId}</span>}
+          {item.itemId !== null && <span className={cn("block font-mono text-subtle", "note" in details && "mt-0.5")}>{t("Item ID")}{" "}{item.itemId}</span>}
         </p>
       )}
     </div>,
@@ -238,7 +239,7 @@ function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: T
   return (
     <li
       ref={liRef}
-      className="flex cursor-pointer items-center gap-2.5 border border-steel/10 bg-ink/50 p-1.5 transition-colors outline-none hover:border-gold-dim/50 focus-visible:border-arcane/60"
+      className="flex cursor-pointer items-center gap-2.5 border border-steel/10 bg-surface/50 p-1.5 transition-colors outline-none hover:border-brand-muted/50 focus-visible:border-arcane/60"
       data-slot-key={item.slotKey}
       tabIndex={0}
       aria-describedby={anchor && !pinned ? tipId : undefined}
@@ -269,17 +270,17 @@ function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: T
       <span className="relative">
         <ApiIcon src={item.icon} alt={item.name} color={c} />
         {item.enchant !== null && item.enchant > 0 && (
-          <span className="absolute -top-1.5 -left-1.5 border border-gold-dim/60 bg-ink px-1 text-4xs leading-tight font-bold text-gold-bright tabular-nums">
+          <span className="absolute -top-1.5 -left-1.5 border border-brand-muted/60 bg-surface px-1 text-4xs leading-tight font-bold text-brand-strong tabular-nums">
             +{item.enchant}
           </span>
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{item.slotLabel}</span>
-        <span className="block truncate text-[0.875rem] font-medium" style={{ color: c }} title={item.name}>
+        <span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{item.slotLabel}</span>
+        <span className="block truncate text-[0.875rem] font-medium" style={{ color: dataText(c) }} title={item.name}>
           {item.name}
         </span>
-        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-3xs text-steel/70">
+        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-3xs text-subtle">
           <GradeLabel grade={item.grade} />
           {item.exceed !== null && item.exceed > 0 && <span title={t("exceedLevel")}>{t("Exceed")}{" "}{item.exceed}</span>}
         </span>
@@ -380,7 +381,7 @@ function EquipmentPanel({
         <div className="space-y-4" data-testid="equipment">
           {view.equipment.map((g) => (
             <div key={g.group}>
-              <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{g.group}</h3>
+              <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-brand uppercase">{g.group}</h3>
               <ul className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
                 {g.items.map((it) => {
                   const key = `gear:${it.slotKey}-${it.name}`;
@@ -432,17 +433,17 @@ function StatGrid({ rows, accent }: { rows: StatRow[]; accent?: boolean }) {
       {rows.map((s) => (
         <div
           key={s.type}
-          className="border border-steel/10 bg-ink/50 px-2.5 py-1.5"
+          className="border border-steel/10 bg-surface/50 px-2.5 py-1.5"
           title={[s.apiName && s.apiName !== s.name ? `${t("API name")}: ${s.apiName}` : null, ...s.effects].filter(Boolean).join("\n") || undefined}
         >
           <dt className="flex items-center justify-between gap-2 text-2xs text-steel">
             <span className="truncate">{s.name}</span>
-            <span className={cn("font-heading text-base font-bold tabular-nums", accent ? "text-gold-bright" : "text-foreground")}>
+            <span className={cn("font-heading text-base font-bold tabular-nums", accent ? "text-brand-strong" : "text-foreground")}>
               {s.value ?? "—"}
             </span>
           </dt>
           {s.effects.length > 0 && (
-            <dd className="mt-0.5 space-y-px text-4xs leading-snug text-[#9af0b3]/80">
+            <dd className="mt-0.5 space-y-px text-4xs leading-snug text-success-text">
               {s.effects.map((e, i) => (
                 <span key={i} className="block truncate">{e}</span>
               ))}
@@ -456,11 +457,11 @@ function StatGrid({ rows, accent }: { rows: StatRow[]; accent?: boolean }) {
 
 function Collapsible({ title, count, children, testId }: { title: string; count?: number; children: React.ReactNode; testId?: string }) {
   return (
-    <details className="group border border-steel/12 bg-ink/40" data-testid={testId}>
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase outline-none select-none hover:bg-white/[0.02] focus-visible:ring-2 focus-visible:ring-arcane/40">
+    <details className="group border border-steel/12 bg-surface/40" data-testid={testId}>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase outline-none select-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-arcane/40">
         <span>
           {title}
-          {count !== undefined && <span className="ml-1.5 font-normal tracking-normal text-steel/60 normal-case">({count})</span>}
+          {count !== undefined && <span className="ml-1.5 font-normal tracking-normal text-subtle normal-case">({count})</span>}
         </span>
         <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" aria-hidden />
       </summary>
@@ -503,16 +504,16 @@ export function CharacterProfileView({
   return (
     <div className="space-y-4" data-testid="character-profile">
       {has("header") && (
-        <section className="relative overflow-hidden border border-gold-dim/35 bg-gradient-to-br from-ink-raised via-ink to-ink">
+        <section className="relative overflow-hidden border border-gold/40 bg-gradient-to-br from-surface-raised via-surface to-surface">
           <div aria-hidden className="pointer-events-none absolute -top-20 -left-16 size-60 rounded-full bg-arcane/15 blur-3xl" />
-          <div aria-hidden className="absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-gold-bright/60 to-transparent" />
+          <div aria-hidden className="absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-brand-strong/60 to-transparent" />
           <div className="relative flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
             <ApiIcon src={member.profile_image} alt={member.character_name} size={88} color="#c9a45c" />
             <div className="min-w-0 flex-1">
-              <p className="text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase" data-testid="profile-server">
-                {member.server_name ?? "—"} · {member.region.toUpperCase()}
+              <p className="text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase" data-testid="profile-server">
+                {member.server_name ?? "—"} · {regionLabel(member.region)}
               </p>
-              <h2 className="mt-0.5 font-heading text-2xl font-bold tracking-[0.06em] text-gold-bright sm:text-3xl" data-testid="profile-name">
+              <h2 className="mt-0.5 font-heading text-2xl font-bold tracking-[0.06em] text-brand-strong sm:text-3xl" data-testid="profile-name">
                 {member.character_name}
               </h2>
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -523,7 +524,7 @@ export function CharacterProfileView({
               </div>
               {view?.title && (
                 <p className="mt-1.5 flex items-center gap-2 text-xs text-steel">
-                  <ScrollText className="size-3.5 text-gold/80" aria-hidden />
+                  <ScrollText className="size-3.5 text-brand" aria-hidden />
                   <span className="text-foreground/90">{view.title.name}</span>
                   <GradeLabel grade={view.title.grade} />
                 </p>
@@ -537,15 +538,15 @@ export function CharacterProfileView({
               ["Server", `${member.server_name ?? "—"} (${member.server_id})`, "profile-server-id", false],
               ["Last API update", null, "profile-updated", false],
             ].map(([label, value, tid, big]) => (
-              <div key={label as string} className="bg-[#090d16] px-4 py-2.5">
-                <dt className="text-4xs font-semibold tracking-[0.2em] text-steel/70 uppercase">{t(label as string)}</dt>
-                <dd className={cn("mt-0.5 tabular-nums", big ? "font-heading text-xl font-bold text-gold-bright" : "text-sm font-semibold text-foreground")} data-testid={tid as string}>
+              <div key={label as string} className="bg-surface-sunken px-4 py-2.5">
+                <dt className="text-4xs font-semibold tracking-[0.2em] text-subtle uppercase">{t(label as string)}</dt>
+                <dd className={cn("mt-0.5 tabular-nums", big ? "font-heading text-xl font-bold text-brand-strong" : "text-sm font-semibold text-foreground")} data-testid={tid as string}>
                   {value ?? <RelativeTime iso={member.api_updated_at} />}
                 </dd>
               </div>
             ))}
           </dl>
-          <details className="relative border-t border-steel/10 px-4 py-1.5 text-3xs text-steel/60">
+          <details className="relative border-t border-steel/10 px-4 py-1.5 text-3xs text-subtle">
             <summary className="cursor-pointer select-none">{t("Admin identifiers")}</summary>
             <p className="mt-1 font-mono break-all">id {member.id}</p>
             <p className="font-mono break-all">{t("characterId")}{" "}{member.character_id}</p>
@@ -554,7 +555,7 @@ export function CharacterProfileView({
       )}
 
       {!view && (has("equipment") || has("stats")) && (
-        <p className="border border-steel/12 bg-ink/50 px-3 py-6 text-center text-sm text-steel">{t("No stored API response for this character yet.")}</p>
+        <p className="border border-steel/12 bg-surface/50 px-3 py-6 text-center text-sm text-steel">{t("No stored API response for this character yet.")}</p>
       )}
 
       {view && has("equipment") && <EquipmentPanel key={member.id} member={member} view={view} identity={identity} lazyDetails={itemDetails} />}
@@ -567,19 +568,19 @@ export function CharacterProfileView({
             <div className="space-y-4" data-testid="stats">
               {view.stats.primary.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Primary")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-brand uppercase">{t("Primary")}</h3>
                   <StatGrid rows={view.stats.primary} accent />
                 </div>
               )}
               {view.stats.deity.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Deity")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-brand uppercase">{t("Deity")}</h3>
                   <StatGrid rows={view.stats.deity} />
                 </div>
               )}
               {view.stats.other.length > 0 && (
                 <div>
-                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">{t("Other")}</h3>
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-brand uppercase">{t("Other")}</h3>
                   <StatGrid rows={view.stats.other} />
                 </div>
               )}
@@ -598,7 +599,7 @@ export function CharacterProfileView({
                     <ApiIcon src={b.icon} alt={b.name} size={28} />
                     <span className="w-24 shrink-0 truncate text-sm text-foreground">{b.name}</span>
                     <span aria-hidden className="h-2 flex-1 bg-steel/10">
-                      <span className="block h-full bg-gradient-to-r from-arcane/60 to-arcane" style={{ width: `${Math.min(100, b.percent ?? 0)}%` }} />
+                      <span className="block h-full bg-[image:var(--bar-gradient)]" style={{ width: `${Math.min(100, b.percent ?? 0)}%` }} />
                     </span>
                     <span className="w-24 shrink-0 text-right text-xs text-steel tabular-nums">
                       {b.open ?? "—"}/{b.total ?? "—"} · {b.percent ?? "—"}%
@@ -614,25 +615,25 @@ export function CharacterProfileView({
                 {view.pet && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.pet.icon} alt={view.pet.name} size={36} />
-                    <span><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
+                    <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
                   </li>
                 )}
                 {view.wing && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.wing.icon} alt={view.wing.name} size={36} color={gradeColor(view.wing.grade)} />
-                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Wings")}</span>{view.wing.name} {view.wing.enchant ? <span className="text-gold-bright">+{view.wing.enchant}</span> : null} <GradeLabel grade={view.wing.grade} /></span>
+                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wings")}</span>{view.wing.name} {view.wing.enchant ? <span className="text-brand-strong">+{view.wing.enchant}</span> : null} <GradeLabel grade={view.wing.grade} /></span>
                   </li>
                 )}
                 {view.wingSkin && (
                   <li className="flex items-center gap-2.5">
                     <ApiIcon src={view.wingSkin.icon} alt={view.wingSkin.name} size={36} color={gradeColor(view.wingSkin.grade)} />
-                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
+                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
                   </li>
                 )}
                 {view.titles && (
                   <li className="flex items-center gap-2.5">
-                    <span className="flex size-9 items-center justify-center border border-gold-dim/40 text-gold"><Gem className="size-4" /></span>
-                    <span><span className="block text-4xs tracking-[0.16em] text-steel/55 uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
+                    <span className="flex size-9 items-center justify-center border border-brand-muted/40 text-brand"><Gem className="size-4" /></span>
+                    <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
                   </li>
                 )}
               </ul>
@@ -647,20 +648,20 @@ export function CharacterProfileView({
             {[
               ["Active", activeSkills],
               ["Passive", passiveSkills],
-              ["Other", otherSkills],
+              ["Stigma Skill", otherSkills],
             ].map(([label, list]) =>
               (list as typeof activeSkills).length ? (
                 <div key={label as string}>
-                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-gold/60 uppercase">
+                  <h3 className="mb-1.5 text-4xs font-semibold tracking-[0.24em] text-brand uppercase">
                     <Sparkles className="mr-1 inline size-3" aria-hidden />
-                    {label as string}
+                    {t(label as string)}
                   </h3>
                   <ul className="grid gap-1 sm:grid-cols-2 xl:grid-cols-3">
                     {(list as typeof activeSkills).map((s, i) => (
                       <li key={`${s.name}-${i}`} className={cn("flex items-center gap-2 border border-steel/10 px-1.5 py-1 text-xs", s.equipped === false && "opacity-55")}>
                         <ApiIcon src={s.icon} alt={s.name} size={26} />
                         <span className="min-w-0 flex-1 truncate text-foreground/90">{s.name}</span>
-                        {s.level !== null && <span className="text-gold-bright tabular-nums">{t("Lv")}{" "}{s.level}</span>}
+                        {s.level !== null && <span className="text-brand-strong tabular-nums">{t("Lv")}{" "}{s.level}</span>}
                       </li>
                     ))}
                   </ul>
@@ -673,7 +674,7 @@ export function CharacterProfileView({
 
       {has("raw") && raw !== undefined && (
         <Collapsible title={t("Raw API Data")} testId="raw-api-data">
-          <p className="mb-2 text-3xs text-steel/60">{t("The stored response, unmodified — for admin/debugging.")}</p>
+          <p className="mb-2 text-3xs text-subtle">{t("The stored response, unmodified — for admin/debugging.")}</p>
           <JsonViewer text={JSON.stringify(raw, null, 2)} className="max-h-80" />
         </Collapsible>
       )}

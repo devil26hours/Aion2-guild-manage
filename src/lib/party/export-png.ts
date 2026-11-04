@@ -2,6 +2,7 @@ import { classImageSrc } from "@/lib/aion/class-images";
 import { CLASS_META } from "@/lib/aion/classes";
 import { knownClass } from "@/lib/roster/party-adapter";
 import { PARTY_ROLES, ROLE_COLORS, type PartyRole } from "./types";
+import { getLocale, translate } from "@/lib/i18n";
 
 /**
  * Party export renderer — draws a dedicated, Discord-friendly party card on
@@ -26,6 +27,8 @@ export interface ExportSlot {
 
 export interface ExportData {
   partyName: string;
+  contentType: string | null;
+  dungeonName: string | null;
   guildName: string;
   server: string;
   slots: ExportSlot[];
@@ -40,7 +43,7 @@ const SCALE = 2;
 const PAD = 44;
 const CARD_H = 92;
 const GAP = 14;
-const HEADER_H = 168;
+const HEADER_H = 244;
 /** Square portrait drawn in each filled card. */
 const AVATAR = 64;
 const IMAGE_TIMEOUT_MS = 8000;
@@ -57,15 +60,15 @@ export function exportSize(slotCount: number) {
 }
 
 const C = {
-  bg0: "#070a11",
-  bg1: "#0b101b",
-  card: "#0d1320",
-  gold: "#c9a45c",
-  goldBright: "#e8d1a0",
-  goldDim: "#8a7440",
-  steel: "#93a2bb",
-  text: "#e7e3d7",
-  arcane: "#5fa8ff",
+  bg0: "#070f22",
+  bg1: "#0f2545",
+  card: "#15305a",
+  gold: "#e3bd68",
+  goldBright: "#cfeaff",
+  goldDim: "#a8863f",
+  steel: "#b1c5df",
+  text: "#eaf3ff",
+  arcane: "#68d0ff",
 };
 
 const nf = new Intl.NumberFormat("en-US");
@@ -178,14 +181,14 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
 
   /* background */
   const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, "#0e1830");
+  bg.addColorStop(0, "#1b4f8a");
   bg.addColorStop(0.45, C.bg1);
   bg.addColorStop(1, C.bg0);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
   const glow = ctx.createRadialGradient(W / 2, 0, 0, W / 2, 0, 520);
-  glow.addColorStop(0, "rgba(95,168,255,0.16)");
-  glow.addColorStop(1, "rgba(95,168,255,0)");
+  glow.addColorStop(0, "rgba(92,196,255,0.16)");
+  glow.addColorStop(1, "rgba(92,196,255,0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, 520);
   frame(ctx, 16, 16, W - 32, H - 32);
@@ -193,7 +196,7 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
   /* header */
   ctx.fillStyle = C.gold;
   ctx.font = `600 13px ${display}`;
-  spaced(ctx, "AION II · GUILD COMMAND", PAD, 62, 4);
+  spaced(ctx, `ChumChon AION2 · ${translate(getLocale(), "AION2 Player Community")}`, PAD, 62, 4);
   ctx.fillStyle = C.goldBright;
   ctx.font = `700 40px ${display}`;
   ctx.fillText(fit(ctx, data.partyName, 640), PAD, 110);
@@ -215,9 +218,9 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
   boxes.forEach(([label, value], i) => {
     const x = W - PAD - (3 - i) * bw - (2 - i) * 10;
     const y = 52;
-    ctx.fillStyle = "rgba(13,19,32,0.9)";
+    ctx.fillStyle = "rgba(21,48,90,0.9)";
     ctx.fillRect(x, y, bw, 82);
-    ctx.strokeStyle = "rgba(147,162,187,0.18)";
+    ctx.strokeStyle = "rgba(177,197,223,0.18)";
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 0.5, y + 0.5, bw - 1, 81);
     ctx.fillStyle = C.gold;
@@ -230,6 +233,22 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     ctx.fillText(fit(ctx, value, bw - 28), x + 14, y + 64);
   });
 
+  // recruitment details
+  const details: [string, string][] = [
+    ["TYPE", data.contentType ?? "—"],
+    ["DUNGEON", data.dungeonName ?? "—"],
+    ["PARTY SIZE", `${data.slots.filter((s) => s.name).length}/${data.slots.length}`],
+  ];
+  details.forEach(([label, value], i) => {
+    const y = 172 + i * 24;
+    ctx.fillStyle = C.gold;
+    ctx.font = `600 13px ${sans}`;
+    spaced(ctx, `${label}:`, PAD, y, 1.6);
+    ctx.fillStyle = C.text;
+    ctx.font = `600 16px ${sans}`;
+    ctx.fillText(fit(ctx, value, W - PAD * 2 - 120), PAD + 120, y);
+  });
+
   /* slots: 2 columns × `rows` rows (left column first) */
   const colW = (W - PAD * 2 - GAP) / 2;
   data.slots.forEach((s, i) => {
@@ -237,15 +256,15 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     const row = col ? i - rows : i;
     const x = PAD + col * (colW + GAP);
     const y = HEADER_H + row * (CARD_H + GAP);
-    const roleColor = s.role ? ROLE_COLORS[s.role] : "#5d6b85";
+    const roleColor = s.role ? ROLE_COLORS[s.role] : "#6c86ab";
 
     if (!s.name) {
       ctx.setLineDash([6, 5]);
-      ctx.strokeStyle = "rgba(147,162,187,0.35)";
+      ctx.strokeStyle = "rgba(177,197,223,0.35)";
       ctx.lineWidth = 1;
       ctx.strokeRect(x + 0.5, y + 0.5, colW - 1, CARD_H - 1);
       ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(147,162,187,0.75)";
+      ctx.fillStyle = "rgba(177,197,223,0.75)";
       ctx.font = `700 15px ${sans}`;
       ctx.fillText(String(s.index + 1).padStart(2, "0"), x + 18, y + 52);
       ctx.font = `italic 400 17px ${sans}`;
@@ -255,7 +274,7 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
 
     ctx.fillStyle = C.card;
     ctx.fillRect(x, y, colW, CARD_H);
-    ctx.strokeStyle = "rgba(147,162,187,0.2)";
+    ctx.strokeStyle = "rgba(177,197,223,0.2)";
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 0.5, y + 0.5, colW - 1, CARD_H - 1);
     // role band
@@ -284,13 +303,13 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     // character portrait (class emblem, then the name initial, when unavailable)
     const ax = x + 18 + pillCol + 16;
     const ay = y + (CARD_H - AVATAR) / 2;
-    ctx.fillStyle = "#0a0e18";
+    ctx.fillStyle = "#0a1b37";
     ctx.fillRect(ax, ay, AVATAR, AVATAR);
     const img = images[i];
     if (img) {
       drawCover(ctx, img, ax, ay, AVATAR);
     } else {
-      ctx.fillStyle = "rgba(147,162,187,0.6)";
+      ctx.fillStyle = "rgba(177,197,223,0.6)";
       ctx.font = `700 24px ${display}`;
       ctx.textAlign = "center";
       ctx.fillText([...s.name][0] ?? "?", ax + AVATAR / 2, ay + AVATAR / 2 + 9);
@@ -308,7 +327,7 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     ctx.fillText(fit(ctx, s.name, nameMax), textX, y + 40);
     const cls = knownClass(s.className);
     if (s.className) {
-      ctx.fillStyle = cls ? CLASS_META[cls].color : "#93a2bb";
+      ctx.fillStyle = cls ? CLASS_META[cls].color : "#b1c5df";
       ctx.save();
       ctx.translate(textX + 5, y + 64);
       ctx.rotate(Math.PI / 4);
@@ -344,9 +363,9 @@ export async function renderPartyCanvas(data: ExportData): Promise<HTMLCanvasEle
     lx += 18 + ctx.measureText(label).width + 26;
   }
   ctx.textAlign = "right";
-  ctx.fillStyle = "rgba(147,162,187,0.7)";
+  ctx.fillStyle = "rgba(177,197,223,0.7)";
   ctx.font = `400 13px ${sans}`;
-  ctx.fillText("Generated by AION II Guild Command · data from the AION2 API", W - PAD, fy);
+  ctx.fillText("Generated by ChumChon AION2 · data from the AION2 API", W - PAD, fy);
   ctx.textAlign = "left";
 
   return canvas;

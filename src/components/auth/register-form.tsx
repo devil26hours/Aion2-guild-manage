@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { REGIONS } from "@/lib/aion2-api/endpoints";
+import { REGIONS, regionLabel } from "@/lib/aion2-api/endpoints";
 import { isCharacterHitList, type CharacterHit } from "@/lib/aion2-api/types";
 import { call } from "@/lib/client/api";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 
 type SearchState = { status: "idle" } | { status: "searching" } | { status: "done"; hits: CharacterHit[] } | { status: "error"; message: string };
 
@@ -99,14 +99,14 @@ export function RegisterForm() {
   if (sentTo) {
     return (
       <div className="space-y-4 text-center" data-testid="register-check-email">
-        <span className="mx-auto flex size-12 items-center justify-center border border-gold-dim/50 bg-gold/10 text-gold">
+        <span className="mx-auto flex size-12 items-center justify-center border border-brand-muted/50 bg-brand/10 text-brand">
           <MailCheck className="size-6" />
         </span>
         <p className="font-heading text-base tracking-[0.1em] text-foreground uppercase">{t("Check your email")}</p>
         <p className="text-sm text-steel">
           {t("We sent a confirmation link to {email}. Open it to activate your account — your selected character is linked to the account after confirmation.", { email: sentTo })}
         </p>
-        <p className="text-xs text-steel/70">{t("No email? Check your spam folder. If this address already has an account, sign in or reset your password instead.")}</p>
+        <p className="text-xs text-subtle">{t("No email? Check your spam folder. If this address already has an account, sign in or reset your password instead.")}</p>
         <Link href="/login" className={cn(aionButtonSecondary, "inline-flex h-10 items-center justify-center border px-4 text-sm text-foreground")}>{t("Go to sign in")}</Link>
       </div>
     );
@@ -114,7 +114,7 @@ export function RegisterForm() {
 
   return (
     <div className="space-y-5">
-      <div role="note" data-testid="register-security-notice" className="flex items-start gap-2.5 border border-[#e0b04a]/40 border-l-2 border-l-[#e0b04a] bg-[#e0b04a]/[0.08] px-3 py-2.5 text-xs leading-relaxed text-[#f0dca8]">
+      <div role="note" data-testid="register-security-notice" className="flex items-start gap-2.5 border border-warning/40 border-l-2 border-l-warning bg-warning/[0.08] px-3 py-2.5 text-xs leading-relaxed text-warning-text">
         <ShieldAlert className="mt-0.5 size-4 shrink-0" />
         <span>
           {t(
@@ -128,22 +128,22 @@ export function RegisterForm() {
         <div className="space-y-1.5">
           <Label htmlFor={`${ids}-email`} className={labelClass}>{t("Email")}</Label>
           <Input id={`${ids}-email`} type="email" autoComplete="email" value={email} aria-invalid={!!errors.email} onChange={(e) => { setEmail(e.target.value); setErrors((x) => ({ ...x, email: undefined })); }} className={aionField} />
-          {errors.email && <p className="text-xs text-[#ef9b89]">{errors.email}</p>}
+          {errors.email && <p className="text-xs text-danger-text">{errors.email}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor={`${ids}-pw`} className={labelClass}>{t("Password")}</Label>
           <div className="relative">
             <Input id={`${ids}-pw`} type={show ? "text" : "password"} autoComplete="new-password" value={password} aria-invalid={!!errors.password} onChange={(e) => { setPassword(e.target.value); setErrors((x) => ({ ...x, password: undefined })); }} className={cn(aionField, "pr-9")} />
-            <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? t("Hide password") : t("Show password")} className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-steel/70 hover:text-gold-bright">
+            <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? t("Hide password") : t("Show password")} className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-subtle hover:text-brand-strong">
               {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
           </div>
-          {errors.password ? <p className="text-xs text-[#ef9b89]">{errors.password}</p> : <p className="text-2xs text-steel/60">{t("At least 8 characters.")}</p>}
+          {errors.password ? <p className="text-xs text-danger-text">{errors.password}</p> : <p className="text-2xs text-subtle">{t("At least 8 characters.")}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor={`${ids}-pw2`} className={labelClass}>{t("Confirm password")}</Label>
           <Input id={`${ids}-pw2`} type={show ? "text" : "password"} autoComplete="new-password" value={confirm} aria-invalid={!!errors.confirm} onChange={(e) => { setConfirm(e.target.value); setErrors((x) => ({ ...x, confirm: undefined })); }} className={aionField} />
-          {errors.confirm && <p className="text-xs text-[#ef9b89]">{errors.confirm}</p>}
+          {errors.confirm && <p className="text-xs text-danger-text">{errors.confirm}</p>}
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export function RegisterForm() {
             <Label htmlFor={`${ids}-region`} className={labelClass}>{t("Region")}</Label>
             <NativeSelect id={`${ids}-region`} value={region} onChange={(e) => setRegion(e.target.value)} className={aionField}>
               <option value="">{t("All regions")}</option>
-              {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              {REGIONS.map((r) => <option key={r} value={r}>{regionLabel(r)}</option>)}
             </NativeSelect>
           </div>
           <Button type="submit" variant="outline" disabled={search.status === "searching"} className={cn(aionButtonSecondary, "text-foreground")}>
@@ -170,23 +170,23 @@ export function RegisterForm() {
             {search.status === "searching" ? t("Searching…") : t("Search")}
           </Button>
         </form>
-        {errors.name && <p className="text-xs text-[#ef9b89]">{errors.name}</p>}
+        {errors.name && <p className="text-xs text-danger-text">{errors.name}</p>}
         <div aria-live="polite" className="space-y-2">
           {search.status === "searching" && <p className="text-sm text-steel">{t("Searching the AION2 API… (can take a few seconds)")}</p>}
-          {search.status === "error" && <p className="text-sm text-[#f6c2b6]" role="alert">{search.message}</p>}
+          {search.status === "error" && <p className="text-sm text-danger-text" role="alert">{search.message}</p>}
           {search.status === "done" && hits.length === 0 && <p className="text-sm text-steel">{t("No characters found.")}</p>}
           {hits.length > 0 && <CharacterHitsTable hits={hits} selectedId={picked?.character_id ?? null} onSelect={(h) => { setPicked(h); setErrors((x) => ({ ...x, character: undefined })); }} testId="register-results" />}
         </div>
         {picked && (
-          <p className="border border-gold-dim/40 bg-gold/[0.05] px-3 py-2 text-sm text-foreground" data-testid="register-picked">
-            {t("Selected")}: <span className="font-semibold">{picked.name}</span> · {picked.server_name ?? "—"} <span className="font-mono text-xs text-steel">({picked.server_id})</span> · <span className="uppercase">{picked.region}</span>
+          <p className="border border-brand-muted/40 bg-brand/[0.05] px-3 py-2 text-sm text-foreground" data-testid="register-picked">
+            {t("Selected")}: <span className="font-semibold">{picked.name}</span> · {picked.server_name ?? "—"} <span className="font-mono text-xs text-steel">({picked.server_id})</span> · {regionLabel(picked.region)}
           </p>
         )}
-        {errors.character && <p className="text-xs text-[#ef9b89]">{errors.character}</p>}
+        {errors.character && <p className="text-xs text-danger-text">{errors.character}</p>}
       </div>
 
       {formError && (
-        <p role="alert" data-testid="register-error" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-[#f6c2b6]">
+        <p role="alert" data-testid="register-error" className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-danger-text">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {formError}
         </p>
       )}
@@ -199,7 +199,7 @@ export function RegisterForm() {
       </form>
       <p className="text-center text-xs text-steel">
         {t("Already have an account?")}{" "}
-        <Link href="/login" className="text-gold underline-offset-4 hover:underline">{t("Sign in")}</Link>
+        <Link href="/login" className="text-brand underline-offset-4 hover:underline">{t("Sign in")}</Link>
       </p>
     </div>
   );

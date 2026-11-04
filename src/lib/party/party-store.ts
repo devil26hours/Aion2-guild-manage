@@ -8,7 +8,7 @@ import {
   newPresetId,
   type PartyOp,
 } from "./ops";
-import { DEFAULT_PARTY_SIZE, type PartyPreset, type PartyRole } from "./types";
+import { DEFAULT_PARTY_SIZE, type PartyContentType, type PartyPreset, type PartyRole } from "./types";
 
 /**
  * Client view of the SHARED party presets. The server (Supabase via
@@ -92,6 +92,8 @@ export function clearPartyError() {
 
 let seq = 0;
 let pending = 0;
+/** The server rewrites the whole preset per op, so this browser sends one op at a time. */
+let queue: Promise<unknown> = Promise.resolve();
 
 /**
  * Apply `op` locally (validated by the same rules as the server), then send it.
@@ -103,7 +105,7 @@ function dispatch(op: PartyOp, rosterIds?: Set<string>): { ok: true } | { ok: fa
   set({ presets: local.presets, error: null });
   const mine = ++seq;
   pending++;
-  void call<{ presets: PartyPreset[] }>("/api/parties", { method: "POST", body: JSON.stringify({ op }) }).then((r) => {
+  queue = queue.then(() => call<{ presets: PartyPreset[] }>("/api/parties", { method: "POST", body: JSON.stringify({ op }) })).then((r) => {
     pending--;
     if (r.ok) {
       if (mine === seq) set({ presets: r.data.presets });
@@ -171,6 +173,14 @@ export function resetPartySlots(presetId: string) {
 /** Change how many members the party can hold (callers confirm first when occupied slots are dropped). */
 export function setPartySize(presetId: string, size: number) {
   dispatch({ op: "setSize", presetId, size });
+}
+
+export function setPartyContentType(presetId: string, contentType: PartyContentType | null) {
+  dispatch({ op: "setContentType", presetId, contentType });
+}
+
+export function setPartyDungeon(presetId: string, dungeonName: string | null) {
+  dispatch({ op: "setDungeon", presetId, dungeonName });
 }
 
 /** Clear slots whose member is no longer in the roster (server re-checks against the roster file). */

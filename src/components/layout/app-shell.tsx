@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
+import { PhotoBackdrop } from "@/components/aion/photo-backdrop";
+import mainBg from "../../../public/image/background-pic/main_bg.png";
 import { AppHeader } from "./app-header";
+import { FooterBar } from "./site-footer";
 import { SidebarGuildCard } from "./sidebar-guild-card";
 import { SidebarNav } from "./sidebar-nav";
 
@@ -8,27 +11,37 @@ export function AppShell({ children }: { children: ReactNode }) {
   const guildCard = <SidebarGuildCard />;
 
   return (
-    <div className="relative flex min-h-dvh flex-1 flex-col bg-[radial-gradient(ellipse_90%_50%_at_60%_-10%,#13213d_0%,#0a1020_45%,#070a11_100%)]">
+    <div className="aion-app-frame relative flex min-h-dvh flex-1 flex-col bg-[image:var(--app-sky)][--footer-bar-h:2.75rem] sm:[--footer-bar-h:2.25rem]">
+      {/* Page headings sit directly on the photo, so the scrim follows the theme: pale under dark ink, dark under light ink. */}
+      <PhotoBackdrop
+        src={mainBg}
+        scrimClassName="bg-[linear-gradient(rgba(240,245,252,0.82),rgba(240,245,252,0.82))] dark:bg-[linear-gradient(180deg,rgba(5,8,15,0.7)_0%,rgba(5,8,15,0.6)_25%,rgba(5,8,15,0.45)_55%,rgba(5,8,15,0.55)_100%)]"
+        moteCount={12}
+        sparkleCount={24}
+      />
+
       <div
         aria-hidden
-        className="aion-grain pointer-events-none fixed inset-0 opacity-[0.035] mix-blend-overlay"
+        className="aion-grain pointer-events-none fixed inset-0 opacity-[var(--grain-opacity)] mix-blend-overlay"
       />
 
       <AppHeader mobileNavFooter={guildCard} />
 
       <div className="relative flex flex-1">
-        <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px)] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-ink/50 px-3 py-5 lg:flex">
-          <p className="px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold/70 uppercase">
+        <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px)] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-[var(--sidebar-bg)] px-3 py-5 lg:flex">
+          <p className="px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
             Command
           </p>
           <SidebarNav />
           <div className="mt-auto">{guildCard}</div>
         </aside>
 
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="min-w-0 flex-1 px-4 pt-6 pb-[calc(var(--footer-bar-h)+1.5rem)] sm:px-6 lg:px-8 lg:pt-8 lg:pb-[calc(var(--footer-bar-h)+2rem)]">
           {children}
         </main>
       </div>
+
+      <FooterBar />
     </div>
   );
 }

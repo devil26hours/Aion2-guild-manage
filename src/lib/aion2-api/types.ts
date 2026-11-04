@@ -61,6 +61,10 @@ export function isCharacterHitList(v: unknown): v is CharacterHit[] {
   return Array.isArray(v) && v.every(isCharacterHit);
 }
 
+export function isServerRosterList(v: unknown): v is ServerRosterEntry[] {
+  return Array.isArray(v) && v.every((e) => isObj(e) && typeof e.server_id === "string" && typeof e.region === "string" && (e.name === null || typeof e.name === "string"));
+}
+
 export function isAmbiguousNameBody(v: unknown): v is AmbiguousNameBody {
   return isObj(v) && typeof v.detail === "string" && isCharacterHitList(v.candidates);
 }

@@ -8,6 +8,7 @@
  * `error:CODE` entries localize server error messages by their code.
  */
 export const TH: Record<string, string> = {
+  "Search any public character and view their profile and equipment. Nothing you look up is saved.": "ค้นหาตัวละครสาธารณะและดูโปรไฟล์กับอุปกรณ์ ข้อมูลที่ค้นหาจะไม่ถูกบันทึก",
   /* ------------------------------- common -------------------------------- */
   Back: "ย้อนกลับ",
   Cancel: "ยกเลิก",
@@ -57,6 +58,7 @@ export const TH: Record<string, string> = {
   Active: "แอคทีฟ",
   Passive: "พาสซีฟ",
   Other: "อื่น ๆ",
+  "Stigma Skill": "สกิล Stigma",
   Main: "หลัก",
   Primary: "หลัก",
   Grade: "เกรด",
@@ -120,6 +122,10 @@ export const TH: Record<string, string> = {
   "e.g. JKDz": "เช่น JKDz",
   "Guild Command": "Guild Command",
   "Guild Management System": "ระบบจัดการกิลด์",
+  "An independent community project, built with passion for AION2 players.": "โปรเจกต์ชุมชนที่พัฒนาด้วยใจเพื่อผู้เล่น AION2",
+  "Not affiliated with NCSOFT.": "ไม่มีส่วนเกี่ยวข้องกับ NCSOFT",
+  "Contact us on Discord": "ติดต่อเราทาง Discord",
+  "AION2 Player Community": "ชุมชนผู้เล่น AION2",
   "Unofficial companion · Not affiliated with NCSOFT": "เครื่องมือเสริมอย่างไม่เป็นทางการ · ไม่มีส่วนเกี่ยวข้องกับ NCSOFT",
 
   /* ------------------------------ auth / login ----------------------------- */
@@ -324,11 +330,22 @@ export const TH: Record<string, string> = {
 
   /* --------------------------- add member dialog --------------------------- */
   "Add Real Character": "เพิ่มตัวละครจริง",
-  "Search the AION2 API, pick the exact character and server (names are not unique), then add it to the guild roster.": "ค้นหาจาก AION2 API เลือกตัวละครและเซิร์ฟเวอร์ให้ถูกต้อง (ชื่ออาจซ้ำกัน) แล้วเพิ่มเข้ารายชื่อกิลด์",
+  "Search the AION2 API, pick the exact characters and servers (names are not unique), then add them to the guild roster.": "ค้นหาจาก AION2 API เลือกตัวละครและเซิร์ฟเวอร์ให้ถูกต้อง (ชื่ออาจซ้ำกัน) แล้วเพิ่มเข้ารายชื่อกิลด์",
+  "Add": "เพิ่ม",
+  "{open} open slots ({n} / {cap} members)": "ว่าง {open} ที่ ({n} / {cap} คน)",
+  "{n} selected": "เลือกแล้ว {n}",
+  "No results on the selected server.": "ไม่พบผลลัพธ์ในเซิร์ฟเวอร์ที่เลือก",
+  "No open slots left for more members.": "ไม่มีที่ว่างสำหรับสมาชิกเพิ่มแล้ว",
+  "Too many members selected: {n} selected but only {open} open slots. Deselect some or raise “Maximum members” in Settings.": "เลือกสมาชิกมากเกินไป: เลือก {n} คน แต่มีที่ว่างเพียง {open} ที่ ยกเลิกบางคนหรือเพิ่ม “จำนวนสมาชิกสูงสุด” ในหน้าตั้งค่า",
+  "{name}: the roster is full.": "{name}: รายชื่อเต็มแล้ว",
+  "Additional information / Notes (optional)": "ข้อมูลเพิ่มเติม / หมายเหตุ (ไม่บังคับ)",
+  "Adding {n} of {total} members…": "กำลังเพิ่มสมาชิก {n} จาก {total} คน…",
+  "Added {done} of {total} members. These could not be added:": "เพิ่มสำเร็จ {done} จาก {total} คน รายการที่เพิ่มไม่ได้:",
+  "Add {n} to Roster": "เพิ่ม {n} คนเข้ารายชื่อ",
+  "{n} members added to the roster.": "เพิ่มสมาชิก {n} คนเข้ารายชื่อแล้ว",
   "— check the server before selecting.": "— ตรวจสอบเซิร์ฟเวอร์ก่อนเลือก",
   "No characters found for “": "ไม่พบตัวละครสำหรับ “",
   "This character is already in the roster.": "ตัวละครนี้อยู่ในรายชื่อแล้ว",
-  "Guild role (optional)": "บทบาทในกิลด์ (ไม่บังคับ)",
   "Add to Roster": "เพิ่มเข้ารายชื่อ",
   "Fetching profile…": "กำลังดึงข้อมูลโปรไฟล์…",
   "Server Name ": "ชื่อเซิร์ฟเวอร์",
@@ -412,6 +429,7 @@ export const TH: Record<string, string> = {
   "{n} / {size} slots filled": "จัดแล้ว {n} / {size} ช่อง",
   "Party name": "ชื่อปาร์ตี้",
   "Party size": "ขนาดปาร์ตี้",
+  Dungeon: "ดันเจี้ยน",
   "{n} members": "{n} คน",
   "Party size set to {n} members.": "ตั้งขนาดปาร์ตี้เป็น {n} คนแล้ว",
   "Renamed to “{name}”.": "เปลี่ยนชื่อเป็น “{name}” แล้ว",
@@ -754,4 +772,6 @@ export const TH: Record<string, string> = {
   "error:SCHEMA_MISSING": "ฐานข้อมูลขาดฟังก์ชันหรือตารางที่จำเป็น โปรดรัน SQL migration ให้ครบ",
   "error:ALREADY_HAS_CHARACTER": "บัญชีนี้มีตัวละครเชื่อมอยู่แล้ว",
   "error:CHARACTER_NOT_FOUND": "ไม่พบตัวละคร",
+  "Switch to light mode": "เปลี่ยนเป็นโหมดสว่าง",
+  "Switch to dark mode": "เปลี่ยนเป็นโหมดมืด",
 };

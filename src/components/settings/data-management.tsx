@@ -106,12 +106,12 @@ function StatusPill({ tone, children }: { tone: "ok" | "idle" | "warn"; children
     <span
       className={cn(
         "inline-flex items-center gap-1.5 border px-2 py-0.5 text-3xs font-semibold tracking-[0.14em] uppercase",
-        tone === "ok" && "border-[#9af0b3]/40 bg-[#9af0b3]/[0.08] text-[#9af0b3]",
-        tone === "idle" && "border-steel/25 bg-ink/60 text-steel",
-        tone === "warn" && "border-[#f0cf86]/40 bg-[#f0cf86]/[0.08] text-[#f0cf86]",
+        tone === "ok" && "border-success/40 bg-success/[0.08] text-success-text",
+        tone === "idle" && "border-steel/25 bg-surface/60 text-steel",
+        tone === "warn" && "border-warning/40 bg-warning/[0.08] text-warning-text",
       )}
     >
-      <span aria-hidden className={cn("size-1.5 rounded-full", tone === "ok" ? "bg-[#9af0b3]" : tone === "warn" ? "bg-[#f0cf86]" : "bg-steel/60")} />
+      <span aria-hidden className={cn("size-1.5 rounded-full", tone === "ok" ? "bg-success" : tone === "warn" ? "bg-warning" : "bg-steel/60")} />
       {children}
     </span>
   );
@@ -131,7 +131,7 @@ function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof use
   const res = check.result;
   return (
     <div className="grid gap-3 sm:grid-cols-2" data-testid="storage-status">
-      <div className={cn("flex flex-col gap-2 border bg-ink/50 p-4", overview.status === "error" ? "border-[#f0cf86]/30" : "border-[#9af0b3]/25")}>
+      <div className={cn("flex flex-col gap-2 border bg-surface/50 p-4", overview.status === "error" ? "border-warning/30" : "border-success/25")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className={cn(subHeading, "flex items-center gap-2")}><Database className="size-4 text-arcane" /> {t("Database")}</p>
           {overview.status === "loading" ? (
@@ -150,9 +150,9 @@ function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof use
         </p>
       </div>
 
-      <div className="flex flex-col gap-2 border border-steel/15 bg-ink/50 p-4">
+      <div className="flex flex-col gap-2 border border-steel/15 bg-surface/50 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className={cn(subHeading, "flex items-center gap-2")}><ServerCog className="size-4 text-gold/80" /> {t("Character data updates")}</p>
+          <p className={cn(subHeading, "flex items-center gap-2")}><ServerCog className="size-4 text-brand" /> {t("Character data updates")}</p>
           {data ? (
             data.storage.server_access ? <StatusPill tone="ok">{t("Configured")}</StatusPill> : <StatusPill tone="warn">{t("Not configured")}</StatusPill>
           ) : (
@@ -171,12 +171,12 @@ function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof use
             </Button>
             <span aria-live="polite" className="text-xs" data-testid="supabase-check-result">
               {check.error ? (
-                <span className="text-[#f6c2b6]">{check.error}</span>
+                <span className="text-danger-text">{check.error}</span>
               ) : res && res.configured ? (
                 res.reachable && res.database.ok ? (
-                  <span className="text-[#9af0b3]">{t("Connected — auth {a} ms, database {d} ms.", { a: res.latencyMs ?? "—", d: res.database.latencyMs ?? "—" })}</span>
+                  <span className="text-success-text">{t("Connected — auth {a} ms, database {d} ms.", { a: res.latencyMs ?? "—", d: res.database.latencyMs ?? "—" })}</span>
                 ) : (
-                  <span className="text-[#f0cf86]">
+                  <span className="text-warning-text">
                     {!res.reachable
                       ? res.httpStatus
                         ? t("Auth service not reachable (HTTP {status}).", { status: res.httpStatus })
@@ -185,7 +185,7 @@ function StorageStatus({ overview, isLeader }: { overview: ReturnType<typeof use
                   </span>
                 )
               ) : res ? (
-                <span className="text-[#f0cf86]">{t("Project settings are not configured.")}</span>
+                <span className="text-warning-text">{t("Project settings are not configured.")}</span>
               ) : null}
             </span>
           </div>
@@ -204,7 +204,7 @@ function OverviewStats({ state, onRetry }: { state: ReturnType<typeof useDataOve
   }
   if (state.status === "error" || !state.data) {
     return (
-      <div className="flex flex-wrap items-center gap-3 text-sm text-[#f6c2b6]">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-danger-text">
         <span className="inline-flex items-center gap-1.5"><CircleAlert className="size-4" /> {t("Could not load the data overview:")} {state.error}</span>
         <Button type="button" variant="outline" onClick={onRetry} className={aionButtonSecondary}><RotateCcw className="size-3.5" /> {t("Retry")}</Button>
       </div>
@@ -221,8 +221,8 @@ function OverviewStats({ state, onRetry }: { state: ReturnType<typeof useDataOve
   return (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" data-testid="data-overview">
       {items.map(({ icon: Icon, label, value }) => (
-        <div key={label} className="border border-steel/12 bg-ink/50 p-3">
-          <dt className="flex items-center gap-1.5 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase"><Icon className="size-3.5" /> {label}</dt>
+        <div key={label} className="border border-steel/12 bg-surface/50 p-3">
+          <dt className="flex items-center gap-1.5 text-3xs font-semibold tracking-[0.18em] text-brand uppercase"><Icon className="size-3.5" /> {label}</dt>
           <dd className="mt-1.5 font-heading text-2xl text-foreground tabular-nums">{value.toLocaleString()}</dd>
         </div>
       ))}
@@ -237,8 +237,8 @@ function StorageInfo({ overview }: { overview: DataOverview | null }) {
   if (!overview) return null;
   const img = overview.image;
   return (
-    <div className="flex items-start gap-3 border border-steel/12 bg-ink/50 p-4" data-testid="storage-info">
-      <ImageIcon className="mt-0.5 size-4 shrink-0 text-gold/80" />
+    <div className="flex items-start gap-3 border border-steel/12 bg-surface/50 p-4" data-testid="storage-info">
+      <ImageIcon className="mt-0.5 size-4 shrink-0 text-brand" />
       <div className="min-w-0 text-xs text-steel">
         <p className={subHeading}>{t("Guild image")}</p>
         {img ? (
@@ -262,14 +262,14 @@ function StorageInfo({ overview }: { overview: DataOverview | null }) {
 function ExportBackup() {
   const t = useT();
   return (
-    <div className="flex flex-col gap-3 border border-gold-dim/30 bg-ink/50 p-4 sm:flex-row sm:items-center sm:justify-between" data-testid="export-backup">
+    <div className="flex flex-col gap-3 border border-brand-muted/30 bg-surface/50 p-4 sm:flex-row sm:items-center sm:justify-between" data-testid="export-backup">
       <div className="min-w-0 space-y-1">
-        <p className={cn(subHeading, "flex items-center gap-2")}><Download className="size-4 text-gold/80" /> {t("Export guild data")}</p>
+        <p className={cn(subHeading, "flex items-center gap-2")}><Download className="size-4 text-brand" /> {t("Export guild data")}</p>
         <p className="text-xs text-steel">
           {t("Downloads this guild's data as one JSON file: guild info and settings, member accounts (id and role), the roster with each character's stored API response, snapshot history with equipment, and party presets with their slots. Read-only — nothing is changed.")}
         </p>
-        <p className="text-xs text-steel/80">{t("Never included: passwords, emails, sessions or tokens, the join code, keys, other guilds' data, or the guild image file.")}</p>
-        <p className="text-xs text-[#f0cf86]/90">{t("This is a guild-level export, not a full database backup.")}</p>
+        <p className="text-xs text-subtle">{t("Never included: passwords, emails, sessions or tokens, the join code, keys, other guilds' data, or the guild image file.")}</p>
+        <p className="text-xs text-warning-text">{t("This is a guild-level export, not a full database backup.")}</p>
       </div>
       {/* Same-origin download: the auth cookies are sent and the server re-checks leadership. */}
       <a href="/api/data/export" download className={cn(buttonVariants(), aionButtonPrimary, "shrink-0 self-start sm:self-center")}>
@@ -282,8 +282,8 @@ function ExportBackup() {
 function RestoreUnavailable() {
   const t = useT();
   return (
-    <div className="flex items-start gap-3 border border-steel/12 bg-ink/50 p-4" data-testid="restore-unavailable">
-      <Upload className="mt-0.5 size-4 shrink-0 text-steel/70" />
+    <div className="flex items-start gap-3 border border-steel/12 bg-surface/50 p-4" data-testid="restore-unavailable">
+      <Upload className="mt-0.5 size-4 shrink-0 text-subtle" />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <p className={subHeading}>{t("Import & restore")}</p>
@@ -343,13 +343,13 @@ export function DataManagement({ isLeader, onReset }: { isLeader: boolean; onRes
       </section>
 
       <section aria-label={t("Data overview")} className="space-y-2">
-        <p className={cn(subHeading, "flex items-center gap-2")}><ScrollText className="size-4 text-gold/80" /> {t("Data overview")}</p>
+        <p className={cn(subHeading, "flex items-center gap-2")}><ScrollText className="size-4 text-brand" /> {t("Data overview")}</p>
         <OverviewStats state={overview} onRetry={() => void overview.reload()} />
         <StorageInfo overview={overview.data} />
       </section>
 
       {!isLeader ? (
-        <p className="text-xs text-[#cfe3ff]" data-testid="data-read-only">{t("Read-only view. Only the Guild Leader can export or manage guild data.")}</p>
+        <p className="text-xs text-info-text" data-testid="data-read-only">{t("Read-only view. Only the Guild Leader can export or manage guild data.")}</p>
       ) : (
         <>
           <section aria-label={t("Backup & export")} className="space-y-3">
@@ -359,12 +359,12 @@ export function DataManagement({ isLeader, onReset }: { isLeader: boolean; onRes
 
           <section aria-label={t("Danger zone")} className="space-y-3 border-t border-destructive/25 pt-4">
             <div>
-              <p className={cn(subHeading, "text-[#f6c2b6]")}>{t("Danger zone")}</p>
+              <p className={cn(subHeading, "text-danger-text")}>{t("Danger zone")}</p>
               <p className="mt-1 text-xs text-steel">{t("These actions affect only this guild, apply to every member and cannot be undone. Download an export first.")}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {(Object.keys(SHARED_ACTIONS) as SharedAction[]).map((a) => (
-                <div key={a} className="flex flex-col gap-3 border border-steel/12 bg-ink/50 p-4">
+                <div key={a} className="flex flex-col gap-3 border border-steel/12 bg-surface/50 p-4">
                   <p className={subHeading}>{t(SHARED_ACTIONS[a].title)}</p>
                   <p className="flex-1 text-xs text-steel">{t(SHARED_ACTIONS[a].body)}</p>
                   <Button
@@ -372,7 +372,7 @@ export function DataManagement({ isLeader, onReset }: { isLeader: boolean; onRes
                     variant="outline"
                     disabled={a === "parties" && parties.status !== "ready"}
                     onClick={() => { setDone(null); setPending(a); }}
-                    className={cn(aionButtonSecondary, "self-start hover:border-destructive/60 hover:text-[#f0a596]")}
+                    className={cn(aionButtonSecondary, "self-start hover:border-destructive/60 hover:text-danger-text")}
                   >
                     <RotateCcw className="size-3.5" /> {t(SHARED_ACTIONS[a].title)}
                   </Button>
@@ -380,7 +380,7 @@ export function DataManagement({ isLeader, onReset }: { isLeader: boolean; onRes
               ))}
             </div>
             <p aria-live="polite" className="text-sm empty:hidden">
-              {done && <span className={cn("inline-flex items-center gap-1.5", done.ok ? "text-[#9af0b3]" : "text-[#f6c2b6]")}>{done.ok && <Check className="size-4" />} {done.text}</span>}
+              {done && <span className={cn("inline-flex items-center gap-1.5", done.ok ? "text-success-text" : "text-danger-text")}>{done.ok && <Check className="size-4" />} {done.text}</span>}
             </p>
             <RosterDataDanger onDone={() => void overview.reload()} />
           </section>
@@ -444,7 +444,7 @@ function RosterDataDanger({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="border border-destructive/40 bg-destructive/[0.06] p-4" data-testid="roster-danger">
-      <p className="flex items-center gap-2 font-heading text-sm tracking-[0.1em] text-[#f6c2b6] uppercase">
+      <p className="flex items-center gap-2 font-heading text-sm tracking-[0.1em] text-danger-text uppercase">
         <Trash className="size-4" /> {" "}{t("Delete Guild Roster Data")}</p>
       <p className="mt-2 text-xs text-steel">
         {t("Permanently removes every member of this guild's roster except your own character — roles, notes, stored API responses and snapshot history. Linked accounts are sent back to guild setup. Settings and party presets are kept; party slots holding removed members become empty.")}</p>
@@ -466,7 +466,7 @@ function RosterDataDanger({ onDone }: { onDone: () => void }) {
         </span>
       </div>
       <p aria-live="polite" className="mt-2 text-sm empty:hidden" data-testid="roster-danger-result">
-        {result && <span className={result.ok ? "text-[#9af0b3]" : "text-[#f6c2b6]"}>{result.text}</span>}
+        {result && <span className={result.ok ? "text-success-text" : "text-danger-text"}>{result.text}</span>}
       </p>
 
       <AlertDialog open={open} onOpenChange={(o) => { if (!busy) { setOpen(o); if (!o) setTyped(""); } }}>

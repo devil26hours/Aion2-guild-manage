@@ -18,16 +18,16 @@ const MOTES = Array.from({ length: 22 }, (_, i) => {
   };
 });
 
-/** Full-screen layered CSS scene: sky glow, distant spires, haze, motes, grain. */
+/** Full-screen layered CSS scene: sky, glow, distant spires, haze, motes, grain. All colours are --bd-* theme tokens. */
 export function FantasyBackdrop() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-      {/* Base night sky */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,#13213d_0%,#0a1020_45%,#05070d_100%)]" />
+      {/* Base sky */}
+      <div className="absolute inset-0 bg-[image:var(--bd-sky)]" />
 
-      {/* Arcane rift glow behind panel */}
-      <div className="absolute top-[18%] left-1/2 h-[60vmin] w-[90vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgba(95,168,255,0.20),rgba(95,168,255,0.06)_55%,transparent)] blur-2xl" />
-      <div className="absolute top-[8%] left-1/2 h-[30vmin] w-[50vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgba(201,164,92,0.10),transparent)] blur-2xl" />
+      {/* Cloud / arcane rift glow behind panel */}
+      <div className="absolute top-[18%] left-1/2 h-[60vmin] w-[90vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,var(--bd-glow),var(--bd-glow-soft)_55%,transparent)] blur-2xl" />
+      <div className="absolute top-[8%] left-1/2 h-[30vmin] w-[50vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,var(--bd-sun),transparent)] blur-2xl" />
 
       {/* Distant floating-citadel silhouettes */}
       <svg
@@ -37,12 +37,12 @@ export function FantasyBackdrop() {
       >
         <defs>
           <linearGradient id="bd-far" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#14203a" />
-            <stop offset="1" stopColor="#0a0f1c" />
+            <stop offset="0" stopColor="var(--bd-far-top)" />
+            <stop offset="1" stopColor="var(--bd-far-bottom)" />
           </linearGradient>
           <linearGradient id="bd-near" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#0b1222" />
-            <stop offset="1" stopColor="#05070d" />
+            <stop offset="0" stopColor="var(--bd-near-top)" />
+            <stop offset="1" stopColor="var(--bd-near-bottom)" />
           </linearGradient>
         </defs>
         <path
@@ -57,7 +57,7 @@ export function FantasyBackdrop() {
       </svg>
 
       {/* Low haze */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05070d] via-[#05070d]/70 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[var(--bd-haze)] via-[color-mix(in_srgb,var(--bd-haze)_70%,transparent)] to-transparent" />
 
       {/* Motes */}
       {MOTES.map((m, i) => (
@@ -70,8 +70,8 @@ export function FantasyBackdrop() {
               top: m.top,
               width: m.size,
               height: m.size,
-              background: m.gold ? "#e8d1a0" : "#9fcbff",
-              boxShadow: `0 0 ${m.size * 4}px ${m.gold ? "rgba(232,209,160,0.8)" : "rgba(95,168,255,0.9)"}`,
+              background: m.gold ? "var(--mote-gold)" : "var(--mote)",
+              boxShadow: `0 0 ${m.size * 4}px ${m.gold ? "var(--mote-gold-glow)" : "var(--mote-glow)"}`,
               "--mote-duration": m.duration,
               "--mote-delay": m.delay,
               "--mote-drift": m.drift,
@@ -82,8 +82,8 @@ export function FantasyBackdrop() {
       ))}
 
       {/* Vignette + grain */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.65)_100%)]" />
-      <div className="aion-grain absolute inset-0 opacity-[0.05] mix-blend-overlay" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,var(--bd-vignette)_100%)]" />
+      <div className="aion-grain absolute inset-0 opacity-[var(--grain-opacity)] mix-blend-overlay" />
     </div>
   );
 }

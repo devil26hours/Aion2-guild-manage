@@ -48,7 +48,7 @@ function RoleSelect({ index, value, onRole, disabled }: { index: number; value: 
 }
 
 const iconBtn =
-  "flex size-8 shrink-0 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-gold-dim/60 hover:text-gold-bright focus-visible:border-arcane/60";
+  "flex size-8 shrink-0 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-brand-muted/60 hover:text-brand-strong focus-visible:border-arcane/60";
 
 export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], view, onAssign, onRemove, onRole, readOnly = false }: Props) {
   const t = useT();
@@ -62,15 +62,15 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
         data-slot-index={index}
         data-state="empty"
         className={cn(
-          "group flex items-center gap-3 border border-dashed border-steel/20 bg-ink/30 transition-colors hover:border-gold-dim/50",
+          "group flex items-center gap-3 border border-dashed border-steel/20 bg-surface/30 transition-colors hover:border-brand-muted/50",
           view === "cards" ? "min-h-[6.5rem] p-3" : "px-3 py-2",
         )}
       >
-        <span className="flex size-7 shrink-0 items-center justify-center border border-steel/20 text-xs font-bold text-steel/60 tabular-nums">
+        <span className="flex size-7 shrink-0 items-center justify-center border border-steel/20 text-xs font-bold text-subtle tabular-nums">
           {index + 1}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-steel/70">{t("Empty slot")}</p>
+          <p className="text-sm text-subtle">{t("Empty slot")}</p>
           {slot.role && <RoleBadge role={slot.role} className="mt-1" />}
         </div>
         {!readOnly && (
@@ -89,14 +89,14 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
       data-slot-index={index}
       data-state={missing ? "missing" : "filled"}
       className={cn(
-        "relative border bg-gradient-to-br from-ink-raised to-ink transition-colors",
-        missing || duplicate ? "border-destructive/50" : "border-steel/15 hover:border-gold-dim/50",
+        "relative border bg-gradient-to-br from-surface-raised to-surface transition-colors",
+        missing || duplicate ? "border-destructive/50" : "border-steel/15 hover:border-brand-muted/50",
         view === "cards" ? "p-3" : "px-3 py-2",
       )}
       style={roleColor && !missing ? { boxShadow: `inset 3px 0 0 ${roleColor}` } : undefined}
     >
       <div className={cn("flex gap-3", view === "cards" ? "items-start" : "flex-wrap items-center")}>
-        <span className="flex size-7 shrink-0 items-center justify-center border border-gold-dim/50 bg-gold/10 text-xs font-bold text-gold-bright tabular-nums">
+        <span className="flex size-7 shrink-0 items-center justify-center border border-brand-muted/50 bg-brand/10 text-xs font-bold text-brand-strong tabular-nums">
           {index + 1}
         </span>
 
@@ -121,7 +121,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
                   data-testid="slot-comment"
                   title={member.comment}
                   className={cn(
-                    "text-xs break-words text-[#cfe3ff]/85 italic",
+                    "text-xs break-words text-info-text italic",
                     view === "cards" ? "line-clamp-2" : "truncate",
                   )}
                 >
@@ -130,7 +130,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
               )}
             </>
           ) : (
-            <p className="flex items-center gap-1.5 text-sm text-[#f0a596]">
+            <p className="flex items-center gap-1.5 text-sm text-danger-text">
               <CircleAlert className="size-3.5" /> {" "}{t("Removed from roster")}</p>
           )}
           {member && (
@@ -139,9 +139,9 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
               <span className="text-steel">Lv. {member.level ?? "—"}</span>
             </div>
           )}
-          {duplicate && <p className="mt-1 text-2xs text-[#f0a596]">{t("Assigned more than once")}</p>}
+          {duplicate && <p className="mt-1 text-2xs text-danger-text">{t("Assigned more than once")}</p>}
           {member && elsewhere.length > 0 && (
-            <p data-testid="slot-elsewhere" className="mt-1 flex items-center gap-1 text-2xs text-[#f0cf86]">
+            <p data-testid="slot-elsewhere" className="mt-1 flex items-center gap-1 text-2xs text-warning-text">
               <CircleAlert aria-hidden className="size-3 shrink-0" />
               {t("Also in")}{" "}{describePlacements(elsewhere)}
             </p>
@@ -150,8 +150,8 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
 
         {member && view === "list" && (
           <div className="flex gap-4 text-xs tabular-nums">
-            <span><span className="text-steel/60">CP </span><span className="font-semibold text-gold-bright">{member.combat_power !== null ? formatNumber(member.combat_power) : "—"}</span></span>
-            <span><span className="text-steel/60">iLv </span><span className="text-foreground">{member.item_level ?? "—"}</span></span>
+            <span><span className="text-subtle">CP </span><span className="font-semibold text-brand-strong">{member.combat_power !== null ? formatNumber(member.combat_power) : "—"}</span></span>
+            <span><span className="text-subtle">iLv </span><span className="text-foreground">{member.item_level ?? "—"}</span></span>
           </div>
         )}
 
@@ -161,7 +161,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
           <button type="button" onClick={onAssign} className={iconBtn} aria-label={t("Replace character in slot {n}", { n: index + 1 })} title={t("Replace")}>
             <ArrowLeftRight className="size-3.5" />
           </button>
-          <button type="button" onClick={onRemove} className={cn(iconBtn, "hover:border-destructive/60 hover:text-[#f0a596]")} aria-label={t("Remove {name} from slot {n}", { name, n: index + 1 })} title={t("Remove")}>
+          <button type="button" onClick={onRemove} className={cn(iconBtn, "hover:border-destructive/60 hover:text-danger-text")} aria-label={t("Remove {name} from slot {n}", { name, n: index + 1 })} title={t("Remove")}>
             <X className="size-3.5" />
           </button>
           </>)}
@@ -172,11 +172,11 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
         <div className="mt-3 flex items-end justify-between gap-2 border-t border-steel/10 pt-2.5">
           <dl className="flex gap-4 text-xs tabular-nums">
             <div>
-              <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">CP</dt>
-              <dd className="font-semibold text-gold-bright">{member.combat_power !== null ? formatNumber(member.combat_power) : "—"}</dd>
+              <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">CP</dt>
+              <dd className="font-semibold text-brand-strong">{member.combat_power !== null ? formatNumber(member.combat_power) : "—"}</dd>
             </div>
             <div>
-              <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">{t("Item Lv.")}</dt>
+              <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">{t("Item Lv.")}</dt>
               <dd className="font-semibold text-foreground">{member.item_level ?? "—"}</dd>
             </div>
           </dl>
@@ -184,7 +184,7 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
         </div>
       )}
       {member && slot.role === null && (
-        <p className="mt-1.5 text-3xs text-steel/60">
+        <p className="mt-1.5 text-3xs text-subtle">
           {t("Guild role:")}{" "}{member.role ?? t("not set")}
         </p>
       )}

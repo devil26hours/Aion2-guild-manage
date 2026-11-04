@@ -149,12 +149,12 @@ export function MembersManager() {
             className={cn(
               "aion-enter flex items-center gap-2.5 border border-l-2 px-3 py-2.5 text-sm",
               notice.tone === "success"
-                ? "border-[#7ee79e]/25 border-l-[#7ee79e] bg-[#7ee79e]/[0.07] text-[#c8f5d4]"
-                : "border-arcane/25 border-l-arcane bg-arcane/[0.07] text-[#cfe3ff]",
+                ? "border-success/25 border-l-success bg-success/[0.07] text-success-text"
+                : "border-arcane/25 border-l-arcane bg-arcane/[0.07] text-info-text",
             )}
           >
             {notice.tone === "success" ? (
-              <CheckCircle2 className="size-4 shrink-0 text-[#7ee79e]" />
+              <CheckCircle2 className="size-4 shrink-0 text-success" />
             ) : (
               <Info className="size-4 shrink-0 text-arcane" />
             )}

@@ -14,7 +14,7 @@ import { useT } from "@/lib/i18n";
 import { GUILD_IMAGE_MAX_BYTES, LIMITS } from "@/lib/settings/schema";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 
 interface GuildSummary {
   id: string;
@@ -50,24 +50,24 @@ export function GuildSetup() {
             type="button"
             data-choice="join"
             onClick={() => setMode("join")}
-            className="group flex min-h-48 flex-col items-center justify-center gap-3 border border-gold-dim/40 bg-gradient-to-b from-ink-raised to-ink p-6 text-center transition-colors outline-none hover:border-gold/70 hover:bg-gold/[0.04] focus-visible:border-arcane/60"
+            className="group flex min-h-48 flex-col items-center justify-center gap-3 border border-brand-muted/40 bg-gradient-to-b from-surface-raised to-surface p-6 text-center transition-colors outline-none hover:border-brand/70 hover:bg-brand/[0.04] focus-visible:border-arcane/60"
           >
-            <span className="flex size-14 items-center justify-center border border-gold-dim/50 bg-gold/10 text-gold transition-colors group-hover:text-gold-bright">
+            <span className="flex size-14 items-center justify-center border border-brand-muted/50 bg-brand/10 text-brand transition-colors group-hover:text-brand-strong">
               <Users className="size-7" />
             </span>
-            <span className="font-heading text-lg tracking-[0.12em] text-gold-bright uppercase">{t("Join an Existing Guild")}</span>
+            <span className="font-heading text-lg tracking-[0.12em] text-brand-strong uppercase">{t("Join an Existing Guild")}</span>
             <span className="text-xs text-steel">{t("Find your guild and enter the 4-digit join code from your Guild Leader.")}</span>
           </button>
           <button
             type="button"
             data-choice="create"
             onClick={() => setMode("create")}
-            className="group flex min-h-48 flex-col items-center justify-center gap-3 border border-gold-dim/40 bg-gradient-to-b from-ink-raised to-ink p-6 text-center transition-colors outline-none hover:border-gold/70 hover:bg-gold/[0.04] focus-visible:border-arcane/60"
+            className="group flex min-h-48 flex-col items-center justify-center gap-3 border border-brand-muted/40 bg-gradient-to-b from-surface-raised to-surface p-6 text-center transition-colors outline-none hover:border-brand/70 hover:bg-brand/[0.04] focus-visible:border-arcane/60"
           >
-            <span className="flex size-14 items-center justify-center border border-gold-dim/50 bg-gold/10 text-gold transition-colors group-hover:text-gold-bright">
+            <span className="flex size-14 items-center justify-center border border-brand-muted/50 bg-brand/10 text-brand transition-colors group-hover:text-brand-strong">
               <Crown className="size-7" />
             </span>
-            <span className="font-heading text-lg tracking-[0.12em] text-gold-bright uppercase">{t("Create a New Guild")}</span>
+            <span className="font-heading text-lg tracking-[0.12em] text-brand-strong uppercase">{t("Create a New Guild")}</span>
             <span className="text-xs text-steel">{t("Start a guild and become its Guild Leader.")}</span>
           </button>
         </div>
@@ -75,7 +75,7 @@ export function GuildSetup() {
       {mode === "join" && <JoinGuild onBack={() => setMode("choose")} />}
       {mode === "create" && <CreateGuild onBack={() => setMode("choose")} />}
       <div className="flex justify-center">
-        <button type="button" onClick={() => void logout()} className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-[#f0b6aa]" data-testid="setup-logout">
+        <button type="button" onClick={() => void logout()} className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-danger-text" data-testid="setup-logout">
           <LogOut className="size-3.5" /> {t("Log out")}
         </button>
       </div>
@@ -86,7 +86,7 @@ export function GuildSetup() {
 function BackButton({ onBack }: { onBack: () => void }) {
   const t = useT();
   return (
-    <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-gold-bright">
+    <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-xs text-steel hover:text-brand-strong">
       <ArrowLeft className="size-3.5" /> {t("Back")}
     </button>
   );
@@ -138,7 +138,7 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
     <div className="space-y-4" data-testid="join-guild">
       <BackButton onBack={onBack} />
       <div className="relative">
-        <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+        <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
         <Input
           aria-label={t("Search guilds")}
           placeholder={t("Search by guild name, server or leader…")}
@@ -149,7 +149,7 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
         />
       </div>
       {list.status === "loading" && <p className="flex items-center gap-2 text-sm text-steel"><Loader2 className="size-4 animate-spin" /> {t("Loading guilds…")}</p>}
-      {list.status === "error" && <p className="text-sm text-[#f6c2b6]">{list.error}</p>}
+      {list.status === "error" && <p className="text-sm text-danger-text">{list.error}</p>}
       {list.status === "ready" && list.guilds.length === 0 && <p className="py-6 text-center text-sm text-steel">{t("No guilds found.")}</p>}
       <ul className="grid gap-3 sm:grid-cols-2" data-testid="guild-list">
         {list.guilds.map((g) => (
@@ -159,11 +159,11 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
               data-guild-id={g.id}
               onClick={() => { setSelected(g); setCode(""); setError(null); }}
               className={cn(
-                "flex w-full items-start gap-3 border bg-ink/50 p-3 text-left transition-colors outline-none focus-visible:border-arcane/60",
-                selected?.id === g.id ? "border-gold/70 bg-gold/[0.06]" : "border-steel/15 hover:border-gold-dim/60",
+                "flex w-full items-start gap-3 border bg-surface/50 p-3 text-left transition-colors outline-none focus-visible:border-arcane/60",
+                selected?.id === g.id ? "border-brand/70 bg-brand/[0.06]" : "border-steel/15 hover:border-brand-muted/60",
               )}
             >
-              <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden border border-gold-dim/40 bg-gold/10 text-gold">
+              <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden border border-brand-muted/40 bg-brand/10 text-brand">
                 {g.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element -- auth-protected API image
                   <img src={g.image_url} alt="" className="size-full object-cover" />
@@ -172,14 +172,14 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-heading text-sm tracking-wide text-gold-bright">{g.name}</span>
+                <span className="block truncate font-heading text-sm tracking-wide text-brand-strong">{g.name}</span>
                 <span className="block text-xs text-steel">
                   {g.server || t("Server not set")} · {t("{n} / {cap} members", { n: g.member_count, cap: g.member_cap })}
                 </span>
-                {g.leader && <span className="block text-xs text-steel/80">{t("Leader")}: {g.leader}</span>}
+                {g.leader && <span className="block text-xs text-subtle">{t("Leader")}: {g.leader}</span>}
                 {g.description && <span className="mt-1 line-clamp-2 block text-xs text-foreground/75">{g.description}</span>}
                 {!g.join_open && (
-                  <span className="mt-1 block text-2xs text-[#f0cf86]">{g.join_code_set ? t("This guild is full.") : t("Joining is closed (no join code set).")}</span>
+                  <span className="mt-1 block text-2xs text-warning-text">{g.join_code_set ? t("This guild is full.") : t("Joining is closed (no join code set).")}</span>
                 )}
               </span>
             </button>
@@ -187,7 +187,7 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
         ))}
       </ul>
       {selected && (
-        <form onSubmit={join} noValidate className="space-y-3 border border-gold-dim/40 bg-gold/[0.04] p-4" data-testid="join-form">
+        <form onSubmit={join} noValidate className="space-y-3 border border-brand-muted/40 bg-brand/[0.04] p-4" data-testid="join-form">
           <p className="text-sm text-foreground">{t("Join {guild}", { guild: selected.name })}</p>
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-1.5">
@@ -207,7 +207,7 @@ function JoinGuild({ onBack }: { onBack: () => void }) {
               {busy ? t("Joining…") : t("Join guild")}
             </Button>
           </div>
-          {error && <p role="alert" className="text-sm text-[#f6c2b6]" data-testid="join-error">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger-text" data-testid="join-error">{error}</p>}
         </form>
       )}
     </div>
@@ -268,7 +268,7 @@ function CreateGuild({ onBack }: { onBack: () => void }) {
         <div className="space-y-1.5">
           <Label htmlFor="cg-name" className={labelClass}>{t("Guild name")} *</Label>
           <Input id="cg-name" maxLength={LIMITS.guildName.max} value={name} aria-invalid={!!errors.name} onChange={(e) => setName(e.target.value)} className={aionField} />
-          {errors.name && <p className="text-xs text-[#ef9b89]">{errors.name}</p>}
+          {errors.name && <p className="text-xs text-danger-text">{errors.name}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cg-server" className={labelClass}>{t("Guild server")} ({t("optional")})</Label>
@@ -286,7 +286,7 @@ function CreateGuild({ onBack }: { onBack: () => void }) {
             onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
             className={cn(aionField, "w-32 text-center font-mono tracking-[0.4em]")}
           />
-          {errors.code ? <p className="text-xs text-[#ef9b89]">{errors.code}</p> : <p className="text-2xs text-steel/60">{t("Players need this code to join. You can set or change it later in Settings.")}</p>}
+          {errors.code ? <p className="text-xs text-danger-text">{errors.code}</p> : <p className="text-2xs text-subtle">{t("Players need this code to join. You can set or change it later in Settings.")}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cg-image" className={labelClass}>{t("Guild image")} ({t("optional")})</Label>
@@ -297,14 +297,14 @@ function CreateGuild({ onBack }: { onBack: () => void }) {
             </Button>
             <span className="truncate text-xs text-steel" data-testid="cg-file-name">{file ? file.name : t("PNG or JPEG, up to 1 MB")}</span>
           </div>
-          {errors.file && <p className="text-xs text-[#ef9b89]">{errors.file}</p>}
+          {errors.file && <p className="text-xs text-danger-text">{errors.file}</p>}
         </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="cg-desc" className={labelClass}>{t("Description")} ({t("optional")})</Label>
         <Textarea id="cg-desc" maxLength={LIMITS.description} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className={cn(aionField, "h-auto min-h-20")} />
       </div>
-      {error && <p role="alert" className="text-sm text-[#f6c2b6]" data-testid="create-error">{error}</p>}
+      {error && <p role="alert" className="text-sm text-danger-text" data-testid="create-error">{error}</p>}
       <Button type="submit" disabled={busy} className={cn(aionButtonPrimary, "h-11 w-full")}>
         {busy ? <Loader2 className="size-4 animate-spin" /> : <Crown className="size-4" />}
         {busy ? t("Creating guild…") : t("Create guild and become Guild Leader")}

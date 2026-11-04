@@ -51,13 +51,13 @@ export function SnapshotTimeline({
               id={`snap-${s.id}`}
               className={cn(
                 "relative px-4 py-3 sm:px-5",
-                s.id === focusId && "bg-gold/[0.06] shadow-[inset_2px_0_0_var(--color-gold)]",
+                s.id === focusId && "bg-brand/[0.06] shadow-[inset_2px_0_0_var(--brand)]",
               )}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="text-xs font-medium text-foreground">{snapshotLabel(s, i)}</p>
-                  <p className="text-2xs text-steel/60">
+                  <p className="text-2xs text-subtle">
                     <RelativeTime iso={s.captured_at} />
                     {i === history.length - 1 && <span className="ml-1.5 text-arcane">· latest</span>}
                     {i === 0 && <span className="ml-1.5">· first recorded</span>}
@@ -74,7 +74,7 @@ export function SnapshotTimeline({
                         onClick={() => onPick(w, s.id)}
                         className={cn(
                           "h-6 min-w-7 border px-1.5 text-3xs font-bold tracking-wider transition-colors outline-none focus-visible:ring-2 focus-visible:ring-arcane/40",
-                          on ? "border-gold/70 bg-gold/20 text-gold-bright" : "border-steel/20 text-steel hover:border-gold-dim/60 hover:text-foreground",
+                          on ? "border-brand/70 bg-brand/20 text-brand-strong" : "border-steel/20 text-steel hover:border-brand-muted/60 hover:text-foreground",
                         )}
                         aria-label={`Set ${snapshotLabel(s, i)} as comparison ${w.toUpperCase()}`}
                       >
@@ -87,21 +87,21 @@ export function SnapshotTimeline({
 
               <dl className="mt-2 grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">CP</dt>
-                  <dd className="flex flex-wrap items-center gap-1 font-semibold text-gold-bright tabular-nums">
+                  <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">CP</dt>
+                  <dd className="flex flex-wrap items-center gap-1 font-semibold text-brand-strong tabular-nums">
                     {formatNumber(s.combat_power)}
                     {prev && <DeltaChip delta={s.combat_power - prev.combat_power} className="px-1 py-0 text-4xs" />}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Item Lv.</dt>
+                  <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Item Lv.</dt>
                   <dd className="flex flex-wrap items-center gap-1 font-semibold text-foreground tabular-nums">
                     {s.item_level}
                     {prev && <DeltaChip delta={s.item_level - prev.item_level} className="px-1 py-0 text-4xs" />}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Combat Speed</dt>
+                  <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Combat Speed</dt>
                   <dd className="flex flex-wrap items-center gap-1 font-semibold text-foreground tabular-nums">
                     {s.stats.combat_speed.toFixed(1)}
                     {prev && <DeltaChip delta={cs} className="px-1 py-0 text-4xs" />}
@@ -109,7 +109,7 @@ export function SnapshotTimeline({
                 </div>
               </dl>
 
-              <p className="mt-1.5 text-2xs text-steel/70">
+              <p className="mt-1.5 text-2xs text-subtle">
                 {!prev
                   ? "Baseline snapshot."
                   : unchanged
@@ -118,9 +118,9 @@ export function SnapshotTimeline({
                       ? "No equipment changes."
                       : eq && (
                           <>
-                            Equipment: <span className="text-[#9af0b3]">{eq.upgraded} upgraded</span>
-                            {eq.downgraded > 0 && <span className="text-[#f0a596]">, {eq.downgraded} downgraded</span>}
-                            {eq.changed > 0 && <span className="text-[#cfe3ff]">, {eq.changed} changed</span>}
+                            Equipment: <span className="text-success-text">{eq.upgraded} upgraded</span>
+                            {eq.downgraded > 0 && <span className="text-danger-text">, {eq.downgraded} downgraded</span>}
+                            {eq.changed > 0 && <span className="text-info-text">, {eq.changed} changed</span>}
                             {eq.enhancementDelta !== 0 && (
                               <>
                                 {" "}· enhancement {eq.enhancementDelta > 0 ? "+" : "−"}

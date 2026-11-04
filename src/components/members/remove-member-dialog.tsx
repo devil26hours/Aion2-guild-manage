@@ -43,15 +43,15 @@ export function RemoveMemberDialog({
               </AlertDialogDescription>
             </AlertDialogHeader>
 
-            <div className="flex items-center justify-between gap-3 border border-steel/12 bg-ink/60 px-3 py-2.5 text-xs">
+            <div className="flex items-center justify-between gap-3 border border-steel/12 bg-surface/60 px-3 py-2.5 text-xs">
               <div>
                 <p className="text-sm font-medium text-foreground">{member.character_name}</p>
-                <p className="text-steel/60">
+                <p className="text-subtle">
                   {member.server} · Lv. {member.level}
                 </p>
               </div>
               <ClassBadge cls={member.class} withIcon />
-              <p className="font-semibold text-gold-bright tabular-nums">
+              <p className="font-semibold text-brand-strong tabular-nums">
                 {formatNumber(member.combat_power)} CP
               </p>
             </div>

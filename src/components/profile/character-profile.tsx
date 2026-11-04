@@ -46,10 +46,10 @@ export function CharacterProfile({ id }: { id: string }) {
   if (!member || !stats || !summary) {
     return (
       <FramedPanel className="mx-auto max-w-lg px-6 py-10 text-center">
-        <UserX className="mx-auto size-8 text-steel/50" />
+        <UserX className="mx-auto size-8 text-subtle" />
         <h1 className="mt-3 font-heading text-lg tracking-[0.12em] text-foreground">Character Not Found</h1>
         <p className="mt-2 text-sm text-steel">
-          No guild member with id <code className="text-gold">{id}</code>. They may have been removed.
+          No guild member with id <code className="text-brand">{id}</code>. They may have been removed.
         </p>
         <BackToMembers className="mt-6" />
       </FramedPanel>

@@ -6,10 +6,10 @@ import { RARITIES } from "@/lib/aion/types";
 
 function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="border border-steel/10 bg-ink/50 px-3 py-2.5">
-      <p className="text-4xs tracking-[0.16em] text-steel/70 uppercase">{label}</p>
+    <div className="border border-steel/10 bg-surface/50 px-3 py-2.5">
+      <p className="text-4xs tracking-[0.16em] text-subtle uppercase">{label}</p>
       <p className="mt-0.5 font-heading text-xl font-bold text-foreground tabular-nums">{value}</p>
-      {sub && <p className="truncate text-2xs text-steel/60">{sub}</p>}
+      {sub && <p className="truncate text-2xs text-subtle">{sub}</p>}
     </div>
   );
 }
@@ -38,7 +38,7 @@ export function EquipmentSummary({ summary }: { summary: Summary }) {
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
+        <p className="mb-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">
           Rarity Distribution
         </p>
         {/* Stacked bar: segments separated by a 2px surface gap */}
@@ -68,7 +68,7 @@ export function EquipmentSummary({ summary }: { summary: Summary }) {
                 <span aria-hidden className="size-2 rotate-45" style={{ backgroundColor: RARITY_META[r].color }} />
                 {RARITY_META[r].label}
               </span>
-              <span className={summary.rarityCounts[r] ? "font-semibold text-foreground tabular-nums" : "text-steel/40 tabular-nums"}>
+              <span className={summary.rarityCounts[r] ? "font-semibold text-foreground tabular-nums" : "text-subtle tabular-nums"}>
                 {summary.rarityCounts[r]}
               </span>
             </li>

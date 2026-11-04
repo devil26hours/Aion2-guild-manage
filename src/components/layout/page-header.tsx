@@ -15,11 +15,11 @@ export function PageHeader({
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4 lg:mb-8">
       <div>
         {eyebrow && (
-          <p className="text-3xs font-semibold tracking-[0.3em] text-arcane/90 uppercase">
+          <p className="text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
             {eyebrow}
           </p>
         )}
-        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[0.08em] text-gold-bright sm:text-3xl">
+        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[0.08em] text-brand-strong sm:text-3xl">
           {title}
         </h1>
         {description && <p className="mt-1.5 text-sm text-steel">{description}</p>}

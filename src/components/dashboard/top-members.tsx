@@ -7,9 +7,9 @@ import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const RANK_STYLE = [
-  "border-gold/70 bg-gold/15 text-gold-bright",
-  "border-steel/50 bg-steel/10 text-[#d7dde8]",
-  "border-[#a0703f]/70 bg-[#a0703f]/15 text-[#e0b083]",
+  "border-gold/70 bg-gold/15 text-gold-text",
+  "border-steel/50 bg-steel/10 text-foreground",
+  "border-bronze/70 bg-bronze/15 text-bronze-text",
 ];
 
 export function TopMembers({ members }: { members: GuildMember[] }) {
@@ -22,7 +22,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
       action={
         <Link
           href="/members"
-          className="flex shrink-0 items-center gap-1 text-xs text-gold/90 transition-colors hover:text-gold-bright"
+          className="flex shrink-0 items-center gap-1 text-xs text-brand transition-colors hover:text-brand-strong"
         >
           View all <ChevronRight className="size-3.5" />
         </Link>
@@ -31,7 +31,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm sm:min-w-[34rem]">
           <thead>
-            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
+            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-subtle uppercase">
               <th scope="col" className="w-10 py-2.5 pl-4 font-medium sm:w-12 sm:pl-5">#</th>
               <th scope="col" className="py-2.5 pl-2 font-medium sm:pl-0">Character</th>
               <th scope="col" className="hidden py-2.5 font-medium sm:table-cell">Class</th>
@@ -53,7 +53,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
             {members.map((m, i) => (
               <tr
                 key={m.id}
-                className="border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-white/[0.025]"
+                className="border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-surface-hover"
               >
                 <td className="py-3 pl-4 sm:pl-5">
                   <span
@@ -68,7 +68,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
                 <td className="py-3 pl-2 font-medium text-foreground sm:pl-0">
                   <Link
                     href={`/members/${m.id}`}
-                    className="underline-offset-4 hover:text-gold-bright hover:underline"
+                    className="underline-offset-4 hover:text-brand-strong hover:underline"
                   >
                     {m.character_name}
                   </Link>
@@ -81,7 +81,7 @@ export function TopMembers({ members }: { members: GuildMember[] }) {
                   <ClassBadge cls={m.class} />
                 </td>
                 <td className="py-3 pl-3 text-right text-steel tabular-nums">{m.level}</td>
-                <td className="py-3 pl-3 text-right font-semibold text-gold-bright tabular-nums">
+                <td className="py-3 pl-3 text-right font-semibold text-brand-strong tabular-nums">
                   {formatNumber(m.combat_power)}
                 </td>
                 <td className="py-3 pr-4 pl-3 text-right text-foreground/85 tabular-nums sm:pr-5">

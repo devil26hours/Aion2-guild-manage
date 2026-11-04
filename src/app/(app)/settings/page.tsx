@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SettingsView } from "@/components/settings/settings-view";
 
 export const metadata: Metadata = {
-  title: "Settings — AION II Guild Command",
+  title: "Settings — ChumChon AION2",
 };
 
 export default function SettingsPage() {

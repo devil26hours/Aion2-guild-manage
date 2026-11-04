@@ -2,17 +2,26 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark"] *));
+/* The page's theme, for parts inside a nested data-theme scope (the app header). */
+@custom-variant page-dark (&:is(html[data-theme="dark"] *));
+/* PC only: as wide as lg, but with a mouse, so tablets in landscape are excluded. */
+@custom-variant pc {
+  @media (min-width: 64rem) and (pointer: fine) {
+    @slot;
+  }
+}
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Latin glyphs come from Geist / Cinzel; Thai glyphs (which those fonts do
-     not contain) fall through to Noto Sans Thai instead of a small OS font. */
+  /* Latin glyphs come from Geist / Sora / Cinzel; Thai glyphs (which those fonts
+     do not contain) fall through to Noto Sans Thai instead of a small OS font.
+     Cinzel (font-display) is reserved for the ChumChon wordmark. */
   --font-sans: var(--font-geist-sans), var(--font-thai), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), var(--font-thai), ui-monospace, monospace;
   --font-display: var(--font-cinzel), var(--font-thai), serif;
-  --font-heading: var(--font-cinzel), var(--font-thai), serif;
+  --font-heading: var(--font-sora), var(--font-thai), ui-sans-serif, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,14 +59,36 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* AION 2 design tokens */
-  --color-gold: #c9a45c;
-  --color-gold-bright: #e8d1a0;
-  --color-gold-dim: #8a7440;
-  --color-arcane: #5fa8ff;
-  --color-ink: #070a11;
-  --color-ink-raised: #0b101b;
-  --color-steel: #93a2bb;
+  /* AION 2 design tokens. Values live in the theme blocks below. */
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-muted: var(--brand-muted);
+  --color-gold: var(--gold);
+  --color-gold-text: var(--gold-text);
+  --color-arcane: var(--arcane);
+  --color-steel: var(--steel);
+  --color-subtle: var(--subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-hover: var(--surface-hover);
+  --color-icon-well: var(--icon-well);
+  --color-scrim: var(--scrim);
+  --color-success: var(--success);
+  --color-success-text: var(--success-text);
+  --color-warning: var(--warning);
+  --color-warning-text: var(--warning-text);
+  --color-danger-text: var(--danger-text);
+  --color-info-text: var(--info-text);
+  --color-mystic: var(--mystic);
+  --color-mystic-text: var(--mystic-text);
+  --color-bronze: var(--bronze);
+  --color-bronze-text: var(--bronze-text);
+  --shadow-panel: var(--panel-shadow);
+  --shadow-frame: var(--frame-shadow);
+  --shadow-dialog: var(--dialog-shadow);
+  --shadow-float: var(--float-shadow);
+  --shadow-cta: var(--cta-shadow);
 }
 
 /* ---------------------------------------------------------------
@@ -110,75 +141,246 @@
   --text-3xl--line-height: 1.35;
 }
 
+/* ---------------------------------------------------------------
+   Themes. <html data-theme> is set by the inline script in the root
+   layout before first paint (see src/lib/theme/script.ts).
+   Both share one hierarchy: page < panel (raised) with nested wells
+   (surface, sunken) set into it. Blue and cyan mean action, gold means
+   decoration or something important, purple marks special badges.
+   Light: daylight over Atreia's skies. White panels, deep-blue ink.
+   Dark: a blue night sky, not an inverted light theme.
+   --------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --radius: 0.5rem;
+
+  --background: #dbe9f7;
+  --foreground: #0d2547;
   --card: #ffffff;
-  --card-foreground: #171717;
+  --card-foreground: #0d2547;
   --popover: #ffffff;
-  --popover-foreground: #171717;
-  --primary: #171717;
+  --popover-foreground: #0d2547;
+  --primary: #0a5cb0;
   --primary-foreground: #ffffff;
-  --secondary: #f1f1f1;
-  --secondary-foreground: #171717;
-  --muted: #f1f1f1;
-  --muted-foreground: #737373;
-  --accent: #f1f1f1;
-  --accent-foreground: #171717;
-  --destructive: #d4553f;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: rgba(0, 0, 0, 0.15);
-  --ring: #737373;
-  --chart-1: #888888;
-  --chart-2: #737373;
-  --chart-3: #5c5c5c;
-  --chart-4: #4d4d4d;
-  --chart-5: #404040;
-  --radius: 0.25rem;
-  --sidebar: #fafafa;
-  --sidebar-foreground: #171717;
-  --sidebar-primary: #171717;
+  --secondary: #dfeaf7;
+  --secondary-foreground: #123461;
+  --muted: #e4edf8;
+  --muted-foreground: #4d6484;
+  --accent: #d9e8f8;
+  --accent-foreground: #0a3f86;
+  --destructive: #c8321f;
+  --border: rgba(30, 79, 138, 0.22);
+  --input: rgba(30, 79, 138, 0.28);
+  --ring: #0089a8;
+  --chart-1: #0a5cb0;
+  --chart-2: #00829e;
+  --chart-3: #a67812;
+  --chart-4: #6d3fd0;
+  --chart-5: #5a6f8e;
+  --chart-grid: rgba(30, 79, 138, 0.14);
+  --chart-axis: #4d6484;
+  --chart-cross: rgba(13, 37, 71, 0.35);
+  --sidebar: #f6fbff;
+  --sidebar-foreground: #0d2547;
+  --sidebar-primary: #0b6fc2;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f1f1;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: rgba(0, 0, 0, 0.1);
-  --sidebar-ring: #737373;
+  --sidebar-accent: #e3eff9;
+  --sidebar-accent-foreground: #0a3f86;
+  --sidebar-border: rgba(30, 79, 138, 0.18);
+  --sidebar-ring: #0b82d8;
+
+  --brand: #0a5cb0;
+  --brand-strong: #0a3270;
+  --brand-muted: #5f94cf;
+  --gold: #b4860c;
+  --gold-text: #6f5003;
+  --arcane: #00637a;
+  --steel: #364e70;
+  --subtle: #445a79;
+  --surface: #edf3fb;
+  --surface-raised: #ffffff;
+  --surface-sunken: #dfe9f6;
+  --surface-hover: #dbe9f8;
+  --icon-well: #1b3a68;
+  --scrim: rgba(13, 37, 71, 0.45);
+
+  --success: #129a58;
+  --success-text: #0b6a3b;
+  --warning: #c98a08;
+  --warning-text: #7c5500;
+  --danger-text: #9f1f10;
+  --info-text: #0a5299;
+  --mystic: #7a4bd8;
+  --mystic-text: #5b2fb5;
+  --bronze: #a86a2c;
+  --bronze-text: #7d4a17;
+  /* Darkens item/class colours used as text so they stay readable on white. */
+  --data-tone: black 36%;
+
+  --panel-shadow: 0 1px 2px rgba(15, 55, 110, 0.08), 0 14px 30px -16px rgba(15, 55, 110, 0.32);
+  --frame-shadow: 0 1px 2px rgba(120, 90, 15, 0.12), 0 28px 60px -24px rgba(15, 60, 125, 0.45);
+  --dialog-shadow: 0 28px 70px -22px rgba(13, 37, 71, 0.5);
+  --float-shadow: 0 16px 40px -14px rgba(13, 37, 71, 0.38);
+  --cta-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 18px -10px rgba(0, 110, 160, 0.9);
+  --cta-gradient: linear-gradient(120deg, #0a4fa8 0%, #0a62ae 50%, #0a76ad 100%);
+
+  --app-sky: radial-gradient(ellipse 55% 40% at 88% -6%, rgba(255, 246, 222, 0.6), transparent 70%), radial-gradient(ellipse 50% 45% at 0% 100%, rgba(125, 100, 230, 0.13), transparent 70%), linear-gradient(180deg, #cce4fa 0%, #dfecf9 42%, #e4ebf8 100%);
+  --sidebar-bg: rgba(255, 255, 255, 0.72);
+  --bd-sky: radial-gradient(ellipse 70% 50% at 82% 0%, rgba(255, 246, 222, 0.6), transparent 70%), radial-gradient(ellipse 60% 45% at 8% 72%, rgba(135, 110, 235, 0.2), transparent 70%), linear-gradient(180deg, #4aaef2 0%, #94d3fa 38%, #d6ecfd 72%, #f0f6ff 100%);
+  --bd-glow: rgba(255, 255, 255, 0.85);
+  --bd-glow-soft: rgba(255, 255, 255, 0.3);
+  --bd-sun: rgba(255, 226, 150, 0.55);
+  --bd-far-top: #a9d0ef;
+  --bd-far-bottom: #d4e9f9;
+  --bd-near-top: #c9e2f6;
+  --bd-near-bottom: #eef7fe;
+  --bd-haze: #f2f9ff;
+  --bd-vignette: rgba(255, 255, 255, 0);
+  --mote: #ffffff;
+  --mote-glow: rgba(255, 255, 255, 0.95);
+  --mote-gold: #ffe6a6;
+  --mote-gold-glow: rgba(240, 190, 80, 0.8);
+  --grain-opacity: 0.02;
+  --wordmark: linear-gradient(180deg, #0f6dc0 0%, #0a4a99 55%, #08336e 100%);
+  --wordmark-shadow: 0 2px 10px rgba(255, 255, 255, 0.65);
+  --logo-shadow: brightness(0.86) saturate(1.5) drop-shadow(0 0 0.75px rgba(6, 40, 95, 0.85)) drop-shadow(0 1px 3px rgba(6, 50, 120, 0.3));
+  --selection: rgba(11, 130, 216, 0.24);
+  --selection-text: #08254f;
+  --elite-glow: rgba(176, 131, 15, 0.25);
+  --panel-border: rgba(30, 79, 138, 0.2);
+  --panel-gradient: linear-gradient(165deg, #ffffff 0%, #ffffff 55%, #f5f6ff 100%);
+  /* White over a photo can turn grey, so the light glass stays this opaque for text contrast. */
+  --panel-glass: linear-gradient(165deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.85) 55%, rgba(245, 246, 255, 0.85) 100%);
+  --panel-glass-filter: blur(12px);
+  --panel-header: linear-gradient(90deg, rgba(10, 92, 176, 0.08), rgba(122, 75, 216, 0.05) 60%, rgba(180, 134, 12, 0.08));
+  --card-gradient: linear-gradient(150deg, #ffffff 0%, #f1f6fe 100%);
+  --active-gradient: linear-gradient(90deg, rgba(10, 92, 176, 0.17), rgba(0, 117, 143, 0.08) 65%, transparent);
+  --bar-gradient: linear-gradient(90deg, #0a5cb0, #0a9cbc);
+  --gold-rule: linear-gradient(90deg, transparent, #b4860c 22%, #e0b84f 50%, #b4860c 78%, transparent);
+  --gold-fade: linear-gradient(90deg, #b4860c, rgba(180, 134, 12, 0.3) 45%, rgba(30, 79, 138, 0.12) 75%, rgba(30, 79, 138, 0.12));
+  --gold-fill: linear-gradient(160deg, #f4dd9d 0%, #dcb24c 55%, #c2952b 100%);
+  --on-gold: #2b1d00;
+  --gold-glow: rgba(180, 134, 12, 0.35);
 }
 
-.dark {
+[data-theme="dark"] {
   color-scheme: dark;
-  --background: #070a11;
-  --foreground: #e7e3d7;
-  --card: #0b101b;
-  --card-foreground: #e7e3d7;
-  --popover: #0b101b;
-  --popover-foreground: #e7e3d7;
-  --primary: #c9a45c;
-  --primary-foreground: #12100a;
-  --secondary: #131a29;
-  --secondary-foreground: #cfd6e4;
-  --muted: #101623;
-  --muted-foreground: #858da0;
-  --accent: #14213a;
-  --accent-foreground: #cfe3ff;
-  --destructive: #cf5b45;
-  --border: rgba(151, 168, 196, 0.16);
-  --input: rgba(151, 168, 196, 0.22);
-  --ring: #5fa8ff;
-  --chart-1: #c9a45c;
-  --chart-2: #5fa8ff;
-  --chart-3: #8a7440;
-  --chart-4: #3f6ea8;
-  --chart-5: #5d6b85;
-  --radius: 0.25rem;
-  --sidebar: #0b101b;
-  --sidebar-foreground: #e7e3d7;
-  --sidebar-primary: #c9a45c;
-  --sidebar-primary-foreground: #12100a;
-  --sidebar-accent: #131a29;
-  --sidebar-accent-foreground: #e7e3d7;
-  --sidebar-border: rgba(151, 168, 196, 0.16);
-  --sidebar-ring: #5fa8ff;
+
+  --background: #070f22;
+  --foreground: #eaf3ff;
+  --card: #172f5a;
+  --card-foreground: #eaf3ff;
+  --popover: #1a3565;
+  --popover-foreground: #eaf3ff;
+  --primary: #0f6fc8;
+  --primary-foreground: #ffffff;
+  --secondary: #1b3562;
+  --secondary-foreground: #d6e6fa;
+  --muted: #132a50;
+  --muted-foreground: #a3b8d5;
+  --accent: #1f4478;
+  --accent-foreground: #d6ecff;
+  --destructive: #ff8a76;
+  --border: rgba(150, 195, 245, 0.2);
+  --input: rgba(150, 195, 245, 0.28);
+  --ring: #5fdcec;
+  --chart-1: #5db8ff;
+  --chart-2: #5fdcec;
+  --chart-3: #e8c26a;
+  --chart-4: #b79cff;
+  --chart-5: #94aacb;
+  --chart-grid: rgba(150, 195, 245, 0.14);
+  --chart-axis: #a3b8d5;
+  --chart-cross: rgba(214, 236, 255, 0.4);
+  --sidebar: #0b1a36;
+  --sidebar-foreground: #eaf3ff;
+  --sidebar-primary: #1c8ae0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a3660;
+  --sidebar-accent-foreground: #eaf3ff;
+  --sidebar-border: rgba(150, 195, 245, 0.18);
+  --sidebar-ring: #5fdcec;
+
+  --brand: #5db8ff;
+  --brand-strong: #d6ecff;
+  --brand-muted: #5a8cc4;
+  --gold: #e3bd68;
+  --gold-text: #f2d893;
+  --arcane: #5fdcec;
+  --steel: #b9cbe3;
+  --subtle: #b0c3dd;
+  --surface: #0d1e3d;
+  --surface-raised: #172f5a;
+  --surface-sunken: #0a1730;
+  --surface-hover: #203f70;
+  --icon-well: #0a1730;
+  --scrim: rgba(3, 10, 26, 0.68);
+
+  --success: #4fdc92;
+  --success-text: #8cedb8;
+  --warning: #f2bd52;
+  --warning-text: #f8d78f;
+  --danger-text: #ffb8ac;
+  --info-text: #bfe2ff;
+  --mystic: #b79cff;
+  --mystic-text: #d9c9ff;
+  --bronze: #d08f52;
+  --bronze-text: #eab98a;
+  /* Lifts the darkest class colours (e.g. Ranger) off the navy surfaces. */
+  --data-tone: white 36%;
+
+  --panel-shadow: inset 0 1px 0 rgba(180, 220, 255, 0.07), 0 18px 38px -22px rgba(1, 6, 20, 0.95);
+  --frame-shadow: inset 0 1px 0 rgba(180, 220, 255, 0.07), 0 30px 70px -22px rgba(2, 10, 28, 0.9), 0 0 60px -28px rgba(92, 196, 255, 0.5);
+  --dialog-shadow: 0 30px 80px -20px rgba(2, 8, 22, 0.9), 0 0 50px -30px rgba(92, 196, 255, 0.5);
+  --float-shadow: 0 18px 50px -12px rgba(2, 8, 22, 0.85);
+  --cta-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 22px -10px rgba(50, 190, 235, 0.75);
+  --cta-gradient: linear-gradient(120deg, #0f5cc0 0%, #0b6cb8 50%, #0a7cab 100%);
+
+  --app-sky: radial-gradient(ellipse 50% 40% at 88% -4%, rgba(227, 189, 104, 0.09), transparent 70%), radial-gradient(ellipse 55% 50% at 0% 100%, rgba(130, 100, 240, 0.16), transparent 70%), radial-gradient(ellipse 90% 55% at 55% -10%, #143d6c 0%, #0c1f3f 52%, #070f22 100%);
+  --header-bg: rgba(8, 21, 47, 0.93);
+  --sidebar-bg: rgba(8, 19, 42, 0.62);
+  --bd-sky: radial-gradient(ellipse 60% 45% at 80% 4%, rgba(227, 189, 104, 0.1), transparent 70%), radial-gradient(ellipse 60% 50% at 10% 75%, rgba(130, 100, 240, 0.2), transparent 70%), radial-gradient(ellipse 120% 80% at 50% 0%, #1b628f 0%, #0e2f5a 42%, #070f22 100%);
+  --bd-glow: rgba(92, 196, 255, 0.28);
+  --bd-glow-soft: rgba(92, 196, 255, 0.08);
+  --bd-sun: rgba(230, 196, 119, 0.12);
+  --bd-far-top: #1c4674;
+  --bd-far-bottom: #0f2747;
+  --bd-near-top: #123158;
+  --bd-near-bottom: #070f22;
+  --bd-haze: #070f22;
+  --bd-vignette: rgba(3, 10, 26, 0.5);
+  --mote: #a6e0ff;
+  --mote-glow: rgba(92, 196, 255, 0.9);
+  --mote-gold: #f0d595;
+  --mote-gold-glow: rgba(240, 213, 149, 0.8);
+  --grain-opacity: 0.035;
+  --wordmark: linear-gradient(180deg, #ffffff 0%, #d4ecff 52%, #86c6f5 100%);
+  --wordmark-shadow: 0 2px 12px rgba(3, 12, 32, 0.6);
+  --logo-shadow: drop-shadow(0 0 12px rgba(92, 196, 255, 0.45));
+  --selection: rgba(92, 196, 255, 0.32);
+  --selection-text: #ffffff;
+  --elite-glow: rgba(240, 213, 149, 0.45);
+  --panel-border: rgba(150, 195, 245, 0.17);
+  --panel-gradient: linear-gradient(165deg, #1b3666 0%, #162c57 60%, #1a2a5c 100%);
+  --panel-glass: linear-gradient(165deg, rgba(27, 54, 102, 0.5) 0%, rgba(22, 44, 87, 0.5) 60%, rgba(26, 42, 92, 0.5) 100%);
+  --panel-glass-filter: blur(12px) brightness(0.55);
+  --panel-header: linear-gradient(90deg, rgba(93, 184, 255, 0.11), rgba(183, 156, 255, 0.07) 60%, rgba(227, 189, 104, 0.08));
+  --card-gradient: linear-gradient(150deg, #1d3a6c 0%, #142a52 100%);
+  --active-gradient: linear-gradient(90deg, rgba(93, 184, 255, 0.24), rgba(95, 220, 236, 0.09) 65%, transparent);
+  --bar-gradient: linear-gradient(90deg, #2f8fe0, #4fd3e6);
+  --gold-rule: linear-gradient(90deg, transparent, #b8914a 22%, #f3dc9c 50%, #b8914a 78%, transparent);
+  --gold-fade: linear-gradient(90deg, #e3bd68, rgba(227, 189, 104, 0.3) 45%, rgba(150, 195, 245, 0.14) 75%, rgba(150, 195, 245, 0.14));
+  --gold-fill: linear-gradient(160deg, #f6e3ad 0%, #e3bd68 55%, #c79c42 100%);
+  --on-gold: #2b1d00;
+  --gold-glow: rgba(227, 189, 104, 0.45);
+}
+
+/* Set for one frame while toggling, so colours switch together instead of
+   each element following its own transition. */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
 }
 
 @layer base {
@@ -190,6 +392,15 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Soft corners for every control and bordered box. Elements with their own
+     rounded-* utility win, since utilities sit in a later layer. */
+  button,
+  input,
+  select,
+  textarea,
+  [class~="border"] {
+    border-radius: var(--radius-md);
   }
   /* Tailwind v4 resets buttons to cursor:default. Restore the pointer on
      every interactive control (enabled only); plain text/containers keep
@@ -229,14 +440,19 @@
    --------------------------------------------------------------- */
 
 ::selection {
-  background: rgba(201, 164, 92, 0.32);
-  color: #f4ecd8;
+  background: var(--selection);
+  color: var(--selection-text);
 }
 
 /* Fine film grain so flat fills do not read as plain CSS colour. */
 .aion-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
+}
+
+/* The site logo has pale outlines, so it needs a tinted edge on light skies. */
+.aion-logo {
+  filter: var(--logo-shadow);
 }
 
 /* Slowly drifting arcane motes. */
@@ -262,6 +478,48 @@
   animation-delay: var(--mote-delay, 0s);
 }
 
+/* See-through panel over a photo: blurs (and in dark mode dims) what is behind it, so text stays readable. */
+.aion-glass {
+  background-image: var(--panel-glass);
+  -webkit-backdrop-filter: var(--panel-glass-filter);
+  backdrop-filter: var(--panel-glass-filter);
+}
+
+/* App frame: the same panel and card colours, letting a little of the photo through. Dialogs and menus render
+   outside this element, so they stay opaque. Dark text on the pale scrim has more contrast to spare than light on dark. */
+.aion-app-frame {
+  --panel-gradient: linear-gradient(165deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.8) 55%, rgba(245, 246, 255, 0.8) 100%);
+  --card-gradient: linear-gradient(150deg, rgba(255, 255, 255, 0.8) 0%, rgba(241, 246, 254, 0.8) 100%);
+}
+
+[data-theme="dark"] .aion-app-frame {
+  --panel-gradient: linear-gradient(165deg, rgba(27, 54, 102, 0.84) 0%, rgba(22, 44, 87, 0.84) 60%, rgba(26, 42, 92, 0.84) 100%);
+  --card-gradient: linear-gradient(150deg, rgba(29, 58, 108, 0.84) 0%, rgba(20, 42, 82, 0.84) 100%);
+}
+
+/* Twinkling gold glint: a soft core and halo crossed by two thin rays. */
+@keyframes aion-sparkle {
+  0%,
+  100% {
+    transform: scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(45deg);
+    opacity: var(--sparkle-peak, 0.8);
+  }
+}
+
+.aion-sparkle {
+  background:
+    radial-gradient(circle, #fffbe8 0%, #ffd976 10%, rgba(255, 200, 90, 0.35) 22%, transparent 45%),
+    linear-gradient(90deg, transparent, #ffe9a8 50%, transparent) center / 100% 1px no-repeat,
+    linear-gradient(0deg, transparent, #ffe9a8 50%, transparent) center / 1px 100% no-repeat;
+  opacity: 0;
+  animation: aion-sparkle var(--sparkle-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--sparkle-delay, 0s);
+}
+
 /* Panel settle-in. */
 @keyframes aion-enter {
   from {
@@ -275,7 +533,8 @@
 }
 
 .aion-enter {
-  animation: aion-enter 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  /* Not "both": a filling opacity animation would keep cutting .aion-glass off from the page behind it. */
+  animation: aion-enter 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
 }
 
 /* Pulsing status pip for the server indicator. */
@@ -297,8 +556,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .aion-mote,
+  .aion-sparkle,
   .aion-enter,
   .aion-pip {
     animation: none !important;
+  }
+
+  /* Keep the glints visible, just without the twinkle. */
+  .aion-sparkle {
+    opacity: calc(var(--sparkle-peak, 0.8) * 0.6);
   }
 }

@@ -38,7 +38,7 @@ import { addMember, isInRoster } from "@/lib/members/members-store";
 import { searchCharacters } from "@/lib/members/mock-character-service";
 import { cn } from "@/lib/utils";
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-brand uppercase";
 
 type LookupState =
   | { status: "idle" }
@@ -126,8 +126,8 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-gold-bright uppercase">
-          <UserPlus className="size-4 text-gold" />
+        <DialogTitle className="flex items-center gap-2 font-heading text-base tracking-[0.12em] text-brand-strong uppercase">
+          <UserPlus className="size-4 text-brand" />
           Add Member
         </DialogTitle>
         <DialogDescription className="text-xs text-steel">
@@ -158,7 +158,7 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
               className={aionField}
             />
             {nameError && (
-              <p id={`${ids}-name-err`} className="text-xs text-[#ef9b89]">
+              <p id={`${ids}-name-err`} className="text-xs text-danger-text">
                 {nameError}
               </p>
             )}
@@ -188,7 +188,7 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
         <div className="grid items-end gap-4 sm:grid-cols-[1.4fr_1fr]">
           <div className="space-y-1.5">
             <Label htmlFor={`${ids}-class`} className={labelClass}>
-              Class <span className="font-normal tracking-normal text-steel/60 normal-case">(optional)</span>
+              Class <span className="font-normal tracking-normal text-subtle normal-case">(optional)</span>
             </Label>
             <NativeSelect
               id={`${ids}-class`}
@@ -233,8 +233,8 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
           </div>
         )}
         {lookup.status === "done" && results.length === 0 && (
-          <div className="flex items-start gap-2.5 border border-steel/15 bg-ink/60 px-3 py-3 text-sm text-steel">
-            <UsersRound className="mt-0.5 size-4 shrink-0 text-steel/60" />
+          <div className="flex items-start gap-2.5 border border-steel/15 bg-surface/60 px-3 py-3 text-sm text-steel">
+            <UsersRound className="mt-0.5 size-4 shrink-0 text-subtle" />
             <span>
               No characters named “{name.trim()}” found on {server}
               {cls && ` with class ${cls}`}.
@@ -258,8 +258,8 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
                       "flex items-center gap-3 border px-3 py-2.5 transition-colors",
                       inGuild
                         ? "cursor-not-allowed border-steel/10 opacity-60"
-                        : "cursor-pointer border-steel/15 hover:border-gold-dim/60 hover:bg-gold/[0.03]",
-                      isSelected && "border-gold/70 bg-gold/[0.07]",
+                        : "cursor-pointer border-steel/15 hover:border-brand-muted/60 hover:bg-brand/[0.03]",
+                      isSelected && "border-brand/70 bg-brand/[0.07]",
                     )}
                   >
                     <input
@@ -278,15 +278,15 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
                       aria-hidden
                       className={cn(
                         "flex size-4 shrink-0 items-center justify-center rounded-full border",
-                        isSelected ? "border-gold" : "border-steel/40",
+                        isSelected ? "border-brand" : "border-steel/40",
                       )}
                     >
-                      {isSelected && <span className="size-2 rounded-full bg-gold" />}
+                      {isSelected && <span className="size-2 rounded-full bg-brand" />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2">
                         <span className="font-medium text-foreground">{r.character_name}</span>
-                        <span className="text-2xs text-steel/60">
+                        <span className="text-2xs text-subtle">
                           {r.server} · Lv. {r.level}
                         </span>
                       </span>
@@ -299,10 +299,10 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
                         </span>
                       ) : (
                         <>
-                          <span className="block text-sm font-semibold text-gold-bright tabular-nums">
+                          <span className="block text-sm font-semibold text-brand-strong tabular-nums">
                             {formatNumber(r.combat_power)}
                           </span>
-                          <span className="block text-3xs text-steel/60 tabular-nums">
+                          <span className="block text-3xs text-subtle tabular-nums">
                             iLv {r.item_level}
                           </span>
                         </>
@@ -318,7 +318,7 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
 
       <div className="space-y-1.5">
         <Label htmlFor={`${ids}-notes`} className={labelClass}>
-          Notes <span className="font-normal tracking-normal text-steel/60 normal-case">(optional)</span>
+          Notes <span className="font-normal tracking-normal text-subtle normal-case">(optional)</span>
         </Label>
         <Textarea
           id={`${ids}-notes`}
@@ -334,7 +334,7 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
       {addError && (
         <div
           role="alert"
-          className="flex items-start gap-2.5 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2.5 text-sm text-[#f0b6aa]"
+          className="flex items-start gap-2.5 border border-destructive/40 border-l-2 border-l-destructive bg-destructive/10 px-3 py-2.5 text-sm text-danger-text"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
           {addError}
@@ -342,9 +342,9 @@ function AddMemberForm({ onAdded }: { onAdded: (member: GuildMember) => void }) 
       )}
 
       <DialogFooter className="items-center gap-2 border-t border-steel/10 pt-4 sm:justify-between">
-        <p className="text-xs text-steel/70">
+        <p className="text-xs text-subtle">
           {selected ? (
-            <span className="inline-flex items-center gap-1.5 text-[#9af0b3]">
+            <span className="inline-flex items-center gap-1.5 text-success-text">
               <CheckCircle2 className="size-3.5" />
               {selected.character_name} ({selected.server}) selected
             </span>

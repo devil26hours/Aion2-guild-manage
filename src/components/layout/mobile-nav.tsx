@@ -23,22 +23,22 @@ export function MobileNav({ footer }: { footer?: ReactNode }) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         aria-label={t("Open navigation")}
-        className="flex size-9 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-gold-dim/60 hover:text-gold-bright focus-visible:border-arcane/60 lg:hidden"
+        className="flex size-9 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-brand-muted/60 hover:text-brand-strong focus-visible:border-arcane/60 lg:hidden"
       >
         <Menu className="size-4" />
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="gap-6 border-gold-dim/30 bg-gradient-to-b from-ink-raised to-ink p-4"
+        className="gap-6 border-gold/35 bg-[image:var(--panel-gradient)] p-4"
       >
         <div className="flex items-center gap-2 pt-1 pr-8">
           <SiteLogo className="h-9 shrink-0" />
           <div className="leading-none">
-            <SheetTitle className="font-heading text-sm tracking-[0.18em] text-gold-bright">
-              AION II
+            <SheetTitle className="font-display text-sm font-bold tracking-[0.18em] text-brand-strong">
+              ChumChon AION2
             </SheetTitle>
-            <SheetDescription className="mt-1 text-4xs tracking-[0.3em] text-steel uppercase">
-              {t("Guild Command")}</SheetDescription>
+            <SheetDescription className="mt-1 text-4xs tracking-[0.12em] text-steel">
+              {t("AION2 Player Community")}</SheetDescription>
           </div>
         </div>
         <SidebarNav onNavigate={() => setOpen(false)} />

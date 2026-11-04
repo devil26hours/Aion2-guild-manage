@@ -24,6 +24,21 @@ export const PARTY_ROLES = ["Tank", "Healer", "Support", "DPS"] as const;
 export type PartyRole = (typeof PARTY_ROLES)[number];
 
 /**
+ * Content category a party recruits for. Chosen independently of the dungeon
+ * name. Must match the check constraint on party_presets.content_type (0007).
+ */
+export const PARTY_CONTENT_TYPES = [
+  "Expedition",
+  "Transcendence",
+  "Raid – Sanctuary",
+  "Raid – Abyssal Forge: Ludra",
+  "Daily Dungeon",
+  "Other",
+] as const;
+export type PartyContentType = (typeof PARTY_CONTENT_TYPES)[number];
+export const DUNGEON_NAME_MAX = 60;
+
+/**
  * What the Party Builder needs to know about a character. Built from the
  * persisted guild roster (see lib/roster/party-adapter). Values the API did
  * not provide stay `null` and are excluded from averages.
@@ -55,6 +70,10 @@ export interface PartyPreset {
   name: string;
   /** One entry per party member slot; its length IS the party size (2–10). */
   slots: PartySlot[];
+  /** Content category; null/absent on presets where it was never set. */
+  content_type?: PartyContentType | null;
+  /** Free-text dungeon name; null/absent on presets where it was never set. */
+  dungeon_name?: string | null;
   created_at: string;
   updated_at: string;
 }

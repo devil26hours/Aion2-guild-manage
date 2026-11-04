@@ -12,14 +12,14 @@ import { SLOT_LABELS } from "@/data/mock/equipment";
 import type { AionClass } from "@/lib/aion/classes";
 import { RARITY_META } from "@/lib/aion/rarity";
 import type { EquipmentItem } from "@/lib/aion/types";
-import { cn } from "@/lib/utils";
+import { cn, dataText } from "@/lib/utils";
 import { formatItemStat, MockTag, RarityLabel, rarityFrameStyle, Stars } from "./item-bits";
 import { SlotIcon } from "./slot-icon";
 import { BindingRate, SoulBindingLines } from "./soul-binding-lines";
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-1.5 flex items-center gap-2 text-3xs font-semibold tracking-[0.18em] text-gold/85 uppercase">
+    <h3 className="mb-1.5 flex items-center gap-2 text-3xs font-semibold tracking-[0.18em] text-brand uppercase">
       {children}
     </h3>
   );
@@ -51,10 +51,10 @@ export function ItemDetailDialog({
                   slot={item.slot}
                   cls={cls}
                   className="size-8 drop-shadow-[0_0_8px_currentColor]"
-                  style={{ color: RARITY_META[item.rarity].color }}
+                  style={{ color: dataText(RARITY_META[item.rarity].color) }}
                 />
                 {item.enhancement > 0 && (
-                  <span className="absolute -top-2 -left-2 border border-gold-dim/60 bg-ink px-1 text-xs font-bold text-gold-bright tabular-nums">
+                  <span className="absolute -top-2 -left-2 border border-brand-muted/60 bg-surface px-1 text-xs font-bold text-brand-strong tabular-nums">
                     +{item.enhancement}
                   </span>
                 )}
@@ -62,7 +62,7 @@ export function ItemDetailDialog({
               <div className="min-w-0 space-y-1.5 text-left">
                 <DialogTitle
                   className="font-heading text-lg leading-tight tracking-wide"
-                  style={{ color: RARITY_META[item.rarity].color }}
+                  style={{ color: dataText(RARITY_META[item.rarity].color) }}
                 >
                   {item.enhancement > 0 && `+${item.enhancement} `}
                   {item.name}
@@ -86,7 +86,7 @@ export function ItemDetailDialog({
                 ["Rarity", RARITY_META[item.rarity].label],
               ].map(([k, v]) => (
                 <div key={k} className="border-r border-steel/10 px-2 py-2.5 last:border-r-0">
-                  <p className="text-4xs tracking-[0.16em] text-steel/60 uppercase">{k}</p>
+                  <p className="text-4xs tracking-[0.16em] text-subtle uppercase">{k}</p>
                   <p className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">{v}</p>
                 </div>
               ))}
@@ -94,7 +94,7 @@ export function ItemDetailDialog({
 
             <div>
               <SectionTitle>Base Stats</SectionTitle>
-              <dl className="divide-y divide-steel/[0.07] border border-steel/10 bg-ink/50">
+              <dl className="divide-y divide-steel/[0.07] border border-steel/10 bg-surface/50">
                 {item.base_stats.map((s) => (
                   <div key={s.label} className="flex items-center justify-between px-3 py-1.5 text-sm">
                     <dt className="text-steel">{s.label}</dt>
@@ -109,7 +109,7 @@ export function ItemDetailDialog({
                 <SectionTitle>
                   Soul Binding
                   {item.soul_binding && (
-                    <span className="font-normal tracking-normal text-steel/60 normal-case">
+                    <span className="font-normal tracking-normal text-subtle normal-case">
                       ({item.soul_binding.lines.length} {item.soul_binding.lines.length === 1 ? "line" : "lines"})
                     </span>
                   )}
@@ -119,19 +119,19 @@ export function ItemDetailDialog({
               {item.soul_binding ? (
                 <SoulBindingLines slot={item.slot} binding={item.soul_binding} />
               ) : (
-                <p className="text-xs text-steel/60">This item cannot be soul bound.</p>
+                <p className="text-xs text-subtle">This item cannot be soul bound.</p>
               )}
-              <p className="mt-1.5 text-3xs text-steel/55">
+              <p className="mt-1.5 text-3xs text-subtle">
                 Option names and slot pools are checked against Global client data. Values, ranges and binding rate are mock.
               </p>
             </div>
 
             {item.set_name && (
-              <p className="border-l-2 border-gold/60 bg-gold/[0.05] px-3 py-2 text-xs text-gold-bright">
+              <p className="border-l-2 border-brand/60 bg-brand/[0.05] px-3 py-2 text-xs text-brand-strong">
                 Set: {item.set_name}
               </p>
             )}
-            <p className="text-xs text-steel/70 italic">“{item.description}”</p>
+            <p className="text-xs text-subtle italic">“{item.description}”</p>
           </>
         )}
       </DialogContent>

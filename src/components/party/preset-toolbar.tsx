@@ -42,7 +42,7 @@ export function PresetToolbar({
   return (
     <div className="flex flex-wrap items-end gap-2">
       <div className="min-w-[12rem] flex-1 space-y-1.5 sm:max-w-xs">
-        <Label htmlFor="preset-select" className="text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">
+        <Label htmlFor="preset-select" className="text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">
           {t("Preset (")}{presets.length})
         </Label>
         <NativeSelect id="preset-select" value={active.id} onChange={(e) => setActivePreset(e.target.value)} className={aionField}>
@@ -63,7 +63,7 @@ export function PresetToolbar({
       <Button
         type="button"
         variant="outline"
-        className={cn(btn, "hover:border-destructive/60 hover:text-[#f0a596]")}
+        className={cn(btn, "hover:border-destructive/60 hover:text-danger-text")}
         disabled={presets.length <= 1}
         title={presets.length <= 1 ? t("At least one preset is required") : undefined}
         onClick={() => setConfirmDelete(true)}

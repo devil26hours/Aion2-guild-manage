@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { RosterManager } from "@/components/roster/roster-manager";
 
 export const metadata: Metadata = {
-  title: "Guild Members — AION II Guild Command",
+  title: "Guild Members — ChumChon AION2",
 };
 
 /** Real guild roster (AION2 API + local JSON persistence). */

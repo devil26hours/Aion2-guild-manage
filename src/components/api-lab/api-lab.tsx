@@ -24,6 +24,7 @@ import {
   describeStatus,
   ENDPOINT_IDS,
   ENDPOINTS,
+  regionLabel,
   validateRequest,
   type EndpointId,
   type ParamError,
@@ -58,12 +59,12 @@ interface LabResponse {
   isJson: boolean;
 }
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
 
 const TONE: Record<"ok" | "warn" | "error", string> = {
-  ok: "border-[#7ee79e]/40 bg-[#7ee79e]/10 text-[#9af0b3]",
-  warn: "border-[#e0b04a]/40 bg-[#e0b04a]/10 text-[#f0cf86]",
-  error: "border-destructive/50 bg-destructive/15 text-[#f6c2b6]",
+  ok: "border-success/40 bg-success/10 text-success-text",
+  warn: "border-warning/40 bg-warning/10 text-warning-text",
+  error: "border-destructive/50 bg-destructive/15 text-danger-text",
 };
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -223,15 +224,15 @@ export function ApiLab() {
                         }}
                         className={cn(
                           "flex w-full items-start gap-2.5 border px-3 py-2 text-left transition-colors outline-none focus-visible:ring-2 focus-visible:ring-arcane/40",
-                          on ? "border-gold/60 bg-gold/[0.08]" : "border-steel/12 hover:border-gold-dim/50 hover:bg-white/[0.02]",
+                          on ? "border-brand/60 bg-brand/[0.08]" : "border-steel/12 hover:border-brand-muted/50 hover:bg-surface-hover",
                         )}
                       >
                         <span className="mt-0.5 shrink-0 border border-arcane/40 bg-arcane/10 px-1 font-mono text-4xs font-bold text-arcane">
                           {d.method}
                         </span>
                         <span className="min-w-0">
-                          <span className={cn("block text-sm", on ? "text-gold-bright" : "text-foreground")}>{d.label}</span>
-                          <span className="block truncate font-mono text-2xs text-steel/70">{d.path}</span>
+                          <span className={cn("block text-sm", on ? "text-brand-strong" : "text-foreground")}>{d.label}</span>
+                          <span className="block truncate font-mono text-2xs text-subtle">{d.path}</span>
                         </span>
                       </button>
                     );
@@ -242,7 +243,7 @@ export function ApiLab() {
               <p className="text-xs text-steel">{def.summary}</p>
 
               {def.params.length === 0 ? (
-                <p className="border border-steel/12 bg-ink/50 px-3 py-2 text-xs text-steel">This endpoint takes no parameters.</p>
+                <p className="border border-steel/12 bg-surface/50 px-3 py-2 text-xs text-steel">This endpoint takes no parameters.</p>
               ) : (
                 <div className="space-y-3">
                   {def.params.map((p) => {
@@ -252,7 +253,7 @@ export function ApiLab() {
                       <div key={p.name} className="space-y-1.5">
                         <Label htmlFor={id} className={labelClass}>
                           {p.label}
-                          <span className="ml-1.5 font-mono font-normal tracking-normal text-steel/50 normal-case">
+                          <span className="ml-1.5 font-mono font-normal tracking-normal text-subtle normal-case">
                             {p.in}:{p.name}
                             {p.required ? " · required" : " · optional"}
                           </span>
@@ -261,7 +262,7 @@ export function ApiLab() {
                           <NativeSelect id={id} value={values[p.name] ?? ""} onChange={(e) => setValue(p.name, e.target.value)} className={aionField}>
                             <option value="">{p.name === "region" ? "All regions" : "Default"}</option>
                             {p.options?.map((o) => (
-                              <option key={o} value={o}>{o}</option>
+                              <option key={o} value={o}>{p.name === "region" ? regionLabel(o) : o}</option>
                             ))}
                           </NativeSelect>
                         ) : (
@@ -278,9 +279,9 @@ export function ApiLab() {
                           />
                         )}
                         {err ? (
-                          <p id={`${id}-err`} className="text-xs text-[#ef9b89]">{err.message}</p>
+                          <p id={`${id}-err`} className="text-xs text-danger-text">{err.message}</p>
                         ) : (
-                          p.help && <p className="text-2xs text-steel/55">{p.help}</p>
+                          p.help && <p className="text-2xs text-subtle">{p.help}</p>
                         )}
                       </div>
                     );
@@ -288,15 +289,15 @@ export function ApiLab() {
                 </div>
               )}
 
-              <div className="border border-steel/12 bg-[#060910] px-3 py-2">
-                <p className="text-4xs tracking-[0.16em] text-steel/60 uppercase">Upstream request</p>
+              <div className="border border-steel/12 bg-surface-sunken px-3 py-2">
+                <p className="text-4xs tracking-[0.16em] text-subtle uppercase">Upstream request</p>
                 <p className="mt-0.5 font-mono text-xs break-all text-foreground/85" data-testid="request-preview">
                   GET {preview}
                 </p>
               </div>
 
               {hint && (
-                <p className="border-l-2 border-arcane bg-arcane/[0.07] px-3 py-2 text-xs text-[#cfe3ff]" role="status">
+                <p className="border-l-2 border-arcane bg-arcane/[0.07] px-3 py-2 text-xs text-info-text" role="status">
                   {hint}
                 </p>
               )}
@@ -312,20 +313,20 @@ export function ApiLab() {
             {selected ? (
               <div className="flex items-start justify-between gap-3" data-testid="selected-character">
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                  <dt className="text-steel/60">Name</dt>
+                  <dt className="text-subtle">Name</dt>
                   <dd className="font-medium text-foreground">{selected.name}</dd>
-                  <dt className="text-steel/60">Server</dt>
+                  <dt className="text-subtle">Server</dt>
                   <dd className="text-foreground">{selected.server_name ?? "—"} <span className="font-mono text-steel">({selected.server_id})</span></dd>
-                  <dt className="text-steel/60">Region</dt>
-                  <dd className="text-foreground uppercase">{selected.region}</dd>
-                  <dt className="text-steel/60">Level</dt>
+                  <dt className="text-subtle">Region</dt>
+                  <dd className="text-foreground">{regionLabel(selected.region)}</dd>
+                  <dt className="text-subtle">Level</dt>
                   <dd className="text-foreground">{selected.level ?? "—"}</dd>
                 </dl>
                 <button
                   type="button"
                   aria-label="Clear selected character"
                   onClick={() => setSelected(null)}
-                  className="p-1 text-steel/60 hover:text-foreground"
+                  className="p-1 text-subtle hover:text-foreground"
                 >
                   <X className="size-3.5" />
                 </button>
@@ -363,7 +364,7 @@ export function ApiLab() {
             )}
 
             {networkError && (
-              <p className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]">
+              <p className="flex items-start gap-2 border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-danger-text">
                 <CircleAlert className="mt-0.5 size-4 shrink-0" /> {networkError}
               </p>
             )}
@@ -385,28 +386,28 @@ export function ApiLab() {
                   </span>
                 </div>
                 <dl className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4" data-testid="response-meta">
-                  <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Total time</dt>
+                  <div className="border border-steel/10 bg-surface/50 px-2.5 py-1.5">
+                    <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Total time</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.clientMs} ms</dd>
                   </div>
-                  <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Upstream time</dt>
+                  <div className="border border-steel/10 bg-surface/50 px-2.5 py-1.5">
+                    <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Upstream time</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.upstreamMs !== null ? `${response.upstreamMs} ms` : "—"}</dd>
                   </div>
-                  <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Size</dt>
+                  <div className="border border-steel/10 bg-surface/50 px-2.5 py-1.5">
+                    <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Size</dt>
                     <dd className="font-semibold text-foreground tabular-nums">{response.bytes.toLocaleString("en-US")} B</dd>
                   </div>
-                  <div className="border border-steel/10 bg-ink/50 px-2.5 py-1.5">
-                    <dt className="text-4xs tracking-[0.14em] text-steel/60 uppercase">Items</dt>
+                  <div className="border border-steel/10 bg-surface/50 px-2.5 py-1.5">
+                    <dt className="text-4xs tracking-[0.14em] text-subtle uppercase">Items</dt>
                     <dd className="font-semibold text-foreground tabular-nums">
                       {Array.isArray(response.json) ? response.json.length : isObj(response.json) ? `${Object.keys(response.json).length} keys` : "—"}
                     </dd>
                   </div>
                 </dl>
-                <p className="font-mono text-2xs break-all text-steel/70">
+                <p className="font-mono text-2xs break-all text-subtle">
                   {response.requestUrl}
-                  {response.upstreamPath && <span className="text-steel/50"> → upstream {response.upstreamPath}</span>}
+                  {response.upstreamPath && <span className="text-subtle"> → upstream {response.upstreamPath}</span>}
                 </p>
 
                 <ResultHelpers response={response} selectedId={selected?.character_id ?? null} onSelect={selectCharacter} onBoard={pickBoard} />
@@ -424,7 +425,7 @@ export function ApiLab() {
                             role="radio"
                             aria-checked={view === v}
                             onClick={() => setView(v)}
-                            className={cn("px-2 py-0.5 text-xs capitalize", view === v ? "bg-gold/15 text-gold-bright" : "text-steel hover:text-foreground")}
+                            className={cn("px-2 py-0.5 text-xs capitalize", view === v ? "bg-brand/15 text-brand-strong" : "text-steel hover:text-foreground")}
                           >
                             {v}
                           </button>
@@ -433,7 +434,7 @@ export function ApiLab() {
                     )}
                   </div>
                   <JsonViewer text={displayText} className="max-h-[36rem]" />
-                  <p className="mt-1 text-3xs text-steel/55">
+                  <p className="mt-1 text-3xs text-subtle">
                     Pretty view re-indents the JSON without changing keys, order or values. Raw view is the body exactly as received.
                   </p>
                 </div>
@@ -463,7 +464,7 @@ function ResultHelpers({
 
   if (source === "proxy" && isProxyErrorBody(json)) {
     return (
-      <div className="border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]" role="alert">
+      <div className="border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-danger-text" role="alert">
         <p className="flex items-center gap-2 font-medium">
           <CircleAlert className="size-4" /> {json.proxy_error.message}
         </p>
@@ -483,7 +484,7 @@ function ResultHelpers({
   if (status === 409 && isAmbiguousNameBody(json)) {
     return (
       <div className="space-y-2" data-testid="conflict-panel">
-        <p className="border border-[#e0b04a]/35 bg-[#e0b04a]/[0.07] px-3 py-2 text-sm text-[#f0dca8]" role="alert">
+        <p className="border border-warning/35 bg-warning/[0.07] px-3 py-2 text-sm text-warning-text" role="alert">
           {json.candidates.length} characters share this name. Choose the right server, then send the request again.
         </p>
         <CharacterHitsTable hits={json.candidates} selectedId={selectedId} onSelect={(h) => onSelect(h, null)} actionLabel="Use this server" testId="candidates-table" />
@@ -493,7 +494,7 @@ function ResultHelpers({
 
   if (status === 422 && isValidationErrorBody(json)) {
     return (
-      <div className="border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-[#f6c2b6]" role="alert">
+      <div className="border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-danger-text" role="alert">
         <p className="font-medium">The API rejected the parameters:</p>
         <ul className="mt-1 list-disc pl-6 text-xs">
           {json.detail.map((d, i) => (
@@ -508,7 +509,7 @@ function ResultHelpers({
 
   const detail = detailString(json);
   if (status >= 400 && detail) {
-    const tone = status === 404 ? "border-[#e0b04a]/35 bg-[#e0b04a]/[0.07] text-[#f0dca8]" : "border-destructive/40 bg-destructive/10 text-[#f6c2b6]";
+    const tone = status === 404 ? "border-warning/35 bg-warning/[0.07] text-warning-text" : "border-destructive/40 bg-destructive/10 text-danger-text";
     const lead =
       status === 404
         ? "Character not found."
@@ -538,12 +539,12 @@ function ResultHelpers({
   if (status === 200 && endpoint === "character-profile" && isObj(json)) {
     return (
       <div>
-        <p className="mb-1.5 text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase">Top-level keys in this response</p>
+        <p className="mb-1.5 text-3xs font-semibold tracking-[0.18em] text-subtle uppercase">Top-level keys in this response</p>
         <ul className="flex flex-wrap gap-1.5" data-testid="profile-keys">
           {Object.entries(json).map(([k, v]) => (
             <li key={k} className="border border-steel/15 px-2 py-0.5 font-mono text-xs text-foreground/85">
               {k}
-              <span className="text-steel/50">
+              <span className="text-subtle">
                 {Array.isArray(v) ? ` [${v.length}]` : isObj(v) ? ` {${Object.keys(v).join(", ")}}` : ""}
               </span>
             </li>
@@ -560,7 +561,7 @@ function ResultHelpers({
       <div className="relative overflow-x-auto border border-steel/12">
         <table className="w-full min-w-[30rem] text-sm" data-testid="boards-table">
           <thead>
-            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-steel/70 uppercase">
+            <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] text-subtle uppercase">
               <th className="py-2 pr-3 pl-3 font-medium">id</th>
               <th className="px-3 py-2 font-medium">name</th>
               <th className="px-3 py-2 text-right font-medium">openNodeCount / totalNodeCount</th>
@@ -582,7 +583,7 @@ function ResultHelpers({
                     <button
                       type="button"
                       onClick={() => onBoard(String(b.id))}
-                      className="border border-steel/20 px-2 py-0.5 text-xs text-steel hover:border-gold-dim/60 hover:text-gold-bright"
+                      className="border border-steel/20 px-2 py-0.5 text-xs text-steel hover:border-brand-muted/60 hover:text-brand-strong"
                     >
                       Open board
                     </button>

@@ -15,8 +15,10 @@ The project started **fresh**: no JSON data was imported (see "Data migration st
 | `migrations/20261103000004_rls_policies.sql` | RLS on every table, table and column grants, policies |
 | `migrations/20261103000005_storage_guild_images.sql` | Private `guild-images` bucket (1 MB, PNG/JPEG) and its storage policies |
 | `migrations/20261103000006_gap_rpcs.sql` | `list_joinable_guilds`, `guild_join_code_set`, `add_roster_member` (owner auto-join), `save_party_preset` (SECURITY INVOKER, atomic per preset). Changes no existing table, policy or grant |
+| `migrations/20261103000007_party_preset_content.sql` | `party_presets.content_type` and `dungeon_name` (both nullable), their column grants, and `save_party_preset` replaced with a version that writes them |
 
 The files are written to be re-runnable (`if not exists`, `create or replace`, `drop policy if exists`).
+After re-running 0004 or 0006, re-run 0007: 0004 revokes its column grants, and 0006 recreates the old `save_party_preset` signature.
 They target Postgres 15 or later: `on delete set null (column)` needs 15+, and Supabase uses 15/17.
 
 ## Tables and relationships
@@ -130,8 +132,9 @@ The **Download JSON** export in Settings → Data Management produces a per-guil
 
 ## Manual steps in the Supabase Dashboard
 
-1. **SQL Editor:** run `migrations/20261103000006_gap_rpcs.sql` (0001–0005 are already applied).
-   Check that it finishes without errors.
+1. **SQL Editor:** run `migrations/20261103000006_gap_rpcs.sql` (0001–0005 are already applied), then
+   `migrations/20261103000007_party_preset_content.sql`. Check that both finish without errors.
+   Run 0007 before deploying the app code that reads its columns.
 2. **`.env.local`:** add the server-only secret key as `SUPABASE_SECRET_KEY=sb_secret_…`
    (Project Settings → API Keys). Never give it a `NEXT_PUBLIC_` prefix. Restart the server.
    - Optional: `SITE_URL=https://your.domain`, the origin used in email links. Without it, the request origin is used.

@@ -30,7 +30,7 @@ const SORT_LABELS: Record<HistorySort, string> = {
   il_asc: "Item Level: Low → High",
 };
 
-const labelClass = "text-3xs font-semibold tracking-[0.18em] text-steel/80 uppercase";
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
 
 export function HistoryList() {
   const members = useMembers();
@@ -100,7 +100,7 @@ export function HistoryList() {
             <div className="col-span-2 space-y-1.5 md:col-span-4 xl:col-span-1">
               <Label htmlFor="h-query" className={labelClass}>Search</Label>
               <div className="relative">
-                <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-steel/50" />
+                <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
                 <Input
                   id="h-query"
                   type="search"
@@ -154,7 +154,7 @@ export function HistoryList() {
         <div className="relative overflow-x-auto">
           <table className="w-full min-w-[60rem] text-sm">
             <thead>
-              <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-steel/70 uppercase">
+              <tr className="border-b border-steel/10 text-left text-3xs tracking-[0.16em] whitespace-nowrap text-subtle uppercase">
                 <th scope="col" className="py-3 pr-3 pl-4 font-medium sm:pl-5">Character</th>
                 <th scope="col" className="px-3 py-3 font-medium">Class</th>
                 <th scope="col" className="px-3 py-3 text-right font-medium">Level</th>
@@ -170,26 +170,26 @@ export function HistoryList() {
               {rows.length === 0 && (
                 <tr>
                   <td colSpan={9} className="px-4 py-14 text-center">
-                    <SearchX className="mx-auto size-7 text-steel/40" />
+                    <SearchX className="mx-auto size-7 text-subtle" />
                     <p className="mt-3 text-sm text-foreground">No characters match these filters.</p>
                   </td>
                 </tr>
               )}
               {rows.map(({ m, h, latest, delta }) => (
-                <tr key={m.id} className="border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-white/[0.025]">
+                <tr key={m.id} className="border-b border-steel/[0.07] transition-colors last:border-0 hover:bg-surface-hover">
                   <td className="py-2.5 pr-3 pl-4 sm:pl-5">
                     <Link
                       href={`/character-history/${m.id}`}
-                      className="font-medium text-foreground underline-offset-4 hover:text-gold-bright hover:underline"
+                      className="font-medium text-foreground underline-offset-4 hover:text-brand-strong hover:underline"
                     >
                       {m.character_name}
                     </Link>
-                    <p className="text-2xs text-steel/60">{m.server}</p>
+                    <p className="text-2xs text-subtle">{m.server}</p>
                   </td>
                   <td className="px-3 py-2.5 text-xs"><ClassBadge cls={m.class} withIcon /></td>
                   <td className="px-3 py-2.5 text-right text-steel tabular-nums">{m.level}</td>
                   <td className="px-3 py-2.5 text-right">
-                    <span className="font-semibold text-gold-bright tabular-nums">{formatNumber(m.combat_power)}</span>
+                    <span className="font-semibold text-brand-strong tabular-nums">{formatNumber(m.combat_power)}</span>
                     {h.length > 1 && <DeltaChip delta={delta} className="ml-2 px-1 py-0 text-3xs" />}
                   </td>
                   <td className="px-3 py-2.5 text-right text-foreground/85 tabular-nums">{m.item_level}</td>
@@ -197,14 +197,14 @@ export function HistoryList() {
                     {latest ? latest.stats.combat_speed.toFixed(1) : "—"}
                   </td>
                   <td className="px-3 py-2.5 text-right text-foreground/80 tabular-nums">{h.length}</td>
-                  <td className="px-3 py-2.5 text-xs whitespace-nowrap text-steel/75">
+                  <td className="px-3 py-2.5 text-xs whitespace-nowrap text-subtle">
                     {latest ? <RelativeTime iso={latest.captured_at} /> : "—"}
                   </td>
                   <td className="py-2.5 pr-4 pl-3 text-right sm:pr-5">
                     <Link
                       href={`/character-history/${m.id}`}
                       aria-label={`View history for ${m.character_name}`}
-                      className="inline-flex items-center gap-1 text-xs text-gold/90 hover:text-gold-bright"
+                      className="inline-flex items-center gap-1 text-xs text-brand hover:text-brand-strong"
                     >
                       History <ChevronRight className="size-3.5" />
                     </Link>

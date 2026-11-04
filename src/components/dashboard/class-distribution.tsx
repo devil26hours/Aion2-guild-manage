@@ -38,7 +38,7 @@ export function ClassDistribution({
               <span className="truncate text-xs text-foreground/85">{meta.name}</span>
               <span className="relative h-3.5">
                 {/* track */}
-                <span className="absolute inset-0 bg-steel/[0.06]" />
+                <span className="absolute inset-0 rounded-r-[4px] bg-surface-sunken" />
                 {/* bar */}
                 <span
                   className="absolute inset-y-0 left-0 rounded-r-[4px] transition-[filter] group-hover/row:brightness-125 group-focus-visible/row:brightness-125"
@@ -50,7 +50,7 @@ export function ClassDistribution({
                 {/* tooltip */}
                 <span
                   role="presentation"
-                  className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden border border-gold-dim/40 bg-ink-raised px-2.5 py-1.5 text-2xs whitespace-nowrap text-foreground shadow-lg group-hover/row:block group-focus-visible/row:block"
+                  className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden border border-brand-muted/40 bg-surface-raised px-2.5 py-1.5 text-2xs whitespace-nowrap text-foreground shadow-lg group-hover/row:block group-focus-visible/row:block"
                 >
                   <span className="font-medium">{meta.name}</span>
                   <span className="text-steel"> · {meta.role}</span>

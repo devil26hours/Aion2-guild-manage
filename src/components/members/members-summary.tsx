@@ -37,7 +37,7 @@ export function MembersSummary({
         detail={
           summary.highestCp && (
             <>
-              <span className="text-gold-bright">
+              <span className="text-brand-strong">
                 {summary.highestCp.member.character_name}
               </span>{" "}
               · {summary.highestCp.member.class}
