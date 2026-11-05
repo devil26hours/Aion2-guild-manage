@@ -120,16 +120,6 @@ export function loadSearchIndex(): Promise<SearchGroup[]> {
   return searchP;
 }
 
-const l10n = new Map<string, Promise<Record<string, string>>>();
-export function loadLocale(loc: string): Promise<Record<string, string>> {
-  let p = l10n.get(loc);
-  if (!p) {
-    p = getJson<Record<string, string>>(`data/l10n/${loc}.json`).catch(() => ({}));
-    l10n.set(loc, p);
-  }
-  return p;
-}
-
 export function assetUrl(shared: Shared, assetId: string | null | undefined): string | null {
   if (!assetId) return null;
   const a = shared.assets.get(assetId);

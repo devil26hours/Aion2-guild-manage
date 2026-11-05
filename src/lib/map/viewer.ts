@@ -44,6 +44,7 @@ export class MapViewer {
   private bundle: MapBundle | null = null;
   private trees = new Map<string, Tree>();
   private visible = new Set<string>();
+  private entityFilter: Record<string, Record<string, boolean>> = {};
   private doneMode: DoneMode = "all";
   private done = new Set<string>();
   private selectedId: string | null = null;
@@ -137,6 +138,8 @@ export class MapViewer {
     this.redraw();
   }
   setVisible(v: Set<string>) { this.visible = v; this.redraw(); }
+  /** Per-entity choices (classification id -> entity id -> on/off); they win over the classification's own visibility. */
+  setEntityFilter(f: Record<string, Record<string, boolean>>) { this.entityFilter = f; this.redraw(); }
   setDone(ids: Set<string>) { this.done = ids; this.redraw(); }
   setDoneMode(m: DoneMode) { this.doneMode = m; this.redraw(); }
   setHighlight(entityIds: Set<string> | null) { this.highlight = entityIds; this.redraw(); }
@@ -267,8 +270,12 @@ export class MapViewer {
   }
 
   // ---- drawing
+  private shown(m: Marker) {
+    const choice = m.ent ? this.entityFilter[m.cid]?.[m.ent.entity_id] : undefined;
+    return choice ?? this.visible.has(m.cid);
+  }
   private passes(m: Marker) {
-    if (!this.visible.has(m.cid)) return false;
+    if (!this.shown(m)) return false;
     if (this.doneMode === "all") return true;
     const d = this.done.has(m.id);
     return this.doneMode === "done" ? d : !d;
@@ -294,7 +301,7 @@ export class MapViewer {
     const clustering = scale * (t.sector_world_size / t.tile_px) > CLUSTER_ENTER_WORLD_PER_SCREEN_PX;
     const byGroup = new Map<string, Marker[]>();
     let n = 0;
-    for (const cid of this.visible) {
+    for (const cid of new Set([...this.visible, ...Object.keys(this.entityFilter)])) { // a classification that is off can still hold individually selected entities
       const tree = this.trees.get(cid);
       if (!tree) continue;
       const g = this.groupOf.get(cid) ?? "unclassified";
@@ -382,7 +389,7 @@ export class MapViewer {
       for (const h of this.hits) if (h.count === 1 && h.m.ent && this.highlight.has(h.m.ent.entity_id)) { ctx.beginPath(); ctx.arc(h.sx, h.sy, 15, 0, Math.PI * 2); ctx.stroke(); }
     }
     const m = this.selectedId ? this.bundle?.byId.get(this.selectedId) : null;
-    if (!m || !this.visible.has(m.cid)) return;
+    if (!m || !this.shown(m)) return;
     const s = this.viewer.viewport.imageToViewerElementCoordinates(new OpenSeadragon.Point(m.x, m.y));
     ctx.strokeStyle = "#facc15"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(s.x, s.y, 17, 0, Math.PI * 2); ctx.stroke();
     ctx.strokeStyle = "rgba(250,204,21,.35)"; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(s.x, s.y, 22, 0, Math.PI * 2); ctx.stroke();

@@ -4,26 +4,27 @@ import { createPersistentStore, isRecord } from "@/lib/persist";
 
 /** Persisted map UI state (localStorage, same pattern as the rest of the app). */
 
-/** Enabled classifications: only explicit user choices are stored; everything else follows the package defaults. */
-export const filterStore = createPersistentStore<{ enabled: Record<string, boolean> }>(
+const booleans = (raw: Record<string, unknown>) => {
+  const o: Record<string, boolean> = {};
+  for (const [k, v] of Object.entries(raw)) if (typeof v === "boolean") o[k] = v;
+  return o;
+};
+
+/**
+ * Only explicit user choices are stored; everything else follows the package defaults.
+ * - `enabled`: classification id -> on/off.
+ * - `entities`: classification id -> entity id -> on/off, per-monster choices that win over the classification's flag.
+ *   Toggling a whole classification clears its entries.
+ */
+export const filterStore = createPersistentStore<{ enabled: Record<string, boolean>; entities: Record<string, Record<string, boolean>> }>(
   "aion2.map.filters.v1",
-  { enabled: {} },
+  { enabled: {}, entities: {} },
   (raw) => {
     if (!isRecord(raw) || !isRecord(raw.enabled)) return null;
-    const enabled: Record<string, boolean> = {};
-    for (const [k, v] of Object.entries(raw.enabled)) if (typeof v === "boolean") enabled[k] = v;
-    return { enabled };
+    const entities: Record<string, Record<string, boolean>> = {};
+    if (isRecord(raw.entities)) for (const [cid, v] of Object.entries(raw.entities)) if (isRecord(v)) entities[cid] = booleans(v);
+    return { enabled: booleans(raw.enabled), entities };
   },
-);
-
-export const NAME_LOCALES = [
-  ["en-US", "English"], ["de-DE", "Deutsch"], ["es-ES", "Español"], ["fr-FR", "Français"],
-  ["ja-JP", "日本語"], ["ko-KR", "한국어"], ["pt-BR", "Português"], ["ru-RU", "Русский"],
-] as const;
-export const nameLocaleStore = createPersistentStore<{ locale: string }>(
-  "aion2.map.names.v1",
-  { locale: "en-US" },
-  (raw) => (isRecord(raw) && typeof raw.locale === "string" && NAME_LOCALES.some(([l]) => l === raw.locale) ? { locale: raw.locale } : null),
 );
 
 /**

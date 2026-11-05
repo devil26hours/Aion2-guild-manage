@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useT } from "@/lib/i18n";
-import { loadLocale, loadMap, loadShared, type Shared } from "@/lib/map/data";
-import { doneStoreFor, filterStore, nameLocaleStore, toggleDone } from "@/lib/map/stores";
+import { loadMap, loadShared, type Shared } from "@/lib/map/data";
+import { doneStoreFor, filterStore, toggleDone } from "@/lib/map/stores";
 import { buildTree } from "@/lib/map/taxonomy";
 import type { MapBundle, Marker, SearchGroup } from "@/lib/map/types";
 import type { DoneMode, MapViewer, TileStatus } from "@/lib/map/viewer";
@@ -45,11 +45,9 @@ export function InteractiveMapView() {
   const [selected, setSelected] = useState<Marker | null>(null);
   const [doneMode, setDoneModeState] = useState<DoneMode>("all");
   const [emptyView, setEmptyView] = useState(false);
-  const [names, setNames] = useState<Record<string, string>>({});
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filters = filterStore.use();
-  const { locale } = nameLocaleStore.use();
   const doneStore = doneStoreFor(mapId ?? "_none");
   const doneState = doneStore.use();
 
@@ -120,22 +118,14 @@ export function InteractiveMapView() {
     const c = shared?.cls.get(cid);
     return filters.enabled[cid] ?? (!!c && c.default_on && c.supported);
   }, [filters, shared]);
+  const isEntityOn = useCallback((cid: string, entityId: string) => filters.entities[cid]?.[entityId] ?? isOn(cid), [filters, isOn]);
   const visibleSet = useMemo(() => new Set([...(shared?.cls.keys() ?? [])].filter(isOn)), [shared, isOn]);
   const doneSet = useMemo(() => new Set(doneState.ids), [doneState]);
   useEffect(() => { viewer?.setVisible(visibleSet); }, [viewer, visibleSet]);
+  useEffect(() => { viewer?.setEntityFilter(filters.entities); }, [viewer, filters.entities]);
   useEffect(() => { viewer?.setDone(doneSet); }, [viewer, doneSet]);
   useEffect(() => { viewer?.setDoneMode(doneMode); }, [viewer, doneMode]);
   useEffect(() => { viewer?.setSelected(selected?.id ?? null); }, [viewer, selected]);
-
-  // entity-name language
-  useEffect(() => {
-    if (locale === "en-US") return;
-    let dead = false;
-    loadLocale(locale).then((n) => { if (!dead) setNames(n); });
-    return () => { dead = true; };
-  }, [locale]);
-  const nameMap = locale === "en-US" ? EMPTY : names;
-  const nameOf = useCallback((m: Marker) => (m.ent ? (m.ent.name_key && nameMap[m.ent.name_key]) || m.ent.name : m.cls.label), [nameMap]);
 
   // ---------------------------------------------------------------- derived UI data
   const counts = useMemo(() => {
@@ -150,7 +140,13 @@ export function InteractiveMapView() {
   }, [bundle, doneSet]);
 
   const setCids = useCallback((cids: string[], on: boolean) => {
-    filterStore.set((p) => ({ enabled: { ...p.enabled, ...Object.fromEntries(cids.map((c) => [c, on])) } }));
+    filterStore.set((p) => ({
+      enabled: { ...p.enabled, ...Object.fromEntries(cids.map((c) => [c, on])) },
+      entities: Object.fromEntries(Object.entries(p.entities).filter(([c]) => !cids.includes(c))),
+    }));
+  }, []);
+  const setEntities = useCallback((cid: string, entityIds: string[], on: boolean) => {
+    filterStore.set((p) => ({ ...p, entities: { ...p.entities, [cid]: { ...p.entities[cid], ...Object.fromEntries(entityIds.map((id) => [id, on])) } } }));
   }, []);
   const selectAll = () => setCids(Object.keys(counts).filter((c) => counts[c] > 0), true);
   const clearAll = () => setCids([...(shared?.cls.keys() ?? [])], false);
@@ -172,19 +168,22 @@ export function InteractiveMapView() {
     const ids = new Set(g.ids);
     const arr = b.markers.filter((m) => m.ent && ids.has(m.ent.entity_id));
     if (!arr.length) return;
-    filterStore.set((p) => ({ enabled: { ...p.enabled, [g.cid]: true } }));
+    // A monster is revealed on its own, so jumping to it does not switch on its siblings.
+    if (arr[0].ent?.entity_type === "monster") setEntities(g.cid, g.ids, true);
+    else filterStore.set((p) => ({ ...p, enabled: { ...p.enabled, [g.cid]: true } }));
     setDoneModeState("all");
     const c = v.centerImage();
     let best = arr[0], bd = Infinity;
     for (const m of arr) { const d = Math.hypot(m.x - c.x, m.y - c.y); if (d < bd) { bd = d; best = m; } }
     v.setVisible(new Set([...sharedRef.current!.cls.keys()].filter((c) => filterStore.get().enabled[c] ?? (sharedRef.current!.cls.get(c)!.default_on && sharedRef.current!.cls.get(c)!.supported))));
+    v.setEntityFilter(filterStore.get().entities);
     v.setHighlight(ids);
     // wait for the tile source to be open before moving (a map switch re-opens it)
     const t0 = Date.now();
     while (!v.isOpen && Date.now() - t0 < 8000) await new Promise((r) => setTimeout(r, 50));
     v.setDoneMode("all");
     v.focus(best);
-  }, [mapId, selectMap]);
+  }, [mapId, selectMap, setEntities]);
 
   // ---------------------------------------------------------------- render
   const groups = tree?.groups ?? [];
@@ -199,9 +198,10 @@ export function InteractiveMapView() {
   const panelFor = (inSheet: boolean) => shared && tree ? (
     <MapFilterPanel
       shared={shared} groups={groups} counts={counts} isOn={isOn} setCids={setCids}
+      isEntityOn={isEntityOn} setEntities={setEntities}
       selectAll={selectAll} clearAll={clearAll} reset={() => filterStore.reset()}
-      bundle={bundle} displayName={(k, n) => (k && nameMap[k]) || n} onPickCreature={(g) => void pick(g)}
-      inSheet={inSheet} nameLocale={locale} setNameLocale={(l) => nameLocaleStore.set({ locale: l })}
+      bundle={bundle} onPickCreature={(g) => void pick(g)}
+      inSheet={inSheet}
     />
   ) : null;
 
@@ -223,7 +223,7 @@ export function InteractiveMapView() {
             return Object.keys(mapsByGroup[curGroup] ?? {}).length > 1 ? <optgroup key={sg} label={t(SUB_LABEL[sg] ?? sg)}>{opts}</optgroup> : opts;
           })}
         </NativeSelect>
-        {shared ? <MapSearch shared={shared} mapId={mapId ?? ""} mapName={mapName} names={nameMap} onPick={(g) => void pick(g)} className="sm:col-span-2 lg:col-span-1" /> : <span />}
+        {shared ? <MapSearch shared={shared} mapId={mapId ?? ""} mapName={mapName} onPick={(g) => void pick(g)} className="sm:col-span-2 lg:col-span-1" /> : <span />}
         <div role="group" aria-label={t("Completion filter")} className="flex" data-testid="done-filter">
           {([["all", "All"], ["notdone", "Not done"], ["done", "Done"]] as const).map(([k, l]) => (
             <button key={k} type="button" aria-pressed={doneMode === k} data-testid={`done-${k}`} onClick={() => setDoneModeState(k)}
@@ -266,7 +266,7 @@ export function InteractiveMapView() {
           )}
 
           {viewer && selected && shared && tree && (
-            <MapPopup marker={selected} viewer={viewer} shared={shared} groups={groups} name={nameOf(selected)} done={doneSet.has(selected.id)}
+            <MapPopup marker={selected} viewer={viewer} shared={shared} groups={groups} name={selected.ent?.name ?? selected.cls.label} done={doneSet.has(selected.id)}
               onToggleDone={() => mapId && toggleDone(mapId, selected.id)} onClose={() => { setSelected(null); viewer.setHighlight(null); }} />
           )}
 
@@ -306,5 +306,3 @@ export function InteractiveMapView() {
     </div>
   );
 }
-
-const EMPTY: Record<string, string> = {};

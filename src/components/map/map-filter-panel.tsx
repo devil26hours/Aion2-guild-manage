@@ -5,10 +5,8 @@ import { useMemo, useState } from "react";
 import { aionButtonSecondary } from "@/components/aion/styles";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { NativeSelect } from "@/components/ui/native-select";
 import { useT } from "@/lib/i18n";
 import { assetUrl, type Shared } from "@/lib/map/data";
-import { NAME_LOCALES } from "@/lib/map/stores";
 import type { TreeGroup } from "@/lib/map/taxonomy";
 import type { MapBundle, SearchGroup } from "@/lib/map/types";
 import { cn } from "@/lib/utils";
@@ -20,15 +18,14 @@ export interface FilterPanelProps {
   counts: Record<string, number>;
   isOn: (cid: string) => boolean;
   setCids: (cids: string[], on: boolean) => void;
+  /** Effective on/off of one monster: its own choice, else its classification's flag. */
+  isEntityOn: (cid: string, entityId: string) => boolean;
+  setEntities: (cid: string, entityIds: string[], on: boolean) => void;
   selectAll: () => void;
   clearAll: () => void;
   reset: () => void;
-  nameLocale: string;
-  setNameLocale: (l: string) => void;
   /** Current map: source of the creature group -> creature name lists (real entity data only). */
   bundle?: MapBundle | null;
-  /** Localized display name of an entity. */
-  displayName?: (nameKey: string | null, name: string) => string;
   /** Jump to a creature on the map (same action as picking a search result). */
   onPickCreature?: (g: SearchGroup) => void;
   /** Inside the mobile drawer: leave room for the drawer's close button. */
@@ -37,6 +34,10 @@ export interface FilterPanelProps {
 
 const sum = (cids: string[], counts: Record<string, number>) => cids.reduce((n, c) => n + (counts[c] ?? 0), 0);
 const fmt = (n: number) => n.toLocaleString("en-US");
+
+type CheckState = boolean | "indeterminate";
+/** Parent state from its children: all on = checked, none on (or no children) = unchecked, otherwise indeterminate. */
+const rollUp = (states: CheckState[]): CheckState => states.every((s) => s === false) ? false : states.every((s) => s === true) ? true : "indeterminate";
 
 export function MapFilterPanel(p: FilterPanelProps) {
   const t = useT();
@@ -62,6 +63,12 @@ export function MapFilterPanel(p: FilterPanelProps) {
     return o;
   }, [p.bundle]);
   const flip = (set: Set<string>, id: string) => { const n = new Set(set); if (n.has(id)) n.delete(id); else n.add(id); return n; };
+  const namesState = (cid: string, names: Iterable<SearchGroup>) => rollUp([...names].flatMap((g) => g.ids.map((id) => p.isEntityOn(cid, id))));
+  /** A classification with monsters on this map rolls up from them; any other one is a plain on/off flag. */
+  const cidState = (cid: string): CheckState => {
+    const byGrp = creatures.get(cid);
+    return byGrp ? namesState(cid, [...byGrp.values()].flatMap((names) => [...names.values()])) : p.isOn(cid);
+  };
 
   return (
     <div className="flex h-full min-h-0 flex-col" data-testid="map-filters">
@@ -76,8 +83,7 @@ export function MapFilterPanel(p: FilterPanelProps) {
           const all = g.subs.flatMap((s) => s.cids);
           const withData = all.filter((c) => (p.counts[c] ?? 0) > 0);
           const total = sum(all, p.counts);
-          const onN = withData.filter((c) => p.isOn(c)).length;
-          const state: boolean | "indeterminate" = withData.length === 0 ? false : onN === 0 ? false : onN === withData.length ? true : "indeterminate";
+          const state = rollUp(withData.map(cidState));
           const open = openGroups.has(g.id);
           return (
             <section key={g.id} className="border-b border-steel/10" data-testid={`group-${g.id}`}>
@@ -97,8 +103,7 @@ export function MapFilterPanel(p: FilterPanelProps) {
                     const present = s.cids.filter((c) => (p.counts[c] ?? 0) > 0);
                     const globalSpawns = s.cids.reduce((n, c) => n + (p.shared.cls.get(c)?.spawn_count ?? 0), 0);
                     const unsupported = s.cids.length > 0 && s.cids.every((c) => p.shared.cls.get(c)?.supported === false);
-                    const on = present.filter((c) => p.isOn(c)).length;
-                    const st: boolean | "indeterminate" = present.length === 0 || on === 0 ? false : on === present.length ? true : "indeterminate";
+                    const st = rollUp(present.map(cidState));
                     const so = openSubs.has(s.id);
                     const expandable = s.cids.length > 1 || s.cids.some((c) => creatures.has(c));
                     const note = s.cids.length === 0 || unsupported ? t("No data in client") : globalSpawns === 0 ? t("No spawns in prepared maps") : subTotal === 0 ? t("None on this map") : null;
@@ -120,10 +125,11 @@ export function MapFilterPanel(p: FilterPanelProps) {
                               const c = p.shared.cls.get(cid);
                               if (!c) return null;
                               const n = p.counts[cid] ?? 0;
+                              const leafState = cidState(cid);
                               const icon = assetUrl(p.shared, c.resource?.primary_yield_icon ? `item:${c.resource.primary_yield_icon}` : c.marker_display.type_icon_asset_id);
                               return (
                                 <li key={cid} className={cn("flex flex-wrap items-center gap-2 py-0.5 pr-3 pl-[4.25rem]", n === 0 && "opacity-45")}>
-                                  <Checkbox aria-label={c.label} checked={p.isOn(cid)} disabled={n === 0} onCheckedChange={(v) => p.setCids([cid], v === true)} data-testid={`leaf-check-${cid}`} />
+                                  <Checkbox aria-label={c.label} checked={leafState} disabled={n === 0} onCheckedChange={() => p.setCids([cid], leafState !== true)} data-testid={`leaf-check-${cid}`} />
                                   {/* eslint-disable-next-line @next/next/no-img-element -- small static game icon; next/image adds nothing */}
                                   {icon ? <img src={icon} alt="" width={18} height={18} className="size-[18px] shrink-0 object-contain" /> : <span className="size-[18px] shrink-0" />}
                                   <span className="min-w-0 flex-1 truncate text-xs">{c.label}</span>
@@ -138,23 +144,32 @@ export function MapFilterPanel(p: FilterPanelProps) {
                                       {[...creatures.get(cid)!.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([grp, names]) => {
                                         const gk = `g:${cid}:${grp}`;
                                         const total = [...names.values()].reduce((x, g) => x + Object.values(g.maps).reduce((y, z) => y + z, 0), 0);
+                                        const grpState = namesState(cid, names.values());
+                                        const grpIds = [...names.values()].flatMap((g) => g.ids);
                                         return (
                                           <li key={gk}>
-                                            <button type="button" aria-expanded={openSubs.has(gk)} onClick={() => setOpenSubs((x) => flip(x, gk))} className="flex w-full items-center gap-1.5 py-0.5 text-left text-xs text-foreground hover:text-brand-strong" data-testid={`creature-group-${cid}-${grp || "none"}`}>
-                                              {openSubs.has(gk) ? <ChevronDown className="size-3.5 shrink-0" /> : <ChevronRight className="size-3.5 shrink-0" />}
-                                              <span className="min-w-0 flex-1 truncate">{grp || t("Unspecified")}</span>
-                                              <span className="text-3xs text-subtle tabular-nums">{fmt(total)}</span>
-                                            </button>
+                                            <div className="flex items-center gap-1.5">
+                                              <Checkbox className="after:inset-x-0" aria-label={grp || t("Unspecified")} checked={grpState} onCheckedChange={() => p.setEntities(cid, grpIds, grpState !== true)} data-testid={`creature-group-check-${cid}-${grp || "none"}`} />
+                                              <button type="button" aria-expanded={openSubs.has(gk)} onClick={() => setOpenSubs((x) => flip(x, gk))} className="flex min-w-0 flex-1 items-center gap-1.5 py-0.5 text-left text-xs text-foreground hover:text-brand-strong" data-testid={`creature-group-${cid}-${grp || "none"}`}>
+                                                {openSubs.has(gk) ? <ChevronDown className="size-3.5 shrink-0" /> : <ChevronRight className="size-3.5 shrink-0" />}
+                                                <span className="min-w-0 flex-1 truncate">{grp || t("Unspecified")}</span>
+                                                <span className="text-3xs text-subtle tabular-nums">{fmt(total)}</span>
+                                              </button>
+                                            </div>
                                             {openSubs.has(gk) && (
                                               <ul className="pl-5">
-                                                {[...names.values()].sort((a, b) => a.name.localeCompare(b.name)).map((g) => (
-                                                  <li key={g.key}>
-                                                    <button type="button" onClick={() => p.onPickCreature?.(g)} className="flex w-full items-center gap-1.5 py-0.5 text-left text-xs text-steel hover:text-brand-strong" data-testid="creature-name">
-                                                      <span className="min-w-0 flex-1 truncate">{p.displayName ? p.displayName(g.nameKey, g.name) : g.name}</span>
-                                                      <span className="text-3xs text-subtle tabular-nums">{fmt(Object.values(g.maps).reduce((y, z) => y + z, 0))}</span>
-                                                    </button>
-                                                  </li>
-                                                ))}
+                                                {[...names.values()].sort((a, b) => a.name.localeCompare(b.name)).map((g) => {
+                                                  const nameState = namesState(cid, [g]);
+                                                  return (
+                                                    <li key={g.key} className="flex items-center gap-1.5">
+                                                      <Checkbox className="after:inset-x-0" aria-label={g.name} checked={nameState} onCheckedChange={() => p.setEntities(cid, g.ids, nameState !== true)} data-testid={`creature-check-${g.ids[0]}`} />
+                                                      <button type="button" onClick={() => p.onPickCreature?.(g)} className="flex min-w-0 flex-1 items-center gap-1.5 py-0.5 text-left text-xs text-steel hover:text-brand-strong" data-testid="creature-name">
+                                                        <span className="min-w-0 flex-1 truncate">{g.name}</span>
+                                                        <span className="text-3xs text-subtle tabular-nums">{fmt(Object.values(g.maps).reduce((y, z) => y + z, 0))}</span>
+                                                      </button>
+                                                    </li>
+                                                  );
+                                                })}
                                               </ul>
                                             )}
                                           </li>
@@ -175,13 +190,6 @@ export function MapFilterPanel(p: FilterPanelProps) {
             </section>
           );
         })}
-        <div className="px-3 pt-3">
-          <label className="mb-1 block text-3xs font-semibold tracking-wider text-subtle uppercase" htmlFor="map-names-lang">{t("Entity name language")}</label>
-          <NativeSelect id="map-names-lang" value={p.nameLocale} onChange={(e) => p.setNameLocale(e.target.value)} className="h-8 text-xs">
-            {NAME_LOCALES.map(([l, n]) => <option key={l} value={l}>{n}</option>)}
-          </NativeSelect>
-          <p className="mt-1 text-3xs text-subtle">{t("Names come from the game client; Thai is not available there.")}</p>
-        </div>
       </div>
     </div>
   );

@@ -14,15 +14,14 @@ interface Props {
   shared: Shared;
   mapId: string;
   mapName: (id: string) => string;
-  names: Record<string, string>; // localized names for the chosen language
   onPick: (g: SearchGroup) => void;
   className?: string;
 }
 
 const norm = (s: string) => s.toLowerCase();
 
-/** Entity search over the cross-map index: by name (any chosen language), yielded item, or object id. */
-export function MapSearch({ shared, mapId, mapName, names, onPick, className }: Props) {
+/** Entity search over the cross-map index: by name, yielded item, or object id. */
+export function MapSearch({ shared, mapId, mapName, onPick, className }: Props) {
   const t = useT();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -45,7 +44,7 @@ export function MapSearch({ shared, mapId, mapName, names, onPick, className }: 
     const scored: { g: SearchGroup; score: number; here: number }[] = [];
     for (const g of index) {
       const c = shared.cls.get(g.cid);
-      const hay = norm(g.name) + " " + norm((g.nameKey && names[g.nameKey]) || "");
+      const hay = norm(g.name);
       const extra = c?.resource ? norm(c.resource.yields.map((y) => y.name).join(" ")) : "";
       let ok = true, score = 0;
       for (const tk of toks) {
@@ -60,7 +59,7 @@ export function MapSearch({ shared, mapId, mapName, names, onPick, className }: 
     }
     scored.sort((a, b) => Number(b.here > 0) - Number(a.here > 0) || a.score - b.score || b.here - a.here);
     return { rows: scored.slice(0, 30).map((s) => s.g), total: scored.length };
-  }, [dq, index, names, shared, mapId]);
+  }, [dq, index, shared, mapId]);
 
   return (
     <div className={cn("relative", className)} data-testid="map-search">
@@ -97,7 +96,6 @@ export function MapSearch({ shared, mapId, mapName, names, onPick, className }: 
             const here = g.maps[mapId] ?? 0;
             const others = Object.entries(g.maps).filter(([m]) => m !== mapId).sort((a, b) => b[1] - a[1]);
             const img = c ? assetUrl(shared, c.resource?.primary_yield_icon ? `item:${c.resource.primary_yield_icon}` : c.marker_display.type_icon_asset_id) : null;
-            const shown = (g.nameKey && names[g.nameKey]) || g.name;
             return (
               <button
                 key={g.key}
@@ -111,7 +109,7 @@ export function MapSearch({ shared, mapId, mapName, names, onPick, className }: 
                 {/* eslint-disable-next-line @next/next/no-img-element -- small static icon */}
                 {img ? <img src={img} alt="" width={22} height={22} className="mt-0.5 size-[22px] shrink-0 object-contain" /> : <span className="mt-1 size-[22px] shrink-0 rounded-full" style={{ background: grp?.color ?? "#9ca3af", transform: "scale(.4)" }} />}
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium">{shown}</span>
+                  <span className="block truncate text-sm font-medium">{g.name}</span>
                   <span className="block truncate text-3xs text-subtle">{grp ? `${t(grp.label)} › ` : ""}{sub ? t(sub.label) : ""}{c && sub && sub.cids.length > 1 ? ` · ${c.label}` : ""}</span>
                   <span className="block text-3xs text-steel">
                     {here ? t("{n} on {map}", { n: here.toLocaleString("en-US"), map: mapName(mapId) }) : t("not on {map}", { map: mapName(mapId) })}

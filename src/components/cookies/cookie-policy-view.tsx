@@ -111,12 +111,12 @@ const STORAGE: Item[] = [
     removed: "Not removed by signing out. Delete it in your browser (the notice then appears again).",
   },
   {
-    name: "aion2.map.filters.v1 / aion2.map.names.v1",
-    purpose: "Interactive Map: remembers which marker types you switched on or off and the language of entity names.",
+    name: "aion2.map.filters.v1",
+    purpose: "Interactive Map: remembers which marker types and individual monsters you switched on or off.",
     category: PREFERENCE,
-    contains: "Marker type IDs with true/false, and a language code such as “en-US”. No personal data.",
+    contains: "Marker type and monster IDs from the game data, with true/false. No personal data.",
     retention: "No expiry. It stays until you delete it.",
-    created: "When you change a marker filter or the entity name language on the Map page.",
+    created: "When you change a marker filter on the Map page.",
     removed: "Not removed by signing out. Delete it in your browser.",
   },
   {
