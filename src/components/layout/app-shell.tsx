@@ -28,7 +28,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <AppHeader mobileNavFooter={guildCard} />
 
       <div className="relative flex flex-1">
-        <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px)] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-[var(--sidebar-bg)] px-3 py-5 lg:flex">
+        {/* Footer is a fixed, full-width bar, so the sidebar's height is shortened by
+            --footer-bar-h to stop right at its top edge instead of running behind it. */}
+        <aside className="sticky top-[65px] hidden h-[calc(100dvh-65px-var(--footer-bar-h))] w-60 shrink-0 flex-col gap-6 border-r border-steel/10 bg-[var(--sidebar-bg)] px-3 py-5 lg:flex">
           <p className="shrink-0 px-3 font-heading text-3xs font-semibold tracking-[0.3em] text-gold-text uppercase">
             Command
           </p>

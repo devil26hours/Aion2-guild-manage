@@ -23,11 +23,11 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
   { href: "/map", label: "Interactive Map", icon: MapIcon },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/members", label: "Members", icon: Users },
   { href: "/character-history", label: "Character History", icon: History },
-  { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
   { href: "/party-builder", label: "Party Builder", icon: Swords },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/settings", label: "Settings", icon: Settings },

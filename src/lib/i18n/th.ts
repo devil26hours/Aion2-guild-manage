@@ -2,9 +2,9 @@
  * Thai translations keyed by the English UI text.
  *
  * Intentionally NOT translated (no entry → stays English): game terms and
- * feature names such as Dashboard, Members, Character History, Party Builder,
- * Character Profile, API Lab, Combat Power, Item Level, CP, Tank, Healer,
- * Support, DPS, Daevanion, and technical field names (characterId, stat.statList…).
+ * feature names such as Character Profile, API Lab, Combat Power, Item Level,
+ * CP, Tank, Healer, Support, DPS, Daevanion, and technical field names
+ * (characterId, stat.statList…).
  * `error:CODE` entries localize server error messages by their code.
  */
 export const TH: Record<string, string> = {
@@ -215,6 +215,10 @@ export const TH: Record<string, string> = {
 
   /* --------------------------------- nav ---------------------------------- */
   "Live Roster": "รายชื่อปัจจุบัน",
+  "Dashboard": "แดชบอร์ด",
+  "Character History": "ประวัติตัวละคร",
+  "Character Lookup": "ค้นหาตัวละคร",
+  "Party Builder": "จัดปาร์ตี้",
 
   /* ------------------------------- dashboard ------------------------------- */
   "Guild Overview": "ภาพรวมกิลด์",
@@ -984,7 +988,7 @@ export const TH: Record<string, string> = {
   "Refresh": "รีเฟรช",
   "Users": "ผู้ใช้",
   "Guilds": "กิลด์",
-  "Members": "Members",
+  "Members": "สมาชิก",
   "{count} new in 7 days": "ใหม่ {count} ใน 7 วัน",
   "{count} leaders": "หัวหน้ากิลด์ {count}",
   "{count} guild accounts": "บัญชีในกิลด์ {count}",

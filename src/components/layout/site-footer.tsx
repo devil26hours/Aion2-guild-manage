@@ -59,14 +59,16 @@ export function SiteFooter({ className, support = false }: { className?: string;
 }
 
 /**
- * Always-visible footer of the app frame. Its height comes from --footer-bar-h, set by
- * AppShell, which also reserves that space under the page. Stacked on mobile (actions above
- * the text), one row from sm up.
+ * Always-visible footer of the app frame, spanning the full viewport width (including
+ * under the sidebar — AppShell shortens the sidebar by --footer-bar-h so it stops at this
+ * footer's top edge instead of running behind it). Its height comes from --footer-bar-h,
+ * set by AppShell, which also reserves that space under the page. Stacked on mobile
+ * (actions above the text), one row from sm up.
  */
 export function FooterBar() {
   const t = useT();
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-20 flex h-[var(--footer-bar-h)] flex-col items-start justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:left-60 lg:px-8">
+    <footer className="fixed inset-x-0 bottom-0 z-20 flex h-[var(--footer-bar-h)] flex-col items-start justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:px-8">
       <div className="order-2 flex min-w-0 flex-col items-start gap-0.5 text-left sm:order-1">
         <p className="hidden xl:block">{t("An independent community project, built with passion for AION2 players.")}</p>
         <p className="flex flex-wrap items-center justify-start gap-x-2">
