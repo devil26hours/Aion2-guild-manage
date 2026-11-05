@@ -104,6 +104,7 @@ export function RosterManager() {
   const [commenting, setCommenting] = useState<RosterMember | null>(null);
   const [busy, setBusy] = useState<Record<string, Busy>>({});
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [refreshingAll, setRefreshingAll] = useState(false);
 
   // Auto-dismiss the current notice (errors stay longer).
   useEffect(() => {
@@ -172,6 +173,28 @@ export function RosterManager() {
     }
   }
 
+  /** Refresh every member from the API (any role). Small concurrency to be gentle on the upstream API. */
+  async function refreshAll() {
+    if (refreshingAll || members.length === 0) return;
+    setRefreshingAll(true);
+    const queue = [...members];
+    let ok = 0;
+    let failed = 0;
+    const worker = async () => {
+      for (let m = queue.shift(); m; m = queue.shift()) {
+        setBusyFor(m.id, "refresh");
+        const r = await refreshRosterMember(m.id);
+        setBusyFor(m.id, null);
+        if (r.ok) ok++;
+        else failed++;
+      }
+    };
+    await Promise.all(Array.from({ length: 3 }, worker));
+    setRefreshingAll(false);
+    if (failed === 0) announce("success", t("Refreshed all {n} members.", { n: ok }));
+    else announce("error", t("Refreshed {ok} members, {failed} failed. Saved data was kept for failed ones.", { ok, failed }));
+  }
+
   async function changeRole(m: RosterMember, role: PartyRole | null) {
     setBusyFor(m.id, "role");
     const r = await updateRosterMember(m.id, { role });
@@ -208,17 +231,30 @@ export function RosterManager() {
         title={t("Guild Members")}
         description={t("Real characters from the AION2 API, saved to the local roster file. Guild roles are managed here.")}
         actions={
-          isLeader && (
-          <Button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            disabled={status !== "ready" || !settingsReady || full}
-            title={full ? t("Roster is full ({n} / {cap}). Change “Maximum members” in Settings.", { n: members.length, cap }) : undefined}
-            className={cn(aionButtonPrimary, "h-10 px-4")}
-          >
-            <UserPlus className="size-4" />
-            {t("Add Member")}</Button>
-          )
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void refreshAll()}
+              disabled={status !== "ready" || members.length === 0 || refreshingAll}
+              data-testid="refresh-all"
+              className={cn(aionButtonSecondary, "h-10 px-4")}
+            >
+              <RefreshCw className={cn("size-4", refreshingAll && "animate-spin")} />
+              {refreshingAll ? t("Refreshing…") : t("Refresh All")}
+            </Button>
+            {isLeader && (
+              <Button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                disabled={status !== "ready" || !settingsReady || full}
+                title={full ? t("Roster is full ({n} / {cap}). Change “Maximum members” in Settings.", { n: members.length, cap }) : undefined}
+                className={cn(aionButtonPrimary, "h-10 px-4")}
+              >
+                <UserPlus className="size-4" />
+                {t("Add Member")}</Button>
+            )}
+          </div>
         }
       />
 

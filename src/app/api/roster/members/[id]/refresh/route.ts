@@ -6,14 +6,14 @@ import { findMember, recordRefreshError, recordSnapshot, toPublicMember, upsertC
 import { serverWriteProblem } from "@/lib/supabase/admin";
 
 /**
- * POST /api/roster/members/{id}/refresh — re-fetch the profile (Guild Leader only).
+ * POST /api/roster/members/{id}/refresh — re-fetch the profile (any guild member).
  * Success: overwrite API-owned fields + raw response, append a snapshot;
  *          role/notes/added_at are kept (they live on the roster row).
  * Failure: keep ALL saved data; only record `last_refresh_error`.
  * API data is written through the service_role functions (0003).
  */
 export async function POST(request: Request, ctx: RouteContext<"/api/roster/members/[id]/refresh">) {
-  const auth = await requireGuild(request, { leader: true });
+  const auth = await requireGuild(request);
   if (auth.response) return auth.response;
   const { guildId, supabase } = auth;
   const id = parseMemberId((await ctx.params).id);
