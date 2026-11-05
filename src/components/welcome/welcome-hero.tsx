@@ -7,6 +7,7 @@ import { OrnamentDivider } from "@/components/aion/ornaments";
 import { PhotoBackdrop } from "@/components/aion/photo-backdrop";
 import { SiteLogo } from "@/components/aion/site-logo";
 import { aionButtonPrimary, aionButtonSecondary } from "@/components/aion/styles";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { Button } from "@/components/ui/button";
 import { CharacterLookupCta } from "@/components/welcome/character-lookup-cta";
 import { AION_CLASSES, CLASS_META } from "@/lib/aion/classes";
@@ -27,6 +28,7 @@ export function WelcomeHero() {
   return (
     <section data-theme="dark" className="relative isolate flex h-full flex-col items-center justify-center overflow-hidden px-4 py-[clamp(0.25rem,2dvh,3rem)] sm:px-6">
       <PhotoBackdrop moteCount={14} sparkleCount={26} />
+      <LanguageSwitcher className="absolute top-3 right-3 z-20 bg-surface/40 backdrop-blur-sm sm:top-4 sm:right-4" />
       <div className="aion-enter relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center">
         <SiteLogo preload className="h-[clamp(2.25rem,calc(20dvh-5.5rem),5rem)] sm:h-[clamp(2.25rem,calc(20dvh-3.5rem),7rem)]" />
         <h1 className="mt-1 font-display leading-none [text-shadow:0_2px_12px_rgba(0,0,0,0.85)]">
