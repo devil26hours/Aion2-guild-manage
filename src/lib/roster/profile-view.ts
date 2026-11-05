@@ -196,6 +196,16 @@ export function snapshotFromRaw(
   };
 }
 
+/**
+ * The one enhancement indicator every item display shows. `exceedLevel` takes priority over `enchantLevel`
+ * (a ★3 item is usually also +15, which is implied); zero or missing values show nothing.
+ */
+export function enhancementOf(item: { enchant: number | null; exceed?: number | null } | null | undefined): { kind: "exceed" | "enchant"; value: number; label: string } | null {
+  if (item?.exceed != null && item.exceed > 0) return { kind: "exceed", value: item.exceed, label: `★${item.exceed}` };
+  if (item?.enchant != null && item.enchant > 0) return { kind: "enchant", value: item.enchant, label: `+${item.enchant}` };
+  return null;
+}
+
 /** Grade → accent color for frames (display only; the grade text is always shown too). */
 export function gradeColor(grade: string | null): string {
   switch (grade) {

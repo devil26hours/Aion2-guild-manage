@@ -74,14 +74,14 @@ const C = {
 const nf = new Intl.NumberFormat("en-US");
 const df = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
-function fontVar(name: string, fallback: string): string {
+export function fontVar(name: string, fallback: string): string {
   if (typeof document === "undefined") return fallback;
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return v ? `${v}, ${fallback}` : fallback;
 }
 
 /** Truncate with an ellipsis so text never overflows `max` px. */
-function fit(ctx: CanvasRenderingContext2D, text: string, max: number): string {
+export function fit(ctx: CanvasRenderingContext2D, text: string, max: number): string {
   if (ctx.measureText(text).width <= max) return text;
   let lo = 0;
   let hi = text.length;
@@ -103,7 +103,7 @@ function spaced(ctx: CanvasRenderingContext2D, text: string, x: number, y: numbe
   }
 }
 
-function frame(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+export function frame(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   ctx.strokeStyle = `${C.goldDim}99`;
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
@@ -120,9 +120,9 @@ function frame(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h
 }
 
 /** Same-origin image → bitmap (never taints the canvas); null on any failure. */
-async function loadBitmap(src: string): Promise<ImageBitmap | null> {
+export async function loadBitmap(src: string, timeoutMs = IMAGE_TIMEOUT_MS): Promise<ImageBitmap | null> {
   try {
-    const res = await fetch(src, { signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS) });
+    const res = await fetch(src, { signal: AbortSignal.timeout(timeoutMs) });
     if (!res.ok) return null;
     return await createImageBitmap(await res.blob());
   } catch {
@@ -150,7 +150,7 @@ async function loadSlotImages(slots: ExportSlot[]): Promise<(ImageBitmap | null)
 }
 
 /** Draw `img` into a square with object-fit: cover. */
-function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, x: number, y: number, size: number) {
+export function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, x: number, y: number, size: number) {
   const side = Math.min(img.width, img.height);
   ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, x, y, size, size);
 }

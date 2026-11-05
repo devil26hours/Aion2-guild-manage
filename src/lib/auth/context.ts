@@ -23,6 +23,8 @@ if (typeof window !== "undefined") {
 /** The account's own character, with its database row id. */
 export interface OwnedCharacter extends CharacterRef {
   db_id: string;
+  /** From the stored AION2 API data (characters.profile_image); null until the character has been fetched/refreshed. */
+  profile_image: string | null;
 }
 
 export interface SessionUser {
@@ -59,7 +61,7 @@ const SCHEMA_MISSING = new Set(["PGRST205", "42P01"]);
 
 interface OwnershipRow {
   character_id: string;
-  characters: { region: Region; server_id: string; character_id: string; character_name: string } | null;
+  characters: { region: Region; server_id: string; character_id: string; character_name: string; profile_image: string | null } | null;
 }
 
 /** Verified user → account context, or null when signed out. Throws on database errors. */
@@ -70,7 +72,7 @@ export async function loadSessionUser(supabase: SupabaseClient): Promise<Session
   const uid = claims.sub;
   const [membership, ownership, suspension] = await Promise.all([
     supabase.from("guild_memberships").select("guild_id, role").eq("user_id", uid).maybeSingle(),
-    supabase.from("character_ownerships").select("character_id, characters(region, server_id, character_id, character_name)").eq("user_id", uid).maybeSingle(),
+    supabase.from("character_ownerships").select("character_id, characters(region, server_id, character_id, character_name, profile_image)").eq("user_id", uid).maybeSingle(),
     supabase.from("user_suspensions").select("user_id").eq("user_id", uid).maybeSingle(),
   ]);
   if (membership.error) throw toDbError(membership.error);
@@ -82,7 +84,7 @@ export async function loadSessionUser(supabase: SupabaseClient): Promise<Session
   return {
     id: uid,
     email: typeof claims.email === "string" ? claims.email : "",
-    character: own && c ? { db_id: own.character_id, region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.character_name } : null,
+    character: own && c ? { db_id: own.character_id, region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.character_name, profile_image: c.profile_image } : null,
     guild_id: (membership.data?.guild_id as string | undefined) ?? null,
     role: (membership.data?.role as "leader" | "member" | undefined) ?? null,
     suspended: !suspension.error && !!suspension.data,

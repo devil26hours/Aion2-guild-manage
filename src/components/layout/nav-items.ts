@@ -3,6 +3,7 @@ import {
   FlaskConical,
   Gauge,
   History,
+  Home,
   Inbox,
   LayoutDashboard,
   Map as MapIcon,
@@ -44,7 +45,15 @@ export const NO_GUILD_NAV_ITEMS: NavItem[] = [
 export const GUEST_NAV_ITEMS: NavItem[] = [
   { href: "/map", label: "Interactive Map", icon: MapIcon },
   { href: "/character-lookup", label: "Character Lookup", icon: ScanSearch },
+  { href: "/", label: "Welcome", icon: Home },
 ];
+
+/**
+ * Link back to the public Welcome page ("/"). Shown to a DEV account alongside the normal
+ * sidebar (src/components/layout/sidebar-nav.tsx) — never to a Member or Guild Leader, who the
+ * proxy (src/proxy.ts) already keeps off "/" itself, so the item would just redirect them.
+ */
+export const WELCOME_NAV_ITEM: NavItem = { href: "/", label: "Welcome", icon: Home };
 
 /** One DEV menu, shown only to a DEV account (display hint; the pages and APIs check the role on the server). */
 export const DEV_NAV_ITEMS: NavItem[] = [

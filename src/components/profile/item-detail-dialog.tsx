@@ -1,6 +1,7 @@
 "use client";
 
 import { aionDialog } from "@/components/aion/styles";
+import { EnhancementBadge } from "@/components/roster/api-icon";
 import {
   Dialog,
   DialogContent,
@@ -53,11 +54,7 @@ export function ItemDetailDialog({
                   className="size-8 drop-shadow-[0_0_8px_currentColor]"
                   style={{ color: dataText(RARITY_META[item.rarity].color) }}
                 />
-                {item.enhancement > 0 && (
-                  <span className="absolute -top-2 -left-2 border border-brand-muted/60 bg-surface px-1 text-xs font-bold text-brand-strong tabular-nums">
-                    +{item.enhancement}
-                  </span>
-                )}
+                <EnhancementBadge enchant={item.enhancement} />
               </span>
               <div className="min-w-0 space-y-1.5 text-left">
                 <DialogTitle

@@ -36,7 +36,7 @@ function toLogin() {
   window.location.replace(`/login?next=${encodeURIComponent(next)}`);
 }
 
-export async function call<T>(url: string, init?: RequestInit): Promise<ApiResult<T>> {
+export async function call<T>(url: string, init?: RequestInit, opts: { redirectOn401?: boolean } = {}): Promise<ApiResult<T>> {
   try {
     const isForm = typeof FormData !== "undefined" && init?.body instanceof FormData;
     const res = await fetch(url, {
@@ -45,7 +45,7 @@ export async function call<T>(url: string, init?: RequestInit): Promise<ApiResul
       headers: { ...(isForm ? {} : { "content-type": "application/json" }), ...(init?.headers ?? {}) },
     });
     const body = (await res.json().catch(() => null)) as (T & { error?: { code?: string; message?: string; status?: number | null } }) | null;
-    if (res.status === 401 && body?.error?.code === "UNAUTHENTICATED") toLogin();
+    if (res.status === 401 && body?.error?.code === "UNAUTHENTICATED" && opts.redirectOn401 !== false) toLogin();
     if (res.status === 403 && body?.error?.code === "ACCOUNT_SUSPENDED" && typeof window !== "undefined") window.location.replace("/suspended");
     if (res.ok && body) return { ok: true, data: body };
     return {

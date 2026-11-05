@@ -34,13 +34,18 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[e
     return NextResponse.json({ error: { code: "NO_GUILD", message: "Join or create a guild first.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
   }
   if (auth.response) {
-    // No guild member session: a verified GUEST may use only the Character Lookup endpoints.
-    const guest = verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
-    if (!guest || auth.response.status !== 401) return auth.response;
-    if (!GUEST_ENDPOINTS.has(endpoint)) {
-      return NextResponse.json({ error: { code: "GUEST_FORBIDDEN", message: "Guests can only use Character Lookup.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
+    // No account session. The allowlisted Character Lookup endpoints are Public Access: open to
+    // any visitor — signed out with no cookie at all, or a verified GUEST — as long as the only
+    // reason auth failed was "not signed in" (401); a suspended/misconfigured account (403/503)
+    // stays denied even here.
+    if (auth.response.status !== 401 || !GUEST_ENDPOINTS.has(endpoint)) {
+      const guest = auth.response.status === 401 && verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
+      if (guest) {
+        return NextResponse.json({ error: { code: "GUEST_FORBIDDEN", message: "Guests can only use Character Lookup.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
+      }
+      return auth.response;
     }
-    if (!rateLimit(`guest-api:${clientIp(request)}`, 90, 60 * 1000)) {
+    if (!rateLimit(`public-api:${clientIp(request)}`, 90, 60 * 1000)) {
       return NextResponse.json({ error: { code: "RATE_LIMITED", message: "Too many requests. Wait a moment and try again.", status: null } }, { status: 429, headers: { "cache-control": "no-store" } });
     }
   }

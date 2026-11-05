@@ -27,12 +27,17 @@ export async function login(email: string, password: string, remember: boolean):
   return r.ok ? { ok: true } : { ok: false, error: r.error.message };
 }
 
-/** Starts a GUEST session (signed cookie, Character Lookup only), then hard-navigates there so the proxy sees it. */
-export async function continueAsGuest(): Promise<LoginResult> {
+/**
+ * Starts a GUEST session (signed cookie, Character Lookup only), then hard-navigates to
+ * `next` so the proxy sees it. Defaults to "/" (the Welcome page, open to any signed-out
+ * visitor including a GUEST) — pass an explicit destination when a caller needs a different
+ * one (e.g. the Welcome page's own "Character Lookup" CTA goes straight to the lookup tool).
+ */
+export async function continueAsGuest(next: string = "/"): Promise<LoginResult> {
   const r = await call<{ ok: true }>("/api/auth/guest", { method: "POST" });
   if (!r.ok) return { ok: false, error: r.error.message };
 
-  window.location.replace("/character-lookup");
+  window.location.replace(next);
   return { ok: true };
 }
 

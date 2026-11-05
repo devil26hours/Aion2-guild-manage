@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useMe } from "@/lib/auth/me-store";
-import { DEV_NAV_ITEMS, NAV_ITEMS, NO_GUILD_NAV_ITEMS, isNavActive } from "./nav-items";
+import { DEV_NAV_ITEMS, NAV_ITEMS, NO_GUILD_NAV_ITEMS, WELCOME_NAV_ITEM, isNavActive } from "./nav-items";
 
 type NavProps = { onNavigate?: () => void };
 
@@ -48,7 +48,8 @@ function NavList({ pathname, onNavigate }: NavProps & { pathname: string | null 
   const noGuild = !!me && !me.guild; // signed in, no guild: Guest-equivalent menu + Guild Management
   const isDev = !!me?.user.is_developer;
   const base = noGuild ? NO_GUILD_NAV_ITEMS : NAV_ITEMS;
-  const items = isDev ? [...base, ...DEV_NAV_ITEMS] : base;
+  // A DEV account also gets a link back to the public Welcome page, even though it already has a guild/menu — a Member or Guild Leader never does.
+  const items = isDev ? [...base, WELCOME_NAV_ITEM, ...DEV_NAV_ITEMS] : base;
   return (
     <nav aria-label={t("Main")} className="flex flex-col gap-1">
       {items.map(({ href, label, icon: Icon }) => {

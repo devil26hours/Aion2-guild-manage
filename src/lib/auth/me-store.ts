@@ -10,7 +10,7 @@ export interface Me {
   user: {
     id: string;
     email: string;
-    character: { region: string; server_id: string; character_id: string; name: string } | null;
+    character: { region: string; server_id: string; character_id: string; name: string; profile_image: string | null } | null;
     guild_id: string | null;
     bootstrap: boolean;
     /** Display hint only (shows the DEV menu entry). The server re-checks on every DEV request. */
@@ -28,10 +28,19 @@ const set = (s: Partial<MeState>) => {
   listeners.forEach((l) => l());
 };
 
+/** Pages open to signed-out visitors that read this store (keep in step with src/proxy.ts). */
+const PUBLIC_PAGES = new Set(["/", "/character-lookup"]);
+
 export async function loadMe() {
   const bg = state.status === "ready";
+  // Public pages read this store too: without a session cookie, asking would 401 and call() would send the visitor to /login.
+  if (!bg && !document.cookie.split(";").some((c) => /^\s*sb-.*-auth-token/.test(c))) {
+    set({ status: "error", me: null, error: null });
+    return;
+  }
   if (!bg) set({ status: "loading" });
-  const r = await call<Me>("/api/auth/me");
+  // A leftover cookie from an expired session also gets a 401: that must not push a visitor off a public page.
+  const r = await call<Me>("/api/auth/me", undefined, { redirectOn401: bg || !PUBLIC_PAGES.has(window.location.pathname) });
   if (r.ok) set({ status: "ready", me: r.data, error: null });
   else if (!bg) set({ status: "error", error: r.error.message });
 }

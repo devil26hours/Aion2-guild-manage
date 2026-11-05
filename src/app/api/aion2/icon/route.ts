@@ -1,8 +1,10 @@
 /**
  * GET /api/aion2/icon?u=<https image url> — serves an NCSOFT item icon same-origin so the Character Lookup
- * "Export equipment image" can draw it into a PNG (the image CDN sends no CORS headers, which would block the
+ * "Export image" can draw it into a PNG (the image CDN sends no CORS headers, which would block the
  * capture). Stateless; not an open proxy: https only, NCSOFT image hosts only (every redirect hop re-checked),
- * image/* responses only, size-capped. The proxy (src/proxy.ts) already requires a session or guest cookie.
+ * image/* responses only, size-capped. The proxy (src/proxy.ts) allows this path for every caller
+ * (it's one of the Public Access Character Lookup endpoints) and the authenticated-only paths
+ * still require a session or guest cookie.
  */
 
 const ALLOWED_HOST_SUFFIXES = ["plaync.com", "playnccdn.com"];

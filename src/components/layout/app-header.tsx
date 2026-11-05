@@ -3,7 +3,7 @@
 import { useT } from "@/lib/i18n";
 import Link from "next/link";
 import { SiteLogo } from "@/components/aion/site-logo";
-import { GuildEmblem, GuildName, GuildOnly, GuildServerBadge, LogoutButton } from "./guild-chrome";
+import { GuildEmblem, GuildName, GuildOnly, GuildServerBadge } from "./guild-chrome";
 import { MobileNav } from "./mobile-nav";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
@@ -51,7 +51,6 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
           <FeedbackButton />
           <ThemeToggle />
           <UserMenu />
-          <LogoutButton />
         </div>
       </div>
       {/* Compact guild / server strip for small screens */}

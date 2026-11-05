@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       user: {
         id: user.id,
         email: user.email,
-        character: c ? { region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.name } : null,
+        character: c ? { region: c.region, server_id: c.server_id, character_id: c.character_id, name: c.name, profile_image: c.profile_image } : null,
         guild_id: guild ? user.guild_id : null,
         bootstrap: false,
         is_developer,

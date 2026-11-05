@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isDeveloper } from "@/lib/auth/developer";
 import { GUEST_COOKIE, isGuestApiPath, verifyGuestToken } from "@/lib/auth/guest";
 import { LEGACY_SESSION_COOKIE } from "@/lib/supabase/cookies";
 import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy";
@@ -9,12 +10,17 @@ import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy"
  * - Refreshes the Supabase Auth session cookies and verifies the JWT (getClaims).
  * - Public pages: /login, /register (signed-in users are sent on),
  *   /forgot-password, the email-link handler /auth/confirm /support, /cookie-policy and the Interactive Map /map (open to guests too).
+ * - / is the public Welcome page: signed-out visitors (including a GUEST) and signed-in DEV
+ *   accounts see it; every other signed-in account is sent on exactly as /login already does
+ *   (dashboard, or guild-setup/character-lookup when it has no guild yet).
  * - /reset-password needs a session (the recovery link signs the user in) but no guild.
  * - Public APIs: login, logout, register, forgot-password, the registration character search and feedback submission.
  * - Every other page/API needs a valid session.
- * - A GUEST (signed cookie, no account) may only use Character Lookup and the allowlisted
- *   AION2 lookup endpoints; every other page redirects to /character-lookup, every other API gets 403.
- *   /character-lookup is rewritten to the shell-less /guest-lookup page for guests.
+ * - Character Lookup is Public Access: ANY signed-out visitor — GUEST cookie or none at all —
+ *   reaches /character-lookup directly (rewritten to the shell-less /guest-lookup page, share-link
+ *   query string intact), and the allowlisted AION2 lookup endpoints answer with no cookie needed.
+ * - A GUEST (signed cookie, no account) gets that same Public Access, plus every other page
+ *   redirects to /character-lookup and every other API gets 403 (vs. 401 for a bare anonymous visitor).
  * - Signed-in users without a guild ("No Guild") have Guest-equivalent page access — Character Lookup,
  *   plus /support and /cookie-policy — and the Guild Management page /guild-setup (create or join a guild).
  *   They stay signed in. Every guild page redirects to /guild-setup; guild APIs answer 403 NO_GUILD
@@ -48,7 +54,7 @@ export async function proxy(request: NextRequest) {
   const guest = !userId && verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
 
   // The guest page is an internal target: it is only ever reached through the rewrite below.
-  if (pathname === GUEST_LOOKUP) return redirect(userId || guest ? LOOKUP : `/login?next=${encodeURIComponent(LOOKUP)}`);
+  if (pathname === GUEST_LOOKUP) return redirect(LOOKUP);
 
   if (OPEN_PAGES.has(pathname)) return response;
 
@@ -66,15 +72,24 @@ export async function proxy(request: NextRequest) {
   // Suspended accounts see only the notice page (it offers a log-out button).
   if (suspended) return redirect("/suspended");
 
+  // Welcome page: signed-out visitors (anonymous or GUEST) and DEV accounts see it as-is;
+  // every other signed-in account is routed on exactly like the PUBLIC_PAGES case below.
+  if (pathname === "/") {
+    if (!userId) return response;
+    if (supabase && (await isDeveloper(supabase))) return response;
+    return redirect(hasGuild ? "/dashboard" : noGuildChosen ? LOOKUP : SETUP);
+  }
+
   if (PUBLIC_PAGES.has(pathname)) {
     if (!userId) return response;
     return redirect(hasGuild ? "/dashboard" : noGuildChosen ? LOOKUP : SETUP);
   }
 
   if (pathname.startsWith("/api/")) {
-    if (userId || PUBLIC_API.has(pathname)) return response;
+    // The allowlisted AION2 lookup endpoints carry only public character data (Public Access):
+    // open to every caller, signed in or not, GUEST cookie or not.
+    if (userId || PUBLIC_API.has(pathname) || isGuestApiPath(pathname)) return response;
     if (guest) {
-      if (isGuestApiPath(pathname)) return response;
       return withSessionCookies(
         response,
         NextResponse.json(
@@ -92,10 +107,15 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  if (guest) {
-    if (pathname === LOOKUP) return withSessionCookies(response, NextResponse.rewrite(new URL(GUEST_LOOKUP, request.url)));
-    return redirect(LOOKUP);
+  // Character Lookup is Public Access: any signed-out visitor — GUEST cookie or none — lands on
+  // the shell-less lookup page directly, with its share-link query string preserved.
+  if (!userId && pathname === LOOKUP) {
+    const guestLookup = new URL(GUEST_LOOKUP, request.url);
+    guestLookup.search = search;
+    return withSessionCookies(response, NextResponse.rewrite(guestLookup));
   }
+
+  if (guest) return redirect(LOOKUP);
 
   if (!userId) {
     const login = new URL("/login", request.url);

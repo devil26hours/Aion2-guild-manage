@@ -1,5 +1,6 @@
 "use client";
 
+import { EnhancementBadge } from "@/components/roster/api-icon";
 import { SLOT_LABELS } from "@/data/mock/equipment";
 import type { AionClass } from "@/lib/aion/classes";
 import { RARITY_META } from "@/lib/aion/rarity";
@@ -62,11 +63,7 @@ export function EquipmentSlotTile({
         style={rarityFrameStyle(item.rarity)}
       >
         <SlotIcon slot={slot} cls={cls} className="size-6 drop-shadow-[0_0_6px_currentColor]" style={{ color }} />
-        {item.enhancement > 0 && (
-          <span className="absolute -top-1.5 -left-1.5 border border-brand-muted/60 bg-surface px-1 text-4xs leading-tight font-bold text-brand-strong tabular-nums">
-            +{item.enhancement}
-          </span>
-        )}
+        <EnhancementBadge enchant={item.enhancement} />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-4xs tracking-[0.18em] text-subtle uppercase">{label}</span>

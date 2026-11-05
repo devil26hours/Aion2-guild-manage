@@ -68,7 +68,7 @@ export function LoginForm() {
     if (busy) return;
     setAuthError(null);
     setGuestBusy(true);
-    const result = await continueAsGuest();
+    const result = await continueAsGuest("/");
     // On success the page navigates away; only a failure comes back here.
     if (!result.ok) {
       setGuestBusy(false);

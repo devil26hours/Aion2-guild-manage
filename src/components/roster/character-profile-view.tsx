@@ -13,10 +13,10 @@ import { RoleBadge } from "@/components/party/role-badge";
 import { formatNumber } from "@/lib/format";
 import { itemDetailKey, itemDetailTarget, profileIdentity, type ItemDetailTarget } from "@/lib/roster/item-details";
 import { requestItemDetail, useItemDetail } from "@/lib/roster/item-details-store";
-import { buildProfileView, gradeColor, type GearItem, type ProfileView, type StatRow } from "@/lib/roster/profile-view";
+import { buildProfileView, enhancementOf, gradeColor, type GearItem, type ProfileView, type StatRow } from "@/lib/roster/profile-view";
 import type { RosterMember } from "@/lib/roster/types";
 import { cn, dataText } from "@/lib/utils";
-import { ApiIcon, GradeLabel } from "./api-icon";
+import { ApiIcon, GradeLabel, ItemIcon } from "./api-icon";
 import { ItemDetailSection } from "./item-detail-body";
 import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { RosterClassBadge } from "./roster-class-badge";
@@ -64,6 +64,7 @@ type PinControls = { z: number; dx: number; dy: number; onClose: () => void; onF
 function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; anchor: Anchor; id: string; details: TooltipDetails; pin?: PinControls }) {
   const t = useT();
   const c = gradeColor(item.grade);
+  const level = enhancementOf(item);
   const ref = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; y: number; dx: number; dy: number } | null>(null);
   const target = "target" in details ? details.target : null;
@@ -138,14 +139,14 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
         data-testid="gear-tooltip-title"
         {...titleDrag}
       >
-        {item.enchant !== null && item.enchant > 0 && `+${item.enchant} `}
+        {level && `${level.label} `}
         {item.name}
       </p>
       <p className="text-xs text-steel">
         {item.grade ? <span style={{ color: dataText(c) }}>{item.grade}</span> : null} {item.slotLabel}
       </p>
       <div className="mt-2.5 flex items-start gap-3">
-        <ApiIcon src={item.icon} alt={item.name} size={52} color={c} />
+        <ItemIcon item={item} size={52} />
         <dl className="grid flex-1 grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
           {item.enchant !== null && (
             <>
@@ -174,7 +175,7 @@ function GearTooltip({ item, anchor, id, details, pin }: { item: GearItem; ancho
         <div className="mt-3 border-t border-steel/15 pt-2" data-testid="gear-tooltip-skin">
           <p className="text-4xs font-semibold tracking-[0.18em] text-brand uppercase">{t("Skin Info")}</p>
           <div className="mt-1.5 flex items-center gap-2">
-            <ApiIcon src={item.skin.icon} alt={item.skin.name} size={30} color={gradeColor(item.skin.grade)} />
+            <ItemIcon item={item.skin} size={30} />
             <span className="min-w-0 text-xs">
               <span className="block truncate" style={{ color: dataText(gradeColor(item.skin.grade)) }}>{item.skin.name}</span>
               {item.skin.grade && <span className="text-subtle">{item.skin.grade}</span>}
@@ -268,14 +269,7 @@ function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: T
     >
       {/* A pinned item shows its pinned tooltip instead of a second hover tooltip. */}
       {anchor && !pinned && <GearTooltip item={item} anchor={anchor} id={tipId} details={details} />}
-      <span className="relative">
-        <ApiIcon src={item.icon} alt={item.name} color={c} />
-        {item.enchant !== null && item.enchant > 0 && (
-          <span className="absolute -top-1.5 -left-1.5 border border-brand-muted/60 bg-surface px-1 text-4xs leading-tight font-bold text-brand-strong tabular-nums">
-            +{item.enchant}
-          </span>
-        )}
-      </span>
+      <ItemIcon item={item} />
       <span className="min-w-0 flex-1">
         <span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{item.slotLabel}</span>
         <span className="block truncate text-[0.875rem] font-medium" style={{ color: dataText(c) }} title={item.name}>
@@ -623,8 +617,8 @@ export function CharacterProfileView({
                 )}
                 {view.wing && (
                   <li className="flex items-center gap-2.5">
-                    <ApiIcon src={view.wing.icon} alt={view.wing.name} size={36} color={gradeColor(view.wing.grade)} />
-                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wings")}</span>{view.wing.name} {view.wing.enchant ? <span className="text-brand-strong">+{view.wing.enchant}</span> : null} <GradeLabel grade={view.wing.grade} /></span>
+                    <ItemIcon item={view.wing} size={36} />
+                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wings")}</span>{view.wing.name} <GradeLabel grade={view.wing.grade} /></span>
                   </li>
                 )}
                 {view.wingSkin && (

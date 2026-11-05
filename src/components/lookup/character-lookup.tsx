@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { Check, CircleAlert, History, ImageDown, Loader2, Search, Share2, X } from "lucide-react";
 import { CharacterHitsTable } from "@/components/api-lab/character-hits-table";
+import { PngExportDialog, PngExportPreview } from "@/components/aion/png-export-dialog";
 import { aionButtonSecondary, aionField } from "@/components/aion/styles";
 import { PageHeader } from "@/components/layout/page-header";
 import { CharacterProfileView } from "@/components/roster/character-profile-view";
@@ -14,16 +15,13 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { describeStatus, REGIONS, regionLabel, validateRequest, type Region } from "@/lib/aion2-api/endpoints";
 import { detailString, isCharacterHitList, isProxyErrorBody, isServerRosterList, type CharacterHit, type ServerRosterEntry } from "@/lib/aion2-api/types";
 import { useT } from "@/lib/i18n";
-import { equipmentFileName, renderEquipmentPng } from "@/lib/lookup/export-equipment";
-import { downloadBlob } from "@/lib/party/export-png";
+import { CARD_SIZE, cardFileName, renderCharacterCard } from "@/lib/lookup/export-card";
 import { mapCharacterProfile } from "@/lib/roster/mapping";
 import { rosterId, type RosterMember } from "@/lib/roster/types";
 import { cn } from "@/lib/utils";
 
 /** Share links carry only public lookup fields: character name, region, server and the public character id. */
 const SHARE_ID = /^[\w:.=+/-]{1,64}$/;
-
-const SHOW_EXPORT_IMAGE: boolean = false;
 
 /** Recent lookups live only in this browser's localStorage (public lookup fields only). */
 const RECENT_KEY = "aion2.lookup.recent";
@@ -99,8 +97,7 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
   const [profile, setProfile] = useState<Profile>({ status: "idle" });
   const [shareState, setShareState] = useState<"idle" | "copied" | "failed">("idle");
   const autoRan = useRef(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-  const [exportState, setExportState] = useState<"idle" | "busy" | "failed">("idle");
+  const [exportOpen, setExportOpen] = useState(false);
   const [recent, setRecent] = useState<RecentLookup[]>([]);
 
   useEffect(() => {
@@ -216,18 +213,6 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
       window.prompt(t("Copy this link"), url);
     }
     setTimeout(() => setShareState("idle"), 2500);
-  }
-
-  async function exportImage(m: RosterMember) {
-    const node = profileRef.current?.querySelector<HTMLElement>('[data-testid="equipment"]');
-    if (!node || exportState === "busy") return;
-    setExportState("busy");
-    try {
-      downloadBlob(await renderEquipmentPng(node), equipmentFileName(m.character_name));
-      setExportState("idle");
-    } catch {
-      setExportState("failed");
-    }
   }
 
   async function view(hit: CharacterHit) {
@@ -367,14 +352,10 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
       )}
       {profile.status === "ready" && (
         <div className="flex items-center justify-end gap-2">
-          {exportState === "failed" && <span className="text-xs text-danger-text" role="alert">{t("Could not create the image.")}</span>}
-          {/* Export image temporarily hidden */}
-          {SHOW_EXPORT_IMAGE && (
-            <Button type="button" variant="outline" disabled={exportState === "busy"} onClick={() => void exportImage(profile.member)} data-testid="lookup-export" className={cn(aionButtonSecondary, "text-foreground")}>
-              {exportState === "busy" ? <Loader2 className="size-3.5 animate-spin" /> : <ImageDown className="size-3.5" />}
-              {t("Export image")}
-            </Button>
-          )}
+          <Button type="button" variant="outline" onClick={() => setExportOpen(true)} data-testid="lookup-export" className={cn(aionButtonSecondary, "text-foreground")}>
+            <ImageDown className="size-3.5" />
+            {t("Export image")}
+          </Button>
           <Button type="button" variant="outline" onClick={() => void share(profile.member)} data-testid="lookup-share" className={cn(aionButtonSecondary, "text-foreground")}>
             {shareState === "copied" ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}
             {shareState === "copied" ? t("Link copied") : t("Share")}
@@ -382,10 +363,33 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
         </div>
       )}
       {profile.status === "ready" && (
-        <div ref={profileRef}>
-          <CharacterProfileView key={profile.member.id} member={profile.member} raw={profile.raw} itemDetails />
-        </div>
+        <CharacterProfileView key={profile.member.id} member={profile.member} raw={profile.raw} itemDetails />
+      )}
+      {profile.status === "ready" && (
+        <PngExportDialog open={exportOpen} onOpenChange={setExportOpen}>
+          <CardExportPreview member={profile.member} raw={profile.raw} />
+        </PngExportDialog>
       )}
     </div>
+  );
+}
+
+/** Generates the Character Party Card from the profile already loaded; the same export flow as Party Builder. */
+function CardExportPreview({ member, raw }: { member: RosterMember; raw: unknown }) {
+  const t = useT();
+  return (
+    <PngExportPreview
+      title={t("Export Character Card")}
+      description={t("A dedicated {width}×{height}px character card for party recruitment. Only this card is exported.", CARD_SIZE)}
+      width={CARD_SIZE.width}
+      height={CARD_SIZE.height}
+      filename={cardFileName(member.character_name)}
+      previewAlt={`Character card preview: ${member.character_name}`}
+      saveOnce
+      render={async () => {
+        const { blob, missingImages } = await renderCharacterCard(member, raw);
+        return { blob, notice: missingImages > 0 ? t("Some pictures could not be loaded and show a placeholder.") : null };
+      }}
+    />
   );
 }

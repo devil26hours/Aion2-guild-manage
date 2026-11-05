@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { gradeColor } from "@/lib/roster/profile-view";
-import { dataText } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
+import { enhancementOf, gradeColor } from "@/lib/roster/profile-view";
+import { cn, dataText } from "@/lib/utils";
 
 /** Remote icon from the API response, with a lettered fallback when it fails or is absent. */
 export function ApiIcon({ src, alt, size = 40, color }: { src: string | null; alt: string; size?: number; color?: string }) {
@@ -18,6 +19,37 @@ export function ApiIcon({ src, alt, size = 40, color }: { src: string | null; al
       ) : (
         <span aria-hidden className="text-xs font-bold text-white/70">{alt.charAt(0)}</span>
       )}
+    </span>
+  );
+}
+
+/** Corner badge for an item icon (`+15`, or `★3` for Exceed items). Needs a `relative` parent; renders nothing without a value. */
+export function EnhancementBadge({ enchant, exceed }: { enchant: number | null; exceed?: number | null }) {
+  const t = useT();
+  const e = enhancementOf({ enchant, exceed });
+  if (!e) return null;
+  return (
+    <span
+      role="img"
+      aria-label={e.kind === "exceed" ? `${t("Exceed")} ${e.value}` : e.label}
+      data-testid="enhancement-badge"
+      data-kind={e.kind}
+      className={cn(
+        "absolute -top-1.5 -left-1.5 border bg-surface px-1 text-4xs leading-tight font-bold whitespace-nowrap tabular-nums",
+        e.kind === "exceed" ? "border-gold/80 text-gold-text" : "border-brand-muted/60 text-brand-strong",
+      )}
+    >
+      {e.label}
+    </span>
+  );
+}
+
+/** An equipment icon with its enhancement badge: the shared way to draw an item from the API. */
+export function ItemIcon({ item, size }: { item: { name: string; icon: string | null; grade: string | null; enchant: number | null; exceed?: number | null }; size?: number }) {
+  return (
+    <span className="relative shrink-0">
+      <ApiIcon src={item.icon} alt={item.name} size={size} color={gradeColor(item.grade)} />
+      <EnhancementBadge enchant={item.enchant} exceed={item.exceed} />
     </span>
   );
 }

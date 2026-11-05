@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { formatNumber } from "@/lib/format";
 import { compareSnapshotGear, compareSnapshotMetrics, summarizeGear, type GearChange } from "@/lib/roster/history";
-import { gradeColor } from "@/lib/roster/profile-view";
+import { enhancementOf, gradeColor } from "@/lib/roster/profile-view";
 import { getRosterMemberDetail, refreshRosterMember, useRoster } from "@/lib/roster/roster-store";
 import type { RosterMember, RosterSnapshot } from "@/lib/roster/types";
 import { cn, dataText } from "@/lib/utils";
@@ -283,8 +283,8 @@ export function RealHistoryView({ id }: { id: string }) {
                         {g.status === "replaced" && g.a && g.b && g.a.name !== g.b.name && <span className="block text-3xs text-subtle">was {g.a.name}</span>}
                       </td>
                       <td className="px-3 py-1.5 text-right text-xs tabular-nums">
-                        {g.b?.enchant != null ? `+${g.b.enchant}` : "—"}
-                        {g.enchantDelta ? <DeltaChip delta={g.enchantDelta} className="ml-1 px-1 py-0 text-4xs" /> : null}
+                        {enhancementOf(g.b)?.label ?? "—"}
+                        {g.exceedDelta || g.enchantDelta ? <DeltaChip delta={(g.exceedDelta || g.enchantDelta)!} className="ml-1 px-1 py-0 text-4xs" /> : null}
                       </td>
                       <td className="py-1.5 pr-4 pl-3 sm:pr-5">
                         <span className={cn("inline-flex border px-1.5 py-px text-4xs font-semibold tracking-[0.12em] uppercase", STATUS_STYLE[g.status])}>{g.status}</span>
