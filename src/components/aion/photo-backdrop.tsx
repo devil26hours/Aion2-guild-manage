@@ -26,15 +26,18 @@ const MOTES = Array.from({ length: 24 }, (_, i) => ({
 /**
  * Full-screen photo with twinkling and rising gold light. By default this is the sign-in
  * pages' version, which looks the same in both themes; the app frame passes its own
- * photo, scrim and a smaller particle count.
+ * photo, scrim and a smaller particle count. With `crossfadeSrc`, the two photos slowly
+ * take turns (one minute each, see .aion-photo-crossfade in globals.css).
  */
 export function PhotoBackdrop({
   src = loginBg,
+  crossfadeSrc,
   scrimClassName = "bg-[linear-gradient(180deg,rgba(5,8,15,0.55)_0%,rgba(5,8,15,0.2)_40%,rgba(5,8,15,0.35)_70%,rgba(5,8,15,0.8)_100%)]",
   moteCount = MOTES.length,
   sparkleCount = SPARKLES.length,
 }: {
   src?: StaticImageData;
+  crossfadeSrc?: StaticImageData;
   scrimClassName?: string;
   moteCount?: number;
   sparkleCount?: number;
@@ -43,6 +46,7 @@ export function PhotoBackdrop({
     <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden bg-[#05080f]">
       {/* object-cover on a portrait screen scales to the height, so the width needed follows the 16:9 photo */}
       <Image src={src} alt="" fill preload placeholder="blur" sizes="max(100vw, 178vh)" className="object-cover" />
+      {crossfadeSrc && <Image src={crossfadeSrc} alt="" fill sizes="max(100vw, 178vh)" className="aion-photo-crossfade object-cover" />}
 
       {/* Scrim: keeps the text that sits directly on the page readable over the photo */}
       <div className={cn("absolute inset-0", scrimClassName)} />

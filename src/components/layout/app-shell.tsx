@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { PhotoBackdrop } from "@/components/aion/photo-backdrop";
-import mainBg from "../../../public/image/background-pic/main_bg.png";
+import mainBgOld from "../../../public/image/background-pic/main_bg.png";
+import mainBg from "../../../public/image/background-pic/main_bg_new.jpg";
 import { AppHeader } from "./app-header";
 import { FooterBar } from "./site-footer";
 import { SidebarGuildCard } from "./sidebar-guild-card";
@@ -15,6 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Page headings sit directly on the photo, so the scrim follows the theme: pale under dark ink, dark under light ink. */}
       <PhotoBackdrop
         src={mainBg}
+        crossfadeSrc={mainBgOld}
         scrimClassName="bg-[linear-gradient(rgba(240,245,252,0.82),rgba(240,245,252,0.82))] dark:bg-[linear-gradient(180deg,rgba(5,8,15,0.7)_0%,rgba(5,8,15,0.6)_25%,rgba(5,8,15,0.45)_55%,rgba(5,8,15,0.55)_100%)]"
         moteCount={12}
         sparkleCount={24}

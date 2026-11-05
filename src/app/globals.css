@@ -520,6 +520,26 @@
   animation-delay: var(--sparkle-delay, 0s);
 }
 
+/* Two backdrop photos taking turns: a 2 minute cycle, one minute each, of which 8s is the fade. */
+@keyframes aion-photo-crossfade {
+  0%,
+  43.33% {
+    opacity: 0;
+  }
+  50%,
+  93.33% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.aion-photo-crossfade {
+  opacity: 0;
+  animation: aion-photo-crossfade 120s ease-in-out infinite;
+}
+
 /* Panel settle-in. */
 @keyframes aion-enter {
   from {
@@ -557,6 +577,7 @@
 @media (prefers-reduced-motion: reduce) {
   .aion-mote,
   .aion-sparkle,
+  .aion-photo-crossfade,
   .aion-enter,
   .aion-pip {
     animation: none !important;
