@@ -111,6 +111,15 @@ const STORAGE: Item[] = [
     removed: "Not removed by signing out. Delete it in your browser (the notice then appears again).",
   },
   {
+    name: "aion2.lookup.region",
+    purpose: "Character Lookup: remembers the region you last picked, so your next search starts with it.",
+    category: PREFERENCE,
+    contains: "One region code. No personal data.",
+    retention: "No expiry. It stays until you delete it.",
+    created: "When you pick a region on the Character Lookup page. Picking “All regions” removes it.",
+    removed: "When you pick “All regions”. Not removed by signing out. You can also delete it in your browser.",
+  },
+  {
     name: "aion2.map.filters.v1",
     purpose: "Interactive Map: remembers which marker types and individual monsters you switched on or off.",
     category: PREFERENCE,

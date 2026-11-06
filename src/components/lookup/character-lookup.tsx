@@ -45,6 +45,25 @@ function saveRecent(list: RecentLookup[]) {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch { /* storage unavailable: skip */ }
 }
 
+/** The region last picked in the dropdown, so a return visit skips the slower all-regions search. */
+const REGION_KEY = "aion2.lookup.region";
+
+function loadRegion(): string {
+  try {
+    const saved = localStorage.getItem(REGION_KEY) ?? "";
+    return (REGIONS as readonly string[]).includes(saved) ? saved : "";
+  } catch {
+    return "";
+  }
+}
+
+function saveRegion(value: string) {
+  try {
+    if (value) localStorage.setItem(REGION_KEY, value);
+    else localStorage.removeItem(REGION_KEY);
+  } catch { /* storage unavailable: skip */ }
+}
+
 export interface ShareParams { name: string; region: string; server: string; id: string }
 
 /** Validates the share-link query (untrusted input); returns null when there is nothing usable to look up. */
@@ -198,6 +217,8 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
     if (autoRan.current) return;
     autoRan.current = true;
     if (initial) void autoLoad(initial.name, initial.region, initial.server, initial.id);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
+    else setRegion(loadRegion()); // a share link's own region always wins over the remembered one
     // one-shot on mount; autoLoad only uses setters and fetch
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -284,7 +305,7 @@ export function CharacterLookup({ initial }: { initial?: ShareParams }) {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor={`${ids}-region`} className={labelClass}>{t("Region")}</Label>
-          <NativeSelect id={`${ids}-region`} value={region} onChange={(e) => { setRegion(e.target.value); setServer(""); }} className={aionField}>
+          <NativeSelect id={`${ids}-region`} value={region} onChange={(e) => { setRegion(e.target.value); saveRegion(e.target.value); setServer(""); }} className={aionField}>
             <option value="">{t("All regions")}</option>
             {REGIONS.map((r) => <option key={r} value={r}>{regionLabel(r)}</option>)}
           </NativeSelect>
