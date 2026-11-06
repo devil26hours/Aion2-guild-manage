@@ -108,6 +108,16 @@ export async function refreshRosterMember(id: string) {
   return r;
 }
 
+/** Seconds until the guild may start "Refresh All" again (0 = now). */
+export function getRefreshAllCooldown() {
+  return call<{ seconds_left: number }>("/api/roster/refresh-all");
+}
+
+/** Claim the guild's "Refresh All" slot. While the cooldown runs this fails, with `data.seconds_left`. */
+export function startRefreshAll() {
+  return call<{ seconds_left: number }>("/api/roster/refresh-all", { method: "POST" });
+}
+
 /** Delete every member except the leader's own record (server-side, Supabase). */
 export async function clearRosterData() {
   const r = await call<{ deleted: number }>("/api/roster", { method: "DELETE" });

@@ -3,7 +3,7 @@
 
 import { useT } from "@/lib/i18n";
 import { useIsLeader, useMe } from "@/lib/auth/me-store";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
   CheckCircle2,
   CircleAlert,
@@ -43,12 +43,15 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { onRevalidate } from "@/lib/client/api";
 import { formatNumber, formatSigned } from "@/lib/format";
 import { PARTY_ROLES, type PartyRole } from "@/lib/party/types";
 import {
+  getRefreshAllCooldown,
   loadRoster,
   refreshRosterMember,
   removeRosterMember,
+  startRefreshAll,
   updateRosterMember,
   useRoster,
 } from "@/lib/roster/roster-store";
@@ -73,6 +76,13 @@ const UNKNOWN = "Unknown";
 /** sort "" = the shared "Default character sorting" preference from Settings. */
 const DEFAULTS = { query: "", cls: "all", server: "all", role: "all", minCp: "", maxCp: "", sort: "" };
 type Filters = typeof DEFAULTS;
+
+function subscribeEverySecond(onTick: () => void) {
+  const timer = setInterval(onTick, 1000);
+  return () => clearInterval(timer);
+}
+
+const formatCountdown = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
 function compare(a: RosterMember, b: RosterMember, key: SortKey): number {
   if (key === "character_name") return a.character_name.localeCompare(b.character_name);
@@ -105,6 +115,25 @@ export function RosterManager() {
   const [busy, setBusy] = useState<Record<string, Busy>>({});
   const [notice, setNotice] = useState<Notice | null>(null);
   const [refreshingAll, setRefreshingAll] = useState(false);
+  // When the guild's "Refresh All" cooldown ends on this device's clock; null until the server has answered.
+  const [refreshAllReadyAt, setRefreshAllReadyAt] = useState<number | null>(null);
+
+  // The server's seconds_left is authoritative. An answer can arrive late, so the end time only moves forward.
+  const applyCooldown = useCallback((seconds: number) => {
+    setRefreshAllReadyAt((prev) => Math.max(prev ?? 0, Date.now() + seconds * 1000));
+  }, []);
+
+  // On open and when returning to the tab, so a press by another member shows up. A failed check leaves
+  // the button usable: the server still decides when it is pressed.
+  useEffect(() => {
+    const sync = async () => {
+      const r = await getRefreshAllCooldown();
+      applyCooldown(r.ok ? r.data.seconds_left : 0);
+    };
+    void sync();
+    const stop = onRevalidate(() => void sync());
+    return () => { stop(); };
+  }, [applyCooldown]);
 
   // Auto-dismiss the current notice (errors stay longer).
   useEffect(() => {
@@ -173,10 +202,27 @@ export function RosterManager() {
     }
   }
 
-  /** Refresh every member from the API (any role). Small concurrency to be gentle on the upstream API. */
+  /**
+   * Refresh every member from the API (any role), once the server has given this guild the slot.
+   * Small concurrency to be gentle on the upstream API.
+   */
   async function refreshAll() {
     if (refreshingAll || members.length === 0) return;
     setRefreshingAll(true);
+    const start = await startRefreshAll();
+    if (!start.ok) {
+      setRefreshingAll(false);
+      const left = start.data?.seconds_left;
+      if (left) {
+        applyCooldown(left);
+        void loadRoster(); // Someone else just refreshed: show their results.
+        announce("info", t("Refresh All was already run in this guild. The latest data is loaded; try again in {time}.", { time: formatCountdown(left) }));
+      } else {
+        announce("error", t("Could not start Refresh All: {msg}", { msg: start.error.message }));
+      }
+      return;
+    }
+    applyCooldown(start.data.seconds_left);
     const queue = [...members];
     let ok = 0;
     let failed = 0;
@@ -232,17 +278,12 @@ export function RosterManager() {
         description={t("Real characters from the AION2 API, saved to the local roster file. Guild roles are managed here.")}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
+            <RefreshAllButton
+              refreshing={refreshingAll}
+              readyAt={refreshAllReadyAt}
+              disabled={status !== "ready" || members.length === 0}
               onClick={() => void refreshAll()}
-              disabled={status !== "ready" || members.length === 0 || refreshingAll}
-              data-testid="refresh-all"
-              className={cn(aionButtonSecondary, "h-10 px-4")}
-            >
-              <RefreshCw className={cn("size-4", refreshingAll && "animate-spin")} />
-              {refreshingAll ? t("Refreshing…") : t("Refresh All")}
-            </Button>
+            />
             {isLeader && (
               <Button
                 type="button"
@@ -571,6 +612,25 @@ export function RosterManager() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+/** Its own component so the once-a-second countdown does not re-render the whole roster. */
+function RefreshAllButton({ refreshing, readyAt, disabled, onClick }: { refreshing: boolean; readyAt: number | null; disabled: boolean; onClick: () => void }) {
+  const t = useT();
+  const secondsLeft = useSyncExternalStore(subscribeEverySecond, () => Math.max(0, Math.ceil(((readyAt ?? 0) - Date.now()) / 1000)), () => 0);
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClick}
+      disabled={disabled || refreshing || readyAt === null || secondsLeft > 0}
+      data-testid="refresh-all"
+      className={cn(aionButtonSecondary, "h-10 px-4 tabular-nums")}
+    >
+      <RefreshCw className={cn("size-4", refreshing && "animate-spin")} />
+      {refreshing ? t("Refreshing…") : secondsLeft > 0 ? t("Refresh All ({time})", { time: formatCountdown(secondsLeft) }) : t("Refresh All")}
+    </Button>
   );
 }
 

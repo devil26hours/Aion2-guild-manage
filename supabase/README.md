@@ -18,6 +18,7 @@ The project started **fresh**: no JSON data was imported (see "Data migration st
 | `migrations/20261103000007_party_preset_content.sql` | `party_presets.content_type` and `dungeon_name` (both nullable), their column grants, and `save_party_preset` replaced with a version that writes them |
 | `migrations/20261104000008_feedback_and_dev_role.sql` | `developers` (DEV role), `feedback` and `feedback_dev_notes` with RLS, `is_developer()`, `submit_feedback()` (service_role only), `dev_list_feedback()`, `dev_update_feedback()`. Additive; changes no existing object |
 | `migrations/20261104000009_dev_tools.sql` | `user_suspensions`, `notifications`, `notification_reads`, `dev_secrets` (RLS on, no client access) and the `dev_*` / `my_*` functions for user suspension, announcements and notifications, the API Lab password hash and the system overview. Additive; changes no existing object |
+| `migrations/20261106000012_roster_refresh_all_cooldown.sql` | `guild_refresh_state` (RLS on, no client access), `roster_refresh_all_seconds_left()`, `start_roster_refresh_all()`: "Refresh All" once per 10 minutes per guild. Additive. Run before deploying the app code that calls them |
 
 The files are written to be re-runnable (`if not exists`, `create or replace`, `drop policy if exists`).
 After re-running 0004 or 0006, re-run 0007: 0004 revokes its column grants, and 0006 recreates the old `save_party_preset` signature.
