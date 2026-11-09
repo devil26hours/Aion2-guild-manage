@@ -37,6 +37,7 @@ const PUBLIC_API = new Set([
   "/api/auth/logout",
   "/api/auth/register",
   "/api/auth/forgot-password",
+  "/api/auth/resend-confirmation",
   "/api/auth/character-search",
   "/api/auth/guest",
   // Feedback may be sent signed out; the handler validates, rate-limits and reads the session itself.

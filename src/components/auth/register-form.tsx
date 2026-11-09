@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { AlertTriangle, Eye, EyeOff, Loader2, MailCheck, Search, ShieldAlert, UserPlus } from "lucide-react";
 import { CharacterHitsTable } from "@/components/api-lab/character-hits-table";
 import { aionButtonPrimary, aionButtonSecondary, aionField } from "@/components/aion/styles";
@@ -41,6 +41,25 @@ export function RegisterForm() {
   const [busy, setBusy] = useState(false);
   /** Email confirmation is required: the address the link was sent to. */
   const [sentTo, setSentTo] = useState<string | null>(null);
+
+  const [resend, setResend] = useState<{ status: "idle" | "sending" | "sent" } | { status: "error"; message: string }>({ status: "idle" });
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const h = setTimeout(() => setCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(h);
+  }, [cooldown]);
+
+  async function resendEmail() {
+    if (!sentTo || resend.status === "sending" || cooldown > 0) return;
+    setResend({ status: "sending" });
+    const r = await call<{ ok: true }>("/api/auth/resend-confirmation", { method: "POST", body: JSON.stringify({ email: sentTo }) });
+    if (r.ok) {
+      setResend({ status: "sent" });
+      setCooldown(60);
+    } else setResend({ status: "error", message: r.error.message });
+  }
 
   async function runSearch(e?: FormEvent) {
     e?.preventDefault();
@@ -107,6 +126,15 @@ export function RegisterForm() {
           {t("We sent a confirmation link to {email}. Open it to activate your account — your selected character is linked to the account after confirmation.", { email: sentTo })}
         </p>
         <p className="text-xs text-subtle">{t("No email? Check your spam folder. If this address already has an account, sign in or reset your password instead.")}</p>
+        <div className="space-y-1.5">
+          <Button type="button" variant="outline" disabled={resend.status === "sending" || cooldown > 0} onClick={() => void resendEmail()} className={cn(aionButtonSecondary, "text-foreground")} data-testid="register-resend">
+            {resend.status === "sending" ? <Loader2 className="size-3.5 animate-spin" /> : <MailCheck className="size-3.5" />}
+            {cooldown > 0 ? t("Resend in {s}s", { s: cooldown }) : t("Resend confirmation email")}
+          </Button>
+          <p aria-live="polite" role={resend.status === "error" ? "alert" : undefined} className={cn("text-xs", resend.status === "error" ? "text-danger-text" : "text-steel")}>
+            {resend.status === "sent" ? t("A new confirmation email was sent. Use only the newest link.") : resend.status === "error" ? resend.message : ""}
+          </p>
+        </div>
         <Link href="/login" className={cn(aionButtonSecondary, "inline-flex h-10 items-center justify-center border px-4 text-sm text-foreground")}>{t("Go to sign in")}</Link>
       </div>
     );
