@@ -1,5 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { siteOrigin } from "@/lib/auth/site-url";
 import { claimPendingCharacter } from "@/lib/auth/claim";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
   const tokenHash = url.searchParams.get("token_hash");
   const rawType = url.searchParams.get("type");
   const type = OTP_TYPES.find((t) => t === rawType) ?? null;
-  const go = (path: string) => NextResponse.redirect(new URL(path, request.url));
+  const go = (path: string) => NextResponse.redirect(new URL(path, siteOrigin(request)));
 
   if (url.searchParams.get("error_code") || url.searchParams.get("error")) return go("/login?confirm=failed");
 

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isDeveloper } from "@/lib/auth/developer";
+import { siteOrigin } from "@/lib/auth/site-url";
 import { GUEST_COOKIE, isGuestApiPath, verifyGuestToken } from "@/lib/auth/guest";
 import { LEGACY_SESSION_COOKIE } from "@/lib/supabase/cookies";
 import { updateSupabaseSession, withSessionCookies } from "@/lib/supabase/proxy";
@@ -49,7 +50,7 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const { response, supabase, userId, noGuildChosen } = await updateSupabaseSession(request).catch(() => ({ response: NextResponse.next({ request }), supabase: null, userId: null, noGuildChosen: false }));
   if (request.cookies.has(LEGACY_SESSION_COOKIE)) response.cookies.delete(LEGACY_SESSION_COOKIE);
-  const redirect = (to: string) => withSessionCookies(response, NextResponse.redirect(new URL(to, request.url)));
+  const redirect = (to: string) => withSessionCookies(response, NextResponse.redirect(new URL(to, siteOrigin(request))));
   // A valid guest cookie only counts when there is no real session.
   const guest = !userId && verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
 
@@ -118,7 +119,7 @@ export async function proxy(request: NextRequest) {
   if (guest) return redirect(LOOKUP);
 
   if (!userId) {
-    const login = new URL("/login", request.url);
+    const login = new URL("/login", siteOrigin(request));
     if (pathname !== "/") login.searchParams.set("next", `${pathname}${search}`);
     return withSessionCookies(response, NextResponse.redirect(login));
   }
