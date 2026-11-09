@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { call } from "@/lib/client/api";
 import { continueAsGuest, login, safeNextPath, validateLogin, type LoginFieldErrors } from "@/lib/auth/client";
 
 const REMEMBER_KEY = "aion2-gc:remembered-email";
@@ -58,6 +59,10 @@ export function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
   const [authError, setAuthError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  /** Set when /auth/confirm sent the user back with a bad link: offers "resend" using the email field. */
+  const [linkFailed, setLinkFailed] = useState(false);
+  const [resendMsg, setResendMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [resendBusy, setResendBusy] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
 
   const [guestBusy, setGuestBusy] = useState(false);
@@ -91,11 +96,25 @@ export function LoginForm() {
     const q = new URLSearchParams(window.location.search);
     if (q.get("confirm") === "failed") {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL
+      setLinkFailed(true);
       setNotice(t("The confirmation link is invalid or has expired. If your email is already confirmed, just sign in."));
     } else if (q.get("reset") === "done") {
       setNotice(t("Your password was changed. Sign in with the new password."));
     }
   }, [t]);
+
+  async function resendConfirmation() {
+    if (resendBusy) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setResendMsg({ ok: false, text: t("Enter a valid email address.") });
+      return emailRef.current?.focus();
+    }
+    setResendBusy(true);
+    setResendMsg(null);
+    const r = await call<{ ok: true }>("/api/auth/resend-confirmation", { method: "POST", body: JSON.stringify({ email: email.trim() }) });
+    setResendBusy(false);
+    setResendMsg(r.ok ? { ok: true, text: t("A new confirmation email was sent. Use only the newest link.") } : { ok: false, text: r.error.message });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -150,6 +169,15 @@ export function LoginForm() {
         >
           <Info className="mt-0.5 size-4 shrink-0 text-arcane" />
           <span>{notice}</span>
+        </div>
+      )}
+      {linkFailed && (
+        <div className="space-y-1.5">
+          <Button type="button" variant="outline" disabled={resendBusy} onClick={() => void resendConfirmation()} data-testid="login-resend-confirmation">
+            {resendBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Mail className="size-3.5" />}
+            {t("Resend confirmation email")}
+          </Button>
+          {resendMsg && <p role={resendMsg.ok ? "status" : "alert"} className={cn("text-xs", resendMsg.ok ? "text-steel" : "text-danger-text")}>{resendMsg.text}</p>}
         </div>
       )}
 

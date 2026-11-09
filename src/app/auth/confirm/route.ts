@@ -21,7 +21,9 @@ const OTP_TYPES: EmailOtpType[] = ["signup", "invite", "magiclink", "recovery", 
 
 /** Only same-origin app paths. */
 function safeNext(raw: string | null): string | null {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\") || raw.startsWith("/api/") || raw.startsWith("/auth/")) return null;
+  if (!raw || raw.length > 200 || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/api/") || raw.startsWith("/auth/")) return null;
+  // Backslashes and control characters (URL parsers strip tab/newline, so "/<TAB>/host" would become "//host").
+  if (/[\u0000-\u001f\u007f\\]/.test(raw)) return null;
   return raw;
 }
 
@@ -45,7 +47,8 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) return go(recovery ? "/forgot-password?link=expired" : "/login?confirm=failed");
   } else {
-    return go("/login");
+    // No usable token (missing token_hash, missing/unknown type, or no params at all): say so instead of a silent redirect.
+    return go(recovery ? "/forgot-password?link=expired" : "/login?confirm=failed");
   }
 
   if (recovery) return go("/reset-password");
