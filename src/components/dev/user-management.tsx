@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, CircleAlert, Loader2, Search, ShieldCheck, UserCheck, UserX, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, Loader2, Search, ShieldCheck, Trash2, UserCheck, UserX, Users } from "lucide-react";
 import { SectionPanel } from "@/components/aion/section-panel";
 import { aionButtonDanger, aionButtonPrimary, aionButtonSecondary, aionDialog, aionField } from "@/components/aion/styles";
 import { PageHeader } from "@/components/layout/page-header";
@@ -33,6 +33,7 @@ export function UserManagement() {
   const [page, setPage] = useState(1);
   const [state, setState] = useState<State>({ status: "loading" });
   const [target, setTarget] = useState<DevUser | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DevUser | null>(null);
   const seq = useRef(0);
 
   useEffect(() => {
@@ -117,9 +118,14 @@ export function UserManagement() {
                     {u.suspended && u.suspended_reason && <p className="mt-1 text-xs break-words text-danger-text">{t("Reason")}: {u.suspended_reason}</p>}
                   </div>
                   {!u.is_developer && u.id !== myId && (
-                    <Button type="button" variant="outline" className={u.suspended ? aionButtonSecondary : aionButtonDanger} onClick={() => setTarget(u)}>
-                      {u.suspended ? <><UserCheck aria-hidden /> {t("Reactivate")}</> : <><UserX aria-hidden /> {t("Suspend")}</>}
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" className={u.suspended ? aionButtonSecondary : aionButtonDanger} onClick={() => setTarget(u)}>
+                        {u.suspended ? <><UserCheck aria-hidden /> {t("Reactivate")}</> : <><UserX aria-hidden /> {t("Suspend")}</>}
+                      </Button>
+                      <Button type="button" variant="outline" className={aionButtonDanger} onClick={() => setDeleteTarget(u)}>
+                        <Trash2 aria-hidden /> {t("Delete")}
+                      </Button>
+                    </div>
                   )}
                 </li>
               ))}
@@ -140,7 +146,73 @@ export function UserManagement() {
           {target && <SuspendForm key={target.id} user={target} onDone={() => { setTarget(null); void load(); }} />}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <DialogContent className={cn(aionDialog, "max-w-md")}>
+          {deleteTarget && <DeleteForm key={deleteTarget.id} user={deleteTarget} onDone={() => { setDeleteTarget(null); void load(); }} />}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function DeleteForm({ user, onDone }: { user: DevUser; onDone: () => void }) {
+  const t = useT();
+  const ids = useId();
+  const isLeader = user.guild_role === "leader";
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inFlight = useRef(false);
+  const needsEmail = !!user.email;
+  const matches = !needsEmail || confirm.trim().toLowerCase() === user.email!.toLowerCase();
+
+  async function submit() {
+    if (inFlight.current || !matches) return;
+    inFlight.current = true;
+    setBusy(true);
+    setError(null);
+    const r = await call<{ ok: true }>(`/api/dev/users/${user.id}`, {
+      method: "DELETE",
+      body: JSON.stringify({ confirm_email: needsEmail ? confirm.trim() : undefined }),
+    });
+    inFlight.current = false;
+    setBusy(false);
+    if (r.ok) onDone();
+    else setError(r.error.message);
+  }
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="font-heading tracking-wider text-danger-text">{t("Delete this account permanently?")}</DialogTitle>
+        <DialogDescription className="break-all">{user.email ?? user.id}</DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-2 text-sm text-steel">
+        <p>
+          {isLeader
+            ? t("This user is the Guild Leader of {guild}. The whole guild is deleted too: roster, history, party presets, settings and image. Its other members will be left without a guild.", { guild: user.guild_name ?? "—" })
+            : user.guild_name
+              ? t("This user will be removed from {guild} (roster entry included). The guild itself is kept.", { guild: user.guild_name })
+              : t("This user is not in a guild.")}
+        </p>
+        <p>{t("The account, sign-in and character link are deleted. This cannot be undone.")}</p>
+      </div>
+      {needsEmail && (
+        <div className="grid gap-1.5">
+          <Label htmlFor={`${ids}-confirm`} className={labelClass}>{t("Type the e-mail to confirm")}</Label>
+          <Input id={`${ids}-confirm`} value={confirm} disabled={busy} autoComplete="off" placeholder={user.email ?? ""} onChange={(e) => setConfirm(e.target.value)} className={aionField} />
+        </div>
+      )}
+      {error && <p role="alert" className="text-sm text-danger-text">{error}</p>}
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <DialogClose asChild><Button type="button" variant="outline" disabled={busy} className={aionButtonSecondary}>{t("Cancel")}</Button></DialogClose>
+        <Button type="button" disabled={busy || !matches} onClick={() => void submit()} className={aionButtonDanger}>
+          {busy && <Loader2 aria-hidden className="animate-spin" />}
+          {t("Delete account")}
+        </Button>
+      </div>
+    </>
   );
 }
 
