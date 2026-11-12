@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { validateRequest } from "@/lib/aion2-api/endpoints";
 import { fetchUpstream, getBaseUrl } from "@/lib/aion2-api/upstream";
 import { clientIp, rateLimit } from "@/lib/auth/config";
+import { recordSearchHitsSafely } from "@/lib/directory/server";
 
 /**
  * GET /api/auth/character-search?name=&region= — PUBLIC, for the registration
@@ -26,5 +27,10 @@ export async function GET(request: NextRequest) {
 
   const result = await fetchUpstream(base, check.path, check.query);
   if (result.kind === "error") return fail(result.code === "TIMEOUT" ? 504 : 502, result.code, result.message);
+  // Same as the proxy: every hit of a successful live search goes into the Character Directory, after the response.
+  if (result.status === 200) {
+    const body = result.body;
+    after(() => recordSearchHitsSafely(check.query.name, check.query.region, body));
+  }
   return new NextResponse(result.body, { status: result.status, headers: { "content-type": result.contentType, "cache-control": "no-store" } });
 }

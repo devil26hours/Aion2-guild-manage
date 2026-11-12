@@ -1,30 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Coffee, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const DISCORD_URL = process.env.NEXT_PUBLIC_DISCORD_URL?.trim();
-
-/** Warm "Buy Me a Coffee" link to /support, shared by the footers. */
-function SupportLink({ className }: { className?: string }) {
-  const t = useT();
-  return (
-    <Link
-      href="/support"
-      data-testid="footer-support"
-      className={cn(
-        "flex items-center justify-center gap-2 rounded-full border border-gold/60 bg-gold/15 font-semibold text-gold-text shadow-sm transition-colors outline-none",
-        "hover:border-gold hover:bg-gold/25 focus-visible:border-arcane/60 focus-visible:ring-2 focus-visible:ring-arcane/30",
-        className,
-      )}
-    >
-      <Coffee className="size-4" aria-hidden />
-      {t("Buy Me a Coffee")}
-    </Link>
-  );
-}
 
 function CookiePolicyLink({ className }: { className?: string }) {
   const t = useT();
@@ -40,7 +21,7 @@ function CookiePolicyLink({ className }: { className?: string }) {
 }
 
 /** Project-identity footer for the auth pages and the guest frame. */
-export function SiteFooter({ className, support = false }: { className?: string; support?: boolean }) {
+export function SiteFooter({ className }: { className?: string }) {
   const t = useT();
   return (
     <footer className={cn("space-y-1.5 text-center text-2xs leading-relaxed text-subtle", className)}>
@@ -49,26 +30,20 @@ export function SiteFooter({ className, support = false }: { className?: string;
       <p>
         Built by JustKiddingLab © 2026 · <CookiePolicyLink />
       </p>
-      {support && (
-        <p className="pt-2">
-          <SupportLink className="inline-flex h-9 px-4 text-xs" />
-        </p>
-      )}
     </footer>
   );
 }
 
 /**
- * Always-visible footer of the app frame, spanning the full viewport width (including
- * under the sidebar — AppShell shortens the sidebar by --footer-bar-h so it stops at this
- * footer's top edge instead of running behind it). Its height comes from --footer-bar-h,
- * set by AppShell, which also reserves that space under the page. Stacked on mobile
- * (actions above the text), one row from sm up.
+ * Footer of the app frame. Part of the normal page flow: AppShell is a full-height
+ * column, so on short pages it sits at the bottom of the window and on long pages it
+ * comes after the content (reached by scrolling). It never floats over the page.
+ * Stacked on mobile (Discord above the text), one row from sm up.
  */
 export function FooterBar() {
   const t = useT();
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-20 flex h-[var(--footer-bar-h)] flex-col items-start justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:px-8">
+    <footer className="relative flex flex-col items-start justify-center gap-2.5 border-t border-steel/15 bg-surface/95 px-4 py-4 text-xs leading-relaxed text-subtle backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 sm:py-3 lg:px-8" data-testid="app-footer">
       <div className="order-2 flex min-w-0 flex-col items-start gap-0.5 text-left sm:order-1">
         <p className="hidden xl:block">{t("An independent community project, built with passion for AION2 players.")}</p>
         <p className="flex flex-wrap items-center justify-start gap-x-2">
@@ -79,9 +54,8 @@ export function FooterBar() {
           <CookiePolicyLink />
         </p>
       </div>
-      <div className="order-1 flex shrink-0 items-center gap-3 sm:order-2">
-        <SupportLink className="h-9 px-4 text-xs" />
-        {DISCORD_URL && (
+      {DISCORD_URL && (
+        <div className="order-1 flex shrink-0 items-center gap-3 sm:order-2">
           <a
             href={DISCORD_URL}
             target="_blank"
@@ -92,8 +66,8 @@ export function FooterBar() {
             <MessageCircle className="size-4" aria-hidden />
             Discord
           </a>
-        )}
-      </div>
+        </div>
+      )}
     </footer>
   );
 }

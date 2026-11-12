@@ -1,10 +1,9 @@
-import { clientIp, rateLimit } from "@/lib/auth/config";
-import { requireUser } from "@/lib/auth/context";
-import { GUEST_COOKIE, GUEST_ENDPOINTS, verifyGuestToken } from "@/lib/auth/guest";
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import { ENDPOINTS, isEndpointId, upstreamTimeoutFor, validateRequest } from "@/lib/aion2-api/endpoints";
+import { lookupAccessDenied } from "@/lib/aion2-api/lookup-access";
 import type { ProxyErrorBody } from "@/lib/aion2-api/types";
 import { fetchUpstream, getBaseUrl } from "@/lib/aion2-api/upstream";
+import { recordSearchHitsSafely } from "@/lib/directory/server";
 
 /**
  * Restricted server-side proxy: /api/aion2/{endpoint}?param=…
@@ -28,27 +27,9 @@ function proxyError(status: number, body: ProxyErrorBody, extra: Record<string, 
 
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[endpoint]">) {
   const { endpoint } = await ctx.params;
-  const auth = await requireUser(request);
-  // A signed-in account without a guild ("No Guild") has Guest-equivalent access: the Character Lookup endpoints only.
-  if (!auth.response && !auth.user.guild_id && !GUEST_ENDPOINTS.has(endpoint)) {
-    return NextResponse.json({ error: { code: "NO_GUILD", message: "Join or create a guild first.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
-  }
-  if (auth.response) {
-    // No account session. The allowlisted Character Lookup endpoints are Public Access: open to
-    // any visitor — signed out with no cookie at all, or a verified GUEST — as long as the only
-    // reason auth failed was "not signed in" (401); a suspended/misconfigured account (403/503)
-    // stays denied even here.
-    if (auth.response.status !== 401 || !GUEST_ENDPOINTS.has(endpoint)) {
-      const guest = auth.response.status === 401 && verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
-      if (guest) {
-        return NextResponse.json({ error: { code: "GUEST_FORBIDDEN", message: "Guests can only use Character Lookup.", status: null } }, { status: 403, headers: { "cache-control": "no-store" } });
-      }
-      return auth.response;
-    }
-    if (!rateLimit(`public-api:${clientIp(request)}`, 90, 60 * 1000)) {
-      return NextResponse.json({ error: { code: "RATE_LIMITED", message: "Too many requests. Wait a moment and try again.", status: null } }, { status: 429, headers: { "cache-control": "no-store" } });
-    }
-  }
+  // Accounts with a guild: every endpoint. No Guild / GUEST / signed out: the lookup endpoints only (see lookup-access).
+  const denied = await lookupAccessDenied(request, endpoint);
+  if (denied) return denied;
 
   if (!isEndpointId(endpoint)) {
     return proxyError(404, {
@@ -90,6 +71,13 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/api/aion2/[e
       { proxy_error: { code: result.code, message: result.message } },
       { "x-aion2-upstream-path": upstreamPath, "x-aion2-upstream-duration-ms": String(result.durationMs) },
     );
+  }
+
+  // Every hit of a successful live search goes into the Character Directory — after the
+  // response is sent, so the search is never slowed down by it.
+  if (endpoint === "character-search" && result.status === 200) {
+    const body = result.body;
+    after(() => recordSearchHitsSafely(check.query.name, check.query.region, body));
   }
 
   // Pass the upstream body through byte-for-byte.

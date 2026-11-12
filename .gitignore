@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local data backups (contain password hashes and sessions — never commit)
 /backups/
+
+# Browser-test screenshots / results (real player data, regenerated on every run)
+/scripts/lookup-e2e/evidence/

@@ -18,6 +18,7 @@ export function CharacterHitsTable({
   actionLabel = "Select",
   testId,
   multi,
+  badge,
 }: {
   hits: CharacterHit[];
   selectedId: string | null;
@@ -26,6 +27,8 @@ export function CharacterHitsTable({
   testId?: string;
   /** Checkbox mode: `isChecked` / `isDisabled` per hit, `onToggle` instead of `onSelect`. */
   multi?: { isChecked: (hit: CharacterHit) => boolean; isDisabled: (hit: CharacterHit) => string | null; onToggle: (hit: CharacterHit) => void };
+  /** Optional marker shown after the name (e.g. "Saved" for a Character Directory row). */
+  badge?: (hit: CharacterHit) => React.ReactNode;
 }) {
   const t = useT();
   if (hits.length === 0) return <p className="px-1 py-4 text-sm text-steel">{t("No characters returned.")}</p>;
@@ -55,7 +58,7 @@ export function CharacterHitsTable({
                   sel && "bg-brand/[0.08] shadow-[inset_2px_0_0_var(--brand)]",
                 )}
               >
-                <td className="py-1.5 pr-3 pl-3 font-medium text-foreground">{h.name}</td>
+                <td className="py-1.5 pr-3 pl-3 font-medium text-foreground">{h.name}{badge?.(h)}</td>
                 <td className="px-3 py-1.5 text-right text-steel tabular-nums">{h.level ?? "—"}</td>
                 <td className="px-3 py-1.5 text-foreground/85">{h.server_name ?? "—"}</td>
                 <td className="px-3 py-1.5 font-mono text-xs text-steel">{h.server_id}</td>

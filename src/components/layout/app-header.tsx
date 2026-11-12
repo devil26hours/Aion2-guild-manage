@@ -8,6 +8,7 @@ import { MobileNav } from "./mobile-nav";
 import { UserMenu } from "./user-menu";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { FeedbackButton } from "@/components/feedback/feedback-dialog";
+import { SupportButton } from "@/components/support/support-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { ReactNode } from "react";
@@ -49,6 +50,7 @@ export function AppHeader({ mobileNavFooter }: { mobileNavFooter?: ReactNode }) 
           <LanguageSwitcher className="hidden sm:flex" />
           <NotificationBell />
           <FeedbackButton />
+          <SupportButton label="coffee" />
           <ThemeToggle />
           <UserMenu />
         </div>

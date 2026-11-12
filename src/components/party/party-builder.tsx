@@ -56,6 +56,7 @@ import { PartySlotView } from "./party-slot";
 import { PresetToolbar } from "./preset-toolbar";
 import { SuggestionsPanel } from "./suggestions-panel";
 import { useSlotDrag } from "./use-slot-drag";
+import { MemberDetailDialog } from "@/components/roster/member-detail-dialog";
 
 type Notice = { tone: "ok" | "warn" | "error"; text: string; id: number };
 
@@ -64,6 +65,9 @@ export function PartyBuilder() {
   // Real, persisted guild roster (Supabase via /api/roster).
   const rosterState = useRoster();
   const roster = useMemo(() => rosterState.members.map(toPartyMember), [rosterState.members]);
+  // Character Profile dialog (the same one Guild Members uses), opened from a slot's name.
+  const rosterById = useMemo(() => new Map(rosterState.members.map((m) => [m.id, m])), [rosterState.members]);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const rosterReady = rosterState.status === "ready";
   const { presets, activeId, status: partyStatus, error: partyError } = usePartyState();
   const partiesReady = partyStatus === "ready";
@@ -412,6 +416,7 @@ export function PartyBuilder() {
                     say(t("{name} removed from slot {slot}.", { name: name ?? t("Character"), slot: i + 1 }));
                   }}
                   onRole={(role) => setSlotRole(preset.id, i, role)}
+                  onOpenProfile={s.member_id && rosterById.has(s.member_id) ? () => setProfileId(s.member_id) : undefined}
                 />
               </li>
             ))}
@@ -533,6 +538,8 @@ export function PartyBuilder() {
       </AlertDialog>
 
       <ExportDialog open={exportOpen} onOpenChange={setExportOpen} data={exportData} />
+      {/* Same Character Profile dialog as Guild Members; closing it leaves the party, filters and view untouched. */}
+      <MemberDetailDialog member={profileId ? (rosterById.get(profileId) ?? null) : null} onClose={() => setProfileId(null)} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { getRosterMemberDetail } from "@/lib/roster/roster-store";
 import type { RosterMember } from "@/lib/roster/types";
 import { cn } from "@/lib/utils";
 import { CharacterProfileView, isInGearPin } from "./character-profile-view";
+import { isBoardFullscreenOpen, isInBoardFullscreen } from "./daevanion-board";
 
 type Detail = { status: "loading" } | { status: "ready"; raw: unknown } | { status: "error"; message: string };
 
@@ -20,9 +21,19 @@ export function MemberDetailDialog({ member, onClose }: { member: RosterMember |
   return (
     <Dialog open={member !== null} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
-        className={cn(aionDialog, "max-w-5xl gap-4")}
-        // Pinned equipment tooltips live outside the dialog DOM (portaled to <body>): interacting with them must not close it.
-        onInteractOutside={(e) => isInGearPin(e.target) && e.preventDefault()}
+        // Up to (almost) the whole viewport: the profile's two-column panels, the Daevanion board
+        // with its Active Effects column and the equipment grid get the room they are laid out for.
+        className={cn(
+          aionDialog,
+          "w-[calc(100vw-1rem)] max-w-[1720px] gap-4 p-3 sm:w-[calc(100vw-2.5rem)] sm:p-5 lg:p-6",
+          "max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2.5rem)]",
+        )}
+        // Pinned equipment tooltips and the fullscreen Daevanion board live outside the dialog DOM
+        // (portaled to <body>): interacting with them must not close it.
+        onInteractOutside={(e) => (isInGearPin(e.target) || isInBoardFullscreen(e.target)) && e.preventDefault()}
+        // Escape while the Daevanion board is fullscreen leaves fullscreen only.
+        onEscapeKeyDown={(e) => isBoardFullscreenOpen() && e.preventDefault()}
+        data-testid="member-detail-dialog"
       >
         {member && <Body key={member.id} member={member} />}
       </DialogContent>

@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { GuestNav } from "@/components/layout/guest-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { SupportButton } from "@/components/support/support-button";
 import { logout } from "@/lib/auth/client";
 import { useT } from "@/lib/i18n";
 import mainBgOld from "../../../public/image/background-pic/main_bg.png";
@@ -36,6 +37,7 @@ export function GuestShell({ children }: { children: ReactNode }) {
           <span className="ml-2 border border-gold/50 bg-gold/10 px-2 py-0.5 text-3xs font-semibold tracking-wider text-gold-text uppercase">{t("Guest")}</span>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher className="hidden sm:flex" />
+            <SupportButton label="coffee" />
             <ThemeToggle />
             <button
               type="button"
@@ -56,7 +58,7 @@ export function GuestShell({ children }: { children: ReactNode }) {
         <div aria-hidden className="h-px bg-gradient-to-r via-gold/70 from-transparent to-transparent" />
       </header>
       <main className="relative min-w-0 flex-1 px-4 pt-6 pb-8 sm:px-6 lg:px-8 lg:pt-8">{children}</main>
-      <SiteFooter support className="relative pb-4" />
+      <SiteFooter className="relative pb-4" />
     </div>
   );
 }

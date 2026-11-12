@@ -30,9 +30,11 @@ export function regionLabel(code: string): string {
 export const ENDPOINT_IDS = [
   "character-search",
   "character-profile",
+  "character-profile-by-id",
   "character-equipment-item",
   "character-daevanion",
   "character-daevanion-board",
+  "character-daevanion-board-by-id",
   "servers-roster",
 ] as const;
 export type EndpointId = (typeof ENDPOINT_IDS)[number];
@@ -59,6 +61,9 @@ export interface EndpointDef {
   summary: string;
   params: ParamDef[];
 }
+
+/** NCSOFT character ids (base64url-like, ending in "="; "%" allows an id that arrives still URL-encoded). */
+const CHARACTER_ID_PATTERN = /^[A-Za-z0-9_\-=+/%]{1,128}$/;
 
 const NAME_PATH: ParamDef = {
   name: "name",
@@ -112,6 +117,19 @@ export const ENDPOINTS: Record<EndpointId, EndpointDef> = {
       },
     ],
   },
+  "character-profile-by-id": {
+    id: "character-profile-by-id",
+    label: "Character Profile (by id)",
+    method: "GET",
+    path: "/characters/by-id",
+    summary:
+      "Same response as Character Profile, from the ids a search hit or directory entry already carries (character_id, server_id, region) — no name search upstream.",
+    params: [
+      { name: "characterId", in: "query", required: true, label: "characterId", kind: "text", placeholder: "character_id from a search hit", pattern: CHARACTER_ID_PATTERN },
+      { name: "serverId", in: "query", required: true, label: "serverId", kind: "text", placeholder: "e.g. 1101", pattern: /^\d{4}$/ },
+      { name: "region", in: "query", required: false, label: "Region", kind: "select", options: REGIONS, help: "Optional — default: the server's own region." },
+    ],
+  },
   "character-equipment-item": {
     id: "character-equipment-item",
     label: "Equipment Item Detail",
@@ -120,7 +138,7 @@ export const ENDPOINTS: Record<EndpointId, EndpointDef> = {
     summary:
       "One equipped item's detail (soulBindRate, mainStats, subStats, subSkills, magicStoneStat, godStoneStat), NCSOFT's response passed through unchanged. characterId/serverId come from a Character Profile's profile, the rest from its equipmentList entry.",
     params: [
-      { name: "characterId", in: "query", required: true, label: "characterId", kind: "text", placeholder: "profile.characterId", pattern: /^[A-Za-z0-9_\-=+/%]{1,128}$/ },
+      { name: "characterId", in: "query", required: true, label: "characterId", kind: "text", placeholder: "profile.characterId", pattern: CHARACTER_ID_PATTERN },
       { name: "serverId", in: "query", required: true, label: "serverId", kind: "text", placeholder: "e.g. 1501", pattern: /^\d{4}$/ },
       { name: "id", in: "query", required: true, label: "Item id", kind: "text", placeholder: "equipmentList[].id", pattern: /^[1-9]\d{0,11}$/ },
       { name: "slotPos", in: "query", required: true, label: "slotPos", kind: "text", placeholder: "equipmentList[].slotPos", pattern: /^[1-9]\d{0,3}$/ },
@@ -147,6 +165,20 @@ export const ENDPOINTS: Record<EndpointId, EndpointDef> = {
       NAME_PATH,
       { name: "board", in: "path", required: true, label: "Board", kind: "text", placeholder: "Board name or id, e.g. Nezekan or 31" },
       SERVER_QUERY,
+    ],
+  },
+  "character-daevanion-board-by-id": {
+    id: "character-daevanion-board-by-id",
+    label: "Daevanion Board Detail (by id)",
+    method: "GET",
+    path: "/characters/by-id/daevanion",
+    summary:
+      "One Daevanion board node by node (nodeList: row, col, type, grade, open, name, effectList; plus openStatEffectList / openSkillEffectList), NCSOFT's response unchanged. One upstream request, no name search: boardId comes from a profile's daevanion.boardList.",
+    params: [
+      { name: "characterId", in: "query", required: true, label: "characterId", kind: "text", placeholder: "profile.characterId", pattern: CHARACTER_ID_PATTERN },
+      { name: "serverId", in: "query", required: true, label: "serverId", kind: "text", placeholder: "e.g. 1101", pattern: /^\d{4}$/ },
+      { name: "boardId", in: "query", required: true, label: "boardId", kind: "text", placeholder: "daevanion.boardList[].id", pattern: /^[1-9]\d{0,5}$/ },
+      { name: "region", in: "query", required: false, label: "Region", kind: "select", options: REGIONS, help: "Optional — default: the server's own region." },
     ],
   },
   "servers-roster": {

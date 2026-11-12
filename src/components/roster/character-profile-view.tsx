@@ -12,11 +12,13 @@ import { SectionPanel } from "@/components/aion/section-panel";
 import { RoleBadge } from "@/components/party/role-badge";
 import { formatNumber } from "@/lib/format";
 import { itemDetailKey, itemDetailTarget, profileIdentity, type ItemDetailTarget } from "@/lib/roster/item-details";
-import { requestItemDetail, useItemDetail } from "@/lib/roster/item-details-store";
+import { preloadItemDetails, requestItemDetail, useItemDetail } from "@/lib/roster/item-details-store";
 import { buildProfileView, enhancementOf, gradeColor, type GearItem, type ProfileView, type StatRow } from "@/lib/roster/profile-view";
 import type { RosterMember } from "@/lib/roster/types";
 import { cn, dataText } from "@/lib/utils";
 import { ApiIcon, GradeLabel, ItemIcon } from "./api-icon";
+import { DaevanionPanel } from "./daevanion-board";
+import { StatRing } from "./stat-ring";
 import { ItemDetailSection } from "./item-detail-body";
 import { regionLabel } from "@/lib/aion2-api/endpoints";
 import { RosterClassBadge } from "./roster-class-badge";
@@ -243,6 +245,7 @@ function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: T
       ref={liRef}
       className="flex cursor-pointer items-center gap-2.5 border border-steel/10 bg-surface/50 p-1.5 transition-colors outline-none hover:border-brand-muted/50 focus-visible:border-arcane/60"
       data-slot-key={item.slotKey}
+      data-item-detail={target ? "" : undefined}
       tabIndex={0}
       aria-describedby={anchor && !pinned ? tipId : undefined}
       onMouseEnter={(e) => {
@@ -285,11 +288,12 @@ function GearTile({ item, details, pinned, onPin }: { item: GearItem; details: T
 }
 
 /**
- * Equipment section. With `lazyDetails`, hovering (or focusing) an equipped
- * item fetches that one item's detail from `GET /characters/equipment/item`
- * through the shared per-item cache in item-details-store; nothing is fetched
- * when the panel mounts. The request ids come from the same stored response
- * the tiles are built from (`profile` + the item's `equipmentList` entry).
+ * Equipment section. With `lazyDetails`, every equipped item's detail from
+ * `GET /characters/equipment/item` is preloaded in the background when the
+ * panel mounts (bounded, deduplicated, through the shared per-item cache in
+ * item-details-store), and hovering / focusing an item that isn't loaded yet
+ * fetches it at once. The request ids come from the same stored response the
+ * tiles are built from (`profile` + the item's `equipmentList` entry).
  */
 function EquipmentPanel({
   member,
@@ -312,6 +316,26 @@ function EquipmentPanel({
     const r = itemDetailTarget(identity, it, region);
     return r.ok ? { target: r.target } : { note: t("Item details cannot be loaded: the stored response has no {fields} for this item.", { fields: r.missing.join(", ") }) };
   };
+
+  // Background preload: every equipped item's detail is queued as soon as this panel
+  // has its data, so a tooltip is normally ready before the first hover. Only items
+  // actually shown here (skins have no per-item detail). Deduplicated, bounded and
+  // cached globally by item-details-store; leaving the panel drops what is still queued.
+  const preloadTargets: ItemDetailTarget[] = [];
+  if (lazyDetails) {
+    for (const g of view.equipment) {
+      for (const it of g.items) {
+        const r = itemDetailTarget(identity, it, region);
+        if (r.ok) preloadTargets.push(r.target);
+      }
+    }
+  }
+  const preloadKey = preloadTargets.map(itemDetailKey).join(",");
+  const preloadRef = useRef(preloadTargets);
+  useLayoutEffect(() => {
+    preloadRef.current = preloadTargets;
+  });
+  useEffect(() => (preloadKey ? preloadItemDetails(preloadRef.current) : undefined), [preloadKey]);
 
   const description = count
     ? lazyDetails
@@ -497,6 +521,12 @@ export function CharacterProfileView({
   const activeSkills = view?.skills.filter((s) => s.category === "Active") ?? [];
   const passiveSkills = view?.skills.filter((s) => s.category === "Passive") ?? [];
   const otherSkills = view?.skills.filter((s) => s.category !== "Active" && s.category !== "Passive") ?? [];
+  // Stats display mode: kept while this profile stays open; switching only changes the view (same data, no request).
+  const [statsMode, setStatsMode] = useState<"picture" | "text">("picture");
+  // Skills card: open by default; the header button collapses / expands it (same as before).
+  const [skillsOpen, setSkillsOpen] = useState(true);
+  const skillsBodyId = useId();
+  const daevanionSkills = useMemo(() => (view?.skills ?? []).map((s) => ({ name: s.name, icon: s.icon, category: s.category })), [view]);
 
   return (
     <div className="space-y-4" data-testid="character-profile">
@@ -558,9 +588,37 @@ export function CharacterProfileView({
       {view && has("equipment") && <EquipmentPanel key={member.id} member={member} view={view} identity={identity} lazyDetails={itemDetails} />}
 
       {view && has("stats") && (
-        <SectionPanel title={t("Stats")} icon={Swords} description={t("stat.statList · hover a stat for its effects")}>
+        <SectionPanel
+          title={t("Stats")}
+          icon={Swords}
+          description={t("stat.statList · hover a stat for its effects")}
+          action={
+            view.stats.primary.length + view.stats.deity.length > 0 ? (
+              <div role="radiogroup" aria-label={t("Stats display")} className="flex border border-steel/20 text-3xs font-semibold tracking-[0.14em] uppercase" data-testid="stats-mode">
+                {(["picture", "text"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="radio"
+                    aria-checked={statsMode === m}
+                    onClick={() => setStatsMode(m)}
+                    data-testid={`stats-mode-${m}`}
+                    className={cn(
+                      "px-2.5 py-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-arcane/40",
+                      statsMode === m ? "bg-brand/15 text-brand-strong" : "text-steel hover:text-foreground",
+                    )}
+                  >
+                    {m === "picture" ? t("Picture") : t("Text")}
+                  </button>
+                ))}
+              </div>
+            ) : undefined
+          }
+        >
           {view.stats.primary.length + view.stats.deity.length + view.stats.other.length === 0 ? (
             <p className="text-sm text-steel">{t("No stat data in the API response.")}</p>
+          ) : statsMode === "picture" && view.stats.primary.length + view.stats.deity.length > 0 ? (
+            <StatRing primary={view.stats.primary} deity={view.stats.deity} />
           ) : (
             <div className="space-y-4" data-testid="stats">
               {view.stats.primary.length > 0 && (
@@ -586,62 +644,56 @@ export function CharacterProfileView({
         </SectionPanel>
       )}
 
-      {view && has("extras") && (view.boards.length > 0 || view.pet || view.wing || view.titles) && (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {view.boards.length > 0 && (
-            <SectionPanel title={t("Daevanion")} icon={BookOpen} description={t("daevanion.boardList")}>
-              <ul className="space-y-2" data-testid="boards">
-                {view.boards.map((b) => (
-                  <li key={`${b.id}-${b.name}`} className="flex items-center gap-2.5">
-                    <ApiIcon src={b.icon} alt={b.name} size={28} />
-                    <span className="w-24 shrink-0 truncate text-sm text-foreground">{b.name}</span>
-                    <span aria-hidden className="h-2 flex-1 bg-steel/10">
-                      <span className="block h-full bg-[image:var(--bar-gradient)]" style={{ width: `${Math.min(100, b.percent ?? 0)}%` }} />
-                    </span>
-                    <span className="w-24 shrink-0 text-right text-xs text-steel tabular-nums">
-                      {b.open ?? "—"}/{b.total ?? "—"} · {b.percent ?? "—"}%
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </SectionPanel>
-          )}
-          {(view.pet || view.wing || view.wingSkin || view.titles) && (
-            <SectionPanel title={t("Companions & Titles")} icon={Feather}>
-              <ul className="space-y-2 text-sm">
-                {view.pet && (
-                  <li className="flex items-center gap-2.5">
-                    <ApiIcon src={view.pet.icon} alt={view.pet.name} size={36} />
-                    <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
-                  </li>
-                )}
-                {view.wing && (
-                  <li className="flex items-center gap-2.5">
-                    <ItemIcon item={view.wing} size={36} />
-                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wings")}</span>{view.wing.name} <GradeLabel grade={view.wing.grade} /></span>
-                  </li>
-                )}
-                {view.wingSkin && (
-                  <li className="flex items-center gap-2.5">
-                    <ApiIcon src={view.wingSkin.icon} alt={view.wingSkin.name} size={36} color={gradeColor(view.wingSkin.grade)} />
-                    <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
-                  </li>
-                )}
-                {view.titles && (
-                  <li className="flex items-center gap-2.5">
-                    <span className="flex size-9 items-center justify-center border border-brand-muted/40 text-brand"><Gem className="size-4" /></span>
-                    <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
-                  </li>
-                )}
-              </ul>
-            </SectionPanel>
-          )}
-        </div>
+      {/* Visual Daevanion boards (fetched live by id) wherever the profile can load per-item data. */}
+      {view && has("extras") && itemDetails && view.boards.length > 0 && (
+        <DaevanionPanel
+          boards={view.boards}
+          identity={identity}
+          region={identity.characterId === member.character_id && identity.serverId === member.server_id ? member.region : undefined}
+          className={member.class_name}
+          skills={daevanionSkills}
+        />
+      )}
+      {/* Profiles without live data (no per-item loading): the board list as text, a full-width card. */}
+      {view && has("extras") && !itemDetails && view.boards.length > 0 && (
+        <SectionPanel title={t("Daevanion")} icon={BookOpen} description={t("daevanion.boardList")}>
+          <ul className="space-y-2" data-testid="boards">
+            {view.boards.map((b) => (
+              <li key={`${b.id}-${b.name}`} className="flex items-center gap-2.5">
+                <ApiIcon src={b.icon} alt={b.name} size={28} />
+                <span className="w-24 shrink-0 truncate text-sm text-foreground">{b.name}</span>
+                <span aria-hidden className="h-2 flex-1 bg-steel/10">
+                  <span className="block h-full bg-[image:var(--bar-gradient)]" style={{ width: `${Math.min(100, b.percent ?? 0)}%` }} />
+                </span>
+                <span className="w-24 shrink-0 text-right text-xs text-steel tabular-nums">
+                  {b.open ?? "—"}/{b.total ?? "—"} · {b.percent ?? "—"}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </SectionPanel>
       )}
 
       {view && has("skills") && view.skills.length > 0 && (
-        <Collapsible title={t("Skills")} count={view.skills.length} testId="skills">
-          <div className="space-y-3">
+        <SectionPanel
+          title={`${t("Skills")} (${view.skills.length})`}
+          icon={Sparkles}
+          action={
+            <button
+              type="button"
+              aria-expanded={skillsOpen}
+              aria-controls={skillsBodyId}
+              onClick={() => setSkillsOpen((o) => !o)}
+              data-testid="skills-toggle"
+              className="flex items-center gap-1 text-3xs font-semibold tracking-[0.14em] text-steel uppercase outline-none hover:text-brand-strong focus-visible:ring-2 focus-visible:ring-arcane/40"
+            >
+              {skillsOpen ? t("Collapse") : t("Expand")}
+              <ChevronDown className={cn("size-3.5 transition-transform", skillsOpen && "rotate-180")} aria-hidden />
+            </button>
+          }
+          bodyClassName={cn(!skillsOpen && "hidden")}
+        >
+          <div className="space-y-3" id={skillsBodyId} data-testid="skills">
             {[
               ["Active", activeSkills],
               ["Passive", passiveSkills],
@@ -666,7 +718,7 @@ export function CharacterProfileView({
               ) : null,
             )}
           </div>
-        </Collapsible>
+        </SectionPanel>
       )}
 
       {isDev && has("raw") && raw !== undefined && (
@@ -674,6 +726,40 @@ export function CharacterProfileView({
           <p className="mb-2 text-3xs text-subtle">{t("The stored response, unmodified — for developers only.")}</p>
           <JsonViewer text={JSON.stringify(raw, null, 2)} className="max-h-80" />
         </Collapsible>
+      )}
+
+      {/* Companions & Titles: always the last card, full width like every other profile card. */}
+      {view && has("extras") && (view.pet || view.wing || view.wingSkin || view.titles) && (
+        <div data-testid="companions-titles">
+          <SectionPanel title={t("Companions & Titles")} icon={Feather}>
+            <ul className="space-y-2 text-sm">
+              {view.pet && (
+                <li className="flex items-center gap-2.5">
+                  <ApiIcon src={view.pet.icon} alt={view.pet.name} size={36} />
+                  <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Pet")}</span>{view.pet.name}{view.pet.level !== null && <span className="text-steel"> {" "}{t("· Lv.")}{" "}{view.pet.level}</span>}</span>
+                </li>
+              )}
+              {view.wing && (
+                <li className="flex items-center gap-2.5">
+                  <ItemIcon item={view.wing} size={36} />
+                  <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wings")}</span>{view.wing.name} <GradeLabel grade={view.wing.grade} /></span>
+                </li>
+              )}
+              {view.wingSkin && (
+                <li className="flex items-center gap-2.5">
+                  <ApiIcon src={view.wingSkin.icon} alt={view.wingSkin.name} size={36} color={gradeColor(view.wingSkin.grade)} />
+                  <span className="min-w-0"><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Wing appearance")}</span>{view.wingSkin.name} <GradeLabel grade={view.wingSkin.grade} /></span>
+                </li>
+              )}
+              {view.titles && (
+                <li className="flex items-center gap-2.5">
+                  <span className="flex size-9 items-center justify-center border border-brand-muted/40 text-brand"><Gem className="size-4" /></span>
+                  <span><span className="block text-4xs tracking-[0.16em] text-subtle uppercase">{t("Titles collected")}</span>{view.titles.owned ?? "—"} / {view.titles.total ?? "—"}</span>
+                </li>
+              )}
+            </ul>
+          </SectionPanel>
+        </div>
       )}
     </div>
   );

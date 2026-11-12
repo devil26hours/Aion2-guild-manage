@@ -18,7 +18,15 @@ export const GUEST_COOKIE = "aion2_guest";
 export const GUEST_TTL_SECONDS = 8 * 60 * 60;
 
 /** The AION2 proxy endpoints Character Lookup uses; nothing else is reachable by a guest. */
-export const GUEST_ENDPOINTS: ReadonlySet<string> = new Set(["servers-roster", "character-search", "character-profile", "character-equipment-item"]);
+export const GUEST_ENDPOINTS: ReadonlySet<string> = new Set([
+  "servers-roster",
+  "character-search",
+  "character-directory", // the saved Character Directory (Supabase), not an upstream call
+  "character-profile",
+  "character-profile-by-id",
+  "character-equipment-item",
+  "character-daevanion-board-by-id", // the Daevanion board shown inside the looked-up profile
+]);
 
 function signingKey(): string | null {
   const secret = process.env.SUPABASE_SECRET_KEY?.trim();

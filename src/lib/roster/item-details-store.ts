@@ -4,56 +4,38 @@ import { useCallback, useSyncExternalStore } from "react";
 import { describeStatus } from "@/lib/aion2-api/endpoints";
 import { detailString, isProxyErrorBody } from "@/lib/aion2-api/types";
 import { call } from "@/lib/client/api";
+import { createItemDetailLoader, type DetailEntry, type FetchResult } from "./item-detail-loader";
 import { itemDetailKey, itemDetailQuery, parseItemDetail, type ItemDetailTarget, type ItemDetailView } from "./item-details";
 
 /**
- * Per-item equipment details (`GET /characters/equipment/item` through the
- * /api/aion2 proxy), loaded when an equipment tile is hovered and cached in
- * memory — same useSyncExternalStore pattern as roster-store.
+ * The ONE shared cache for per-item equipment details
+ * (`GET /characters/equipment/item` through the /api/aion2 proxy), used by every
+ * equipment tooltip in the app (all of them render through
+ * CharacterProfileView's EquipmentPanel). Module-level, so it survives
+ * component unmounts and client-side navigation.
  *
  * - Keyed by itemDetailKey(): characterId, serverId, item id, slotPos,
- *   enchantLevel, exceedLevel and region. A different character, item, slot or
- *   level is a different key, so details are never shared or shown stale.
- * - Deduplicated: while a key is loading, further requests for it are no-ops
- *   and reuse the pending one. Requests are started from hover/focus events
- *   (never render), and keep running when the tooltip or panel unmounts.
- * - A loaded result is reused for READY_TTL_MS; failures are stored as errors
- *   (never as results) and the next request for that key retries.
+ *   enchantLevel, exceedLevel and region. Details are per character (Soul
+ *   Binding rolls, stones), so the same item id on two characters is two keys.
+ * - Background preload: as soon as an equipment panel has its data it calls
+ *   preloadItemDetails() for every equipped item, so tooltips are usually
+ *   ready before the first hover. At most PRELOAD_CONCURRENCY run at once,
+ *   started when the browser is idle and paused while the tab is hidden.
+ * - Hover / focus / click calls requestItemDetail(): starts immediately (it
+ *   jumps the preload queue), and is a no-op while that key is loading or fresh.
+ * - All request rules (dedup, in-flight sharing, retry, 429/503 cooldown,
+ *   cache bound) live in item-detail-loader.ts.
  */
 
-export type ItemDetailEntry =
-  | { status: "loading" }
-  | { status: "ready"; detail: ItemDetailView; loadedAt: number }
-  | { status: "error"; message: string };
+export type ItemDetailEntry = DetailEntry<ItemDetailView>;
 
-/** How long a loaded detail is reused before a hover fetches it again (the service caches 60 s on its side). */
+/** How long a loaded detail is reused before it is fetched again (the service caches 60 s on its side). */
 const READY_TTL_MS = 10 * 60_000;
-
-let entries = new Map<string, ItemDetailEntry>();
-const listeners = new Set<() => void>();
-/** Request token per key, so a request whose entry was cleared meanwhile cannot write. */
-const tokens = new Map<string, number>();
-let seq = 0;
-
-function emit() {
-  listeners.forEach((l) => l());
-}
-
-function write(key: string, entry: ItemDetailEntry) {
-  entries = new Map(entries).set(key, entry);
-  emit();
-}
-
-function subscribe(l: () => void) {
-  listeners.add(l);
-  return () => listeners.delete(l);
-}
-
-/** The cached entry for one item, or null (not requested yet / no valid target). */
-export function useItemDetail(key: string | null): ItemDetailEntry | null {
-  const get = useCallback(() => (key ? (entries.get(key) ?? null) : null), [key]);
-  return useSyncExternalStore(subscribe, get, () => null);
-}
+/**
+ * Background requests at once, per browser tab. The Python service spaces its
+ * own NCSOFT calls 1 s apart, so more parallelism would only queue there.
+ */
+const PRELOAD_CONCURRENCY = 2;
 
 function errorMessage(status: number, body: unknown): string {
   if (isProxyErrorBody(body)) return body.proxy_error.message;
@@ -63,35 +45,61 @@ function errorMessage(status: number, body: unknown): string {
   return detail ? `${label}: ${detail}` : label;
 }
 
+async function fetchOne(target: ItemDetailTarget): Promise<FetchResult<ItemDetailView>> {
+  // Never redirect to /login from a background request: a public visitor has no session.
+  const r = await call<unknown>(`/api/aion2/character-equipment-item?${itemDetailQuery(target)}`, undefined, { redirectOn401: false });
+  if (!r.ok) {
+    const status = r.error.code === "NETWORK" ? 0 : r.error.httpStatus;
+    const message = r.error.code === "NETWORK" ? r.error.message : errorMessage(r.error.httpStatus, r.data);
+    return { ok: false, message, status };
+  }
+  const detail = parseItemDetail(r.data);
+  return detail ? { ok: true, detail } : { ok: false, message: "The AION2 API returned an unexpected response.", status: 200 };
+}
+
+const hidden = () => typeof document !== "undefined" && document.visibilityState === "hidden";
+
+const loader = createItemDetailLoader<ItemDetailTarget, ItemDetailView>({
+  keyOf: itemDetailKey,
+  fetchOne,
+  concurrency: PRELOAD_CONCURRENCY,
+  ttlMs: READY_TTL_MS,
+  isPaused: hidden,
+  scheduleIdle: (fn) => {
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) window.requestIdleCallback(fn, { timeout: 1500 });
+    else setTimeout(fn, 50);
+  },
+});
+
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (!hidden()) loader.resume();
+  });
+  // Test / diagnostics hook: request counters only, no data.
+  (window as unknown as { __aion2ItemDetailStats?: () => unknown }).__aion2ItemDetailStats = () => loader.stats();
+}
+
+/** The cached entry for one item, or null (not requested yet / only queued / no valid target). */
+export function useItemDetail(key: string | null): ItemDetailEntry | null {
+  const get = useCallback(() => (key ? loader.get(key) : null), [key]);
+  return useSyncExternalStore(loader.subscribe, get, () => null);
+}
+
 /**
- * Load one item's detail unless it is already loading or freshly cached.
- * Called from hover/focus handlers; safe to call repeatedly.
+ * Load one item's detail now unless it is already loading or freshly cached.
+ * Called from hover/focus/click handlers; safe to call repeatedly.
  */
 export function requestItemDetail(target: ItemDetailTarget): void {
-  const key = itemDetailKey(target);
-  const cur = entries.get(key);
-  if (cur?.status === "loading") return;
-  if (cur?.status === "ready" && Date.now() - cur.loadedAt < READY_TTL_MS) return;
+  loader.request(target);
+}
 
-  const token = ++seq;
-  tokens.set(key, token);
-  write(key, { status: "loading" });
-
-  void call<unknown>(`/api/aion2/character-equipment-item?${itemDetailQuery(target)}`).then((r) => {
-    if (tokens.get(key) !== token) return;
-    tokens.delete(key);
-    if (!r.ok) {
-      const message = r.error.code === "NETWORK" ? r.error.message : errorMessage(r.error.httpStatus, r.data);
-      write(key, { status: "error", message });
-      return;
-    }
-    const detail = parseItemDetail(r.data);
-    if (!detail) {
-      write(key, { status: "error", message: "The AION2 API returned an unexpected response." });
-      return;
-    }
-    write(key, { status: "ready", detail, loadedAt: Date.now() });
-  });
+/**
+ * Queue background loads for the given equipped items (only those not cached,
+ * loading or queued). Returns a release function for the effect cleanup: items
+ * still waiting in the queue are dropped, running requests finish and are cached.
+ */
+export function preloadItemDetails(targets: readonly ItemDetailTarget[]): () => void {
+  return loader.preload(targets);
 }
 
 /**
@@ -102,16 +110,5 @@ export function clearItemDetails(rosterId: string) {
   const [, serverId, ...rest] = rosterId.split(":");
   const characterId = rest.join(":");
   if (!serverId || !characterId) return;
-  const prefix = `${characterId}|${serverId}|`;
-  let changed = false;
-  const next = new Map(entries);
-  for (const key of entries.keys()) {
-    if (!key.startsWith(prefix)) continue;
-    next.delete(key);
-    tokens.delete(key);
-    changed = true;
-  }
-  if (!changed) return;
-  entries = next;
-  emit();
+  loader.clearPrefix(`${characterId}|${serverId}|`);
 }

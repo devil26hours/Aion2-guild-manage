@@ -29,6 +29,8 @@ interface Props {
   /** Drag-and-drop: pointer handler for the card body, and this slot's role in the current drag. */
   onDragPointerDown?: (e: React.PointerEvent) => void;
   dragRole?: "source" | "swap" | "move";
+  /** Opens the shared Character Profile dialog for this slot's member (the name becomes a button). */
+  onOpenProfile?: () => void;
 }
 
 /** Highlight + hint shown on the dragged card and on the slot it would land on. */
@@ -73,7 +75,7 @@ function RoleSelect({ index, value, onRole, disabled }: { index: number; value: 
 const iconBtn =
   "flex size-8 shrink-0 items-center justify-center border border-steel/15 text-steel transition-colors outline-none hover:border-brand-muted/60 hover:text-brand-strong focus-visible:border-arcane/60";
 
-export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], view, onAssign, onRemove, onRole, readOnly = false, onDragPointerDown, dragRole }: Props) {
+export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], view, onAssign, onRemove, onRole, readOnly = false, onDragPointerDown, dragRole, onOpenProfile }: Props) {
   const t = useT();
   const missing = !!slot.member_id && !member;
   const roleColor = slot.role ? ROLE_COLORS[slot.role] : null;
@@ -144,7 +146,20 @@ export function PartySlotView({ index, slot, member, duplicate, elsewhere = [], 
           {member ? (
             <>
               <p className="truncate font-medium text-foreground" title={member.server_name ? `${name} · ${member.server_name}` : name}>
-                {name}
+                {onOpenProfile ? (
+                  // A button (not draggable: use-slot-drag ignores interactive elements).
+                  <button
+                    type="button"
+                    onClick={onOpenProfile}
+                    data-testid="slot-open-profile"
+                    aria-label={t("Open character profile of {name}", { name })}
+                    className="max-w-full truncate text-left underline-offset-2 outline-none hover:text-brand-strong hover:underline focus-visible:underline focus-visible:ring-2 focus-visible:ring-arcane/40"
+                  >
+                    {name}
+                  </button>
+                ) : (
+                  name
+                )}
               </p>
               {member.comment && (
                 <p
