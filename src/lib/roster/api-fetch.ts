@@ -18,14 +18,25 @@ export type ProfileFetch =
   | { ok: false; status: number; message: string; upstreamStatus: number | null };
 
 export async function fetchCharacterProfile(name: string, serverId: string): Promise<ProfileFetch> {
-  const check = validateRequest("character-profile", { name, server: serverId });
+  return fetchValidated(validateRequest("character-profile", { name, server: serverId }));
+}
+
+/**
+ * Same response handling, but straight by ids (`/characters/by-id`): no upstream name
+ * search, and still correct after a rename. Used by the background refresh.
+ */
+export async function fetchCharacterProfileById(characterId: string, serverId: string, region: string, timeoutMs?: number): Promise<ProfileFetch> {
+  return fetchValidated(validateRequest("character-profile-by-id", { characterId, serverId, region }), timeoutMs);
+}
+
+async function fetchValidated(check: ReturnType<typeof validateRequest>, timeoutMs?: number): Promise<ProfileFetch> {
   if (!check.ok) {
     return { ok: false, status: 400, upstreamStatus: null, message: check.errors.map((e) => e.message).join(" ") };
   }
   const base = getBaseUrl();
   if (!base) return { ok: false, status: 500, upstreamStatus: null, message: "AION2_API_BASE_URL is not configured." };
 
-  const res = await fetchUpstream(base, check.path, check.query);
+  const res = await fetchUpstream(base, check.path, check.query, timeoutMs);
   if (res.kind === "error") {
     return { ok: false, status: res.code === "TIMEOUT" ? 504 : 502, upstreamStatus: null, message: res.message };
   }

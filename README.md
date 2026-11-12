@@ -97,6 +97,26 @@ The AION2 API backend is maintained separately:
 
 Refer to the backend repository for installation and API configuration instructions.
 
+## Background character refresh (every 30 minutes)
+
+Stored characters that are on a guild roster or owned by an account are re-fetched in the
+background (up to 60 per run, one at a time, ~8 minutes at most), without anyone opening the site.
+The work happens in `POST /api/cron/refresh-characters` on the web service; a Railway Cron service
+only calls it and exits.
+
+1. Run `supabase/migrations/20261113000015_background_character_refresh.sql` in the Supabase SQL Editor.
+2. Web service → Variables: `CRON_SECRET` = a long random value (`openssl rand -hex 32`). Without it the route answers 503.
+3. New Railway service from this same repository (the cron service):
+   - Settings → Deploy → **Cron Schedule**: `*/30 * * * *`
+   - Start command: `node scripts/cron/refresh-characters.mjs` (no build step needed; Node 18+)
+   - Variables: `CRON_SECRET` (same value) and `CRON_TARGET_URL` = the web service's private address,
+     e.g. `http://${{web.RAILWAY_PRIVATE_DOMAIN}}:${{web.PORT}}`
+4. Each run is logged in the `character_refresh_runs` table (status, counts, duration).
+
+Overlapping runs are refused by a database run lock (and Railway skips a schedule while the previous
+execution is still running). Keep the Python API at a single replica: its 1 request/second throttle is
+per process.
+
 ## Development
 
 Run the development server:

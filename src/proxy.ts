@@ -42,6 +42,8 @@ const PUBLIC_API = new Set([
   "/api/auth/guest",
   // Feedback may be sent signed out; the handler validates, rate-limits and reads the session itself.
   "/api/feedback",
+  // Background refresh (Railway Cron): no session; the handler requires the CRON_SECRET bearer token.
+  "/api/cron/refresh-characters",
 ]);
 const SETUP = "/guild-setup";
 const LOOKUP = "/character-lookup";
