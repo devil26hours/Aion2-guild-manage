@@ -2,16 +2,20 @@
 
 
 import { useT } from "@/lib/i18n";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Database, FlaskConical, History, Loader2, RotateCcw } from "lucide-react";
+import { ChevronRight, Database, FlaskConical, History, Loader2, RotateCcw, Search, SearchX } from "lucide-react";
 import { RelativeTime } from "@/components/aion/relative-time";
 import { SectionPanel } from "@/components/aion/section-panel";
-import { aionButtonSecondary } from "@/components/aion/styles";
+import { aionButtonSecondary, aionField } from "@/components/aion/styles";
 import { HistoryList } from "@/components/history/history-list";
 import { PageHeader } from "@/components/layout/page-header";
 import { RoleBadge } from "@/components/party/role-badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
+import { PARTY_ROLES, type PartyRole } from "@/lib/party/types";
 import { formatNumber } from "@/lib/format";
 import { loadRoster, useRoster } from "@/lib/roster/roster-store";
 import { cn } from "@/lib/utils";
@@ -61,10 +65,71 @@ export function HistoryHub() {
   );
 }
 
+type RosterSort = "latest" | "oldest" | "name" | "cp_desc" | "cp_asc" | "il_desc" | "il_asc" | "lv_desc" | "lv_asc";
+
+const SORT_LABELS: Record<RosterSort, string> = {
+  latest: "Latest update",
+  oldest: "Least recently updated",
+  name: "Name: A → Z",
+  cp_desc: "CP: High → Low",
+  cp_asc: "CP: Low → High",
+  il_desc: "Item Level: High → Low",
+  il_asc: "Item Level: Low → High",
+  lv_desc: "Level: High → Low",
+  lv_asc: "Level: Low → High",
+};
+
+const labelClass = "text-3xs font-semibold tracking-[0.18em] text-subtle uppercase";
+/** Missing values always sort last, whatever the direction. */
+const desc = (a: number | null, b: number | null) => (b ?? -Infinity) - (a ?? -Infinity);
+const asc = (a: number | null, b: number | null) => (a ?? Infinity) - (b ?? Infinity);
+
 function RosterHistoryList() {
   const t = useT();
   const { status, members, error } = useRoster();
-  const rows = [...members].sort((a, b) => b.api_updated_at.localeCompare(a.api_updated_at));
+  const [query, setQuery] = useState("");
+  const [cls, setCls] = useState("all");
+  const [server, setServer] = useState("all");
+  const [role, setRole] = useState<PartyRole | "all" | "none">("all");
+  const [sort, setSort] = useState<RosterSort>("latest");
+
+  const classes = useMemo(() => [...new Set(members.map((m) => m.class_name).filter((c): c is string => !!c))].sort(), [members]);
+  const servers = useMemo(() => [...new Set(members.map((m) => m.server_name).filter((c): c is string => !!c))].sort(), [members]);
+
+  const rows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return members
+      .filter(
+        (m) =>
+          (!q || m.character_name.toLowerCase().includes(q)) &&
+          (cls === "all" || m.class_name === cls) &&
+          (server === "all" || m.server_name === server) &&
+          (role === "all" || (role === "none" ? m.role === null : m.role === role)),
+      )
+      .sort((a, b) => {
+        const byName = a.character_name.localeCompare(b.character_name);
+        switch (sort) {
+          case "latest": return b.api_updated_at.localeCompare(a.api_updated_at) || byName;
+          case "oldest": return a.api_updated_at.localeCompare(b.api_updated_at) || byName;
+          case "name": return byName;
+          case "cp_desc": return desc(a.combat_power, b.combat_power) || byName;
+          case "cp_asc": return asc(a.combat_power, b.combat_power) || byName;
+          case "il_desc": return desc(a.item_level, b.item_level) || byName;
+          case "il_asc": return asc(a.item_level, b.item_level) || byName;
+          case "lv_desc": return desc(a.level, b.level) || byName;
+          case "lv_asc": return asc(a.level, b.level) || byName;
+        }
+      });
+  }, [members, query, cls, server, role, sort]);
+
+  const active = query !== "" || cls !== "all" || server !== "all" || role !== "all" || sort !== "latest";
+  const reset = () => {
+    setQuery("");
+    setCls("all");
+    setServer("all");
+    setRole("all");
+    setSort("latest");
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -86,6 +151,54 @@ function RosterHistoryList() {
           <p className="px-4 py-10 text-center text-sm text-steel">
             {t("The roster is empty.")}{" "}<Link href="/members" className="text-brand underline-offset-4 hover:underline">{t("Add members")}</Link> {" "}{t("to start tracking history.")}</p>
         ) : (
+          <>
+          <div className="space-y-3 border-b border-steel/10 p-4 sm:p-5">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-[minmax(12rem,1.6fr)_1fr_1fr_1fr_1.3fr]">
+              <div className="col-span-2 space-y-1.5 md:col-span-4 xl:col-span-1">
+                <Label htmlFor="rh-query" className={labelClass}>{t("Search")}</Label>
+                <div className="relative">
+                  <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-subtle" />
+                  <Input id="rh-query" type="search" placeholder={t("Character name…")} value={query} onChange={(e) => setQuery(e.target.value)} className={cn(aionField, "pl-8")} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rh-class" className={labelClass}>{t("Class")}</Label>
+                <NativeSelect id="rh-class" value={cls} onChange={(e) => setCls(e.target.value)} className={aionField}>
+                  <option value="all">{t("All classes")}</option>
+                  {classes.map((c) => <option key={c} value={c}>{t(c)}</option>)}
+                </NativeSelect>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rh-server" className={labelClass}>{t("Server")}</Label>
+                <NativeSelect id="rh-server" value={server} onChange={(e) => setServer(e.target.value)} className={aionField}>
+                  <option value="all">{t("All servers")}</option>
+                  {servers.map((s) => <option key={s} value={s}>{s}</option>)}
+                </NativeSelect>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rh-role" className={labelClass}>{t("Role")}</Label>
+                <NativeSelect id="rh-role" value={role} onChange={(e) => setRole(e.target.value as PartyRole | "all" | "none")} className={aionField}>
+                  <option value="all">{t("All roles")}</option>
+                  {PARTY_ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                  <option value="none">{t("No role")}</option>
+                </NativeSelect>
+              </div>
+              <div className="col-span-2 space-y-1.5 md:col-span-2 xl:col-span-1">
+                <Label htmlFor="rh-sort" className={labelClass}>{t("Sort by")}</Label>
+                <NativeSelect id="rh-sort" value={sort} onChange={(e) => setSort(e.target.value as RosterSort)} className={aionField}>
+                  {(Object.keys(SORT_LABELS) as RosterSort[]).map((k) => <option key={k} value={k}>{t(SORT_LABELS[k])}</option>)}
+                </NativeSelect>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-steel" aria-live="polite">
+                {t("Showing")} <span className="font-semibold text-foreground tabular-nums">{rows.length}</span> {t("of")} <span className="tabular-nums">{members.length}</span> {t("characters")}
+              </p>
+              <Button type="button" variant="outline" onClick={reset} disabled={!active} className={cn(aionButtonSecondary, "h-8")}>
+                <RotateCcw className="size-3.5" /> {t("Reset Filters")}
+              </Button>
+            </div>
+          </div>
           <div className="relative overflow-x-auto">
             <table className="w-full min-w-[52rem] text-sm" data-testid="roster-history-list">
               <thead>
@@ -101,6 +214,14 @@ function RosterHistoryList() {
                 </tr>
               </thead>
               <tbody>
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-14 text-center">
+                      <SearchX className="mx-auto size-7 text-subtle" />
+                      <p className="mt-3 text-sm text-foreground">{t("No characters match these filters.")}</p>
+                    </td>
+                  </tr>
+                )}
                 {rows.map((m) => {
                   const href = `/character-history/${encodeURIComponent(m.id)}`;
                   return (
@@ -126,6 +247,7 @@ function RosterHistoryList() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </SectionPanel>
     </div>

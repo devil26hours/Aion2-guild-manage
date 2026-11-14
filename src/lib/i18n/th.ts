@@ -1290,4 +1290,7 @@ export const TH: Record<string, string> = {
   "Already have an account? Log in": "มีบัญชีอยู่แล้ว? เข้าสู่ระบบ",
   "Community & Support": "ชุมชนและการสนับสนุน",
   "ChumChon AION2 is built and kept running by the community.": "ChumChon AION2 สร้างและดูแลให้ทำงานต่อไปได้ด้วยชุมชนผู้เล่น",
+  "Latest update": "อัปเดตล่าสุด",
+  characters: "ตัวละคร",
+  "No characters match these filters.": "ไม่พบตัวละครที่ตรงกับตัวกรอง",
 };
